@@ -1,11 +1,17 @@
 [project]
-name = "deadlock-maxing"
-version = "0.1.0"
-description = "Claude Code skill: find, explain and translate Deadlock builds into in-game build codes"
+name = "deadlockmax"
+version = "0.2.0"
+description = "Claude Code plugin for Deadlock: game knowledge, hero pages, build codes, measured statistics, match analysis"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.14"
+# The core (pages, build codes, knowledge) uses the standard library only.
 dependencies = []
+
+[project.optional-dependencies]
+# Measured statistics (scripts/lake.py, scripts/profiles.py): DuckDB reads the public data lake.
+# Run them with `uv run --extra stats python -I scripts/<script>.py`.
+stats = ["duckdb>=1.4"]
 
 [tool.ruff]
 line-length = 140
