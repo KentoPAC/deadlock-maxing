@@ -606,6 +606,76 @@ footer::before{content:"";display:block;height:5px;margin-bottom:var(--space-sm)
 .tldr-btn:hover{animation:jitterHot 1.3s steps(1,end) infinite}
 .tldr-btn:active{animation:none;transform:rotate(-1.5deg) translate(3px,3px)}
 @media (prefers-reduced-motion:reduce){.tags li,.copy,.tldr-btn,.copy:hover,.tldr-btn:hover{animation:none!important}}
+/* ---- data view: measured profile ---- */
+.dv-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-sm);margin-top:var(--space-sm)}
+.dv-seg{display:inline-flex;border:1px solid var(--color-rule);border-radius:var(--radius-sm);overflow:hidden}
+.dv-seg button{font:600 var(--text-sm)/1 var(--font-body);color:var(--color-muted);background:none;border:0;padding:8px 14px;cursor:pointer;transition:background var(--dur-micro),color var(--dur-micro)}
+.dv-seg button[aria-pressed=true]{background:var(--color-accent);color:var(--color-accent-ink)}
+.dv-seg button:focus-visible{outline:2px solid var(--color-focus);outline-offset:-2px}
+.dv-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--space-xs);margin-top:var(--space-md)}
+.dv-tile{position:relative;background:var(--color-paper-2);border:1px solid var(--color-rule);border-radius:var(--radius-sm);padding:var(--space-sm);display:grid;gap:6px;min-width:0;overflow:hidden}
+.dv-tile::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--tone,var(--color-rule))}
+.dv-tile__k{font:700 var(--text-xs)/1.2 var(--font-display);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral)}
+.dv-tile__v{font:800 clamp(1.5rem,1.2rem + 1vw,2.1rem)/1 var(--font-display);letter-spacing:.02em;color:var(--color-ink);font-variant-numeric:tabular-nums}
+.dv-tile__s{font-size:var(--text-sm);color:var(--color-muted);line-height:1.35}
+.dv-tile svg{display:block;width:100%;height:auto}
+.dv-badge{justify-self:start;font:700 var(--text-xs)/1 var(--font-display);letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border-radius:2px;background:var(--color-accent);color:var(--color-accent-ink)}
+.dv-chart{position:relative;margin-top:var(--space-sm);background:var(--color-paper-2);border:1px solid var(--color-rule);border-radius:var(--radius-sm);padding:var(--space-xs) var(--space-xs) 4px;touch-action:pan-y}
+.dv-chart svg{display:block;width:100%;height:auto;overflow:visible}
+.dv-chart text{fill:var(--color-neutral);font:500 11px/1 var(--font-body);font-variant-numeric:tabular-nums}
+.dv-chart .lbl-strong{fill:var(--color-ink);font-weight:700}
+.dv-chart .lbl-acc{fill:var(--color-accent-hi);font:700 11px/1 var(--font-display);letter-spacing:.2em}
+.dv-tip{position:absolute;z-index:5;pointer-events:none;min-width:190px;background:var(--color-shade);border:1px solid var(--color-accent-dim);border-radius:var(--radius-sm);padding:8px 10px;font-size:var(--text-sm);color:var(--color-ink);box-shadow:0 10px 30px oklch(0% 0 0 / .5)}
+.dv-tip b{display:block;font:700 var(--text-sm)/1.2 var(--font-display);letter-spacing:.06em;margin-bottom:4px}
+.dv-tip div{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.dv-tip i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.dv-tip small{display:block;color:var(--color-neutral);margin-top:4px;line-height:1.3}
+.dv-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:6px;font-size:var(--text-xs);color:var(--color-muted)}
+.dv-legend span{display:inline-flex;align-items:center;gap:6px}
+.dv-legend i{display:inline-block;width:16px;height:3px;border-radius:2px;background:var(--c)}
+.dv-legend i.dash{background:repeating-linear-gradient(90deg,var(--c) 0 4px,transparent 4px 7px)}
+.dv-legend i.band{height:10px;width:14px;background:var(--c);opacity:.35}
+.dv-strip{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:3px;margin-top:var(--space-sm)}
+.dv-cell{border-radius:3px;padding:10px 6px;text-align:center;background:color-mix(in oklch,var(--c) var(--a),var(--color-paper-2));border:1px solid var(--color-rule)}
+.dv-cell b{display:block;font:800 var(--text-md)/1 var(--font-display);color:var(--color-ink);font-variant-numeric:tabular-nums}
+.dv-cell span{display:block;margin-top:6px;font-size:var(--text-xs);color:var(--color-muted)}
+.dv-cell em{display:block;margin-top:4px;font:700 10px/1.2 var(--font-display);letter-spacing:.1em;color:var(--color-accent-hi);font-style:normal;min-height:12px}
+.dv-rows{display:grid;gap:var(--space-xs);margin-top:var(--space-sm)}
+.dv-row{display:grid;grid-template-columns:76px minmax(0,1fr) minmax(170px,300px);gap:var(--space-sm);align-items:center;background:var(--color-paper-2);border:1px solid var(--color-rule);border-radius:var(--radius-sm);padding:var(--space-xs) var(--space-sm)}
+.dv-row.weak{opacity:.62}
+.dv-row h4{margin:0;font:700 var(--text-base)/1.2 var(--font-body);color:var(--color-ink);display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
+.dv-row h4 small{font-weight:500;color:var(--color-neutral);font-size:var(--text-sm)}
+.dv-row p{margin:4px 0 0;font-size:var(--text-sm);color:var(--color-muted)}
+.dv-pill{font:700 var(--text-xs)/1 var(--font-body);padding:3px 7px;border-radius:20px;background:var(--color-paper-3);color:var(--color-muted)}
+.dv-pill.ok{background:color-mix(in oklch,var(--color-accent) 22%,transparent);color:var(--color-accent-hi)}
+.dv-vs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center;font-size:var(--text-xs);color:var(--color-neutral)}
+.dv-vs span{display:inline-flex;align-items:center;gap:5px;background:var(--color-paper-3);border-radius:20px;padding:2px 8px 2px 2px;color:var(--color-ink)}
+.dv-vs img{width:20px;height:20px;border-radius:50%;object-fit:cover}
+.dv-row .mod{width:70px}
+.dv-row__bar{display:grid;gap:6px}
+.dv-row__bar b{font:800 var(--text-md)/1 var(--font-display);color:var(--color-muted);font-variant-numeric:tabular-nums;text-align:right}
+.dv-row__bar b.up{color:var(--color-accent-hi)}
+.dvb{position:relative;height:10px;border-radius:5px;background:var(--color-paper-3)}
+.dvb__f{position:absolute;top:0;bottom:0;border-radius:5px}
+.dvb__z{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--color-rule)}
+.dvb__e{position:absolute;top:50%;height:2px;margin-top:-1px;background:var(--color-ink);opacity:.55}
+.dvb__e::before,.dvb__e::after{content:"";position:absolute;top:-4px;width:2px;height:10px;background:inherit}
+.dvb__e::before{left:0}.dvb__e::after{right:0}
+.dv-tile .dvb{margin-top:2px}
+.dv-farm{display:grid;gap:10px;margin-top:var(--space-sm)}
+.dv-farm__r{display:grid;grid-template-columns:150px minmax(0,1fr) 92px;gap:var(--space-sm);align-items:center;font-size:var(--text-sm)}
+.dv-farm__r .bar{height:12px}
+.dv-farm__r .bar.avg{height:6px;opacity:.55;margin-top:4px}
+.dv-farm__r b{font-weight:600;color:var(--color-ink)}
+.dv-farm__r .num{text-align:right;color:var(--color-muted);font-variant-numeric:tabular-nums;line-height:1.3}
+.dv-keys{display:grid;gap:var(--space-xs);margin-top:var(--space-sm)}
+.dv-key{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(0,1.6fr);gap:var(--space-sm);align-items:center;font-size:var(--text-sm)}
+.dv-key b{color:var(--color-ink);font-weight:600}
+.dv-key small{display:block;color:var(--color-neutral)}
+.dv-note{margin-top:var(--space-lg);font-size:var(--text-xs);color:var(--color-neutral);line-height:1.5;max-width:75ch}
+.dv-empty{margin-top:var(--space-sm);color:var(--color-muted);font-size:var(--text-sm)}
+@media (max-width:640px){.dv-row{grid-template-columns:64px minmax(0,1fr)}.dv-row__bar{grid-column:1/-1}.dv-row__bar b{text-align:left}.dv-farm__r{grid-template-columns:1fr;gap:4px}.dv-farm__r .num{text-align:left}.dv-key{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.dv-seg button{transition:none}}
 </style>
 </head>
 <body>
@@ -702,7 +772,8 @@ function renderFresh(){const f=pageFresh(),el=$('fresh');el.dataset.lvl=f.lvl;
 /* ---- rail ---- */
 const HASPLAN=!!(D.plan||D.baseline||(D.guides&&D.guides.guides&&D.guides.guides.length));
 const HASVS=!!((D.plan||{}).vs||(D.plan||{}).weaknesses||D.matchups||(D.videoTips||[]).length);
-const views=['tldr'].concat(D.builds.map(b=>b.key),HASPLAN?['plan']:[],HASVS?['vs']:[],D.builds.length>1?['compare']:[]);
+const HASDATA=!!(D.profile&&D.profile.ranked);
+const views=['tldr'].concat(D.builds.map(b=>b.key),HASPLAN?['plan']:[],HASDATA?['data']:[],HASVS?['vs']:[],D.builds.length>1?['compare']:[]);
 function renderRail(){$('list').innerHTML=D.builds.map(b=>{const f=buildFresh(b),t=wrTone(b.winrate);
   const sub=[b.rank?rankImg(b,'rank--sm')+esc(b.rank):'',b.winrate!=null?`<span class="wr-${t}">${L('wr.short',{n:b.winrate})}</span>`:b.favorites?L('fav.short',{n:b.favorites}):''].filter(Boolean).join(' · ');
   return `<li><button class="pick cham" data-v="${esc(b.key)}">
@@ -710,6 +781,7 @@ function renderRail(){$('list').innerHTML=D.builds.map(b=>{const f=buildFresh(b)
   <span class="pick__sub">${sub}</span></button></li>`}).join('')
  +(HASPLAN?`<li><button class="pick pick--compare cham" data-v="plan"><span class="pick__src">${L('rail.plan_src')}</span>
   <span class="pick__who">${L('rail.plan')}</span><span class="pick__sub">${L('rail.plan_sub')}</span></button></li>`:'')
+ +(HASDATA?`<li><button class="pick pick--compare cham" data-v="data"><span class="pick__src">${L('rail.data_src')}</span><span class="pick__who">${L('rail.data')}</span><span class="pick__sub">${L('rail.data_sub')}</span></button></li>`:'')
  +(HASVS?`<li><button class="pick pick--compare cham" data-v="vs"><span class="pick__src">${L('rail.vs_src')}</span><span class="pick__who">${L('rail.vs')}</span><span class="pick__sub">${L('rail.vs_sub')}</span></button></li>`:'')
  +(D.builds.length>1?`<li><button class="pick pick--compare cham" data-v="compare"><span class="pick__src">${L('rail.cmp_src')}</span>
   <span class="pick__who">${L('rail.cmp')}</span><span class="pick__sub">${L('rail.cmp_sub')}</span></button></li>`:'');}
@@ -975,9 +1047,123 @@ function comparePanel(){
    <p class="legend">${L(common>1?'cmp.common_many':'cmp.common_one',{n:common,total:N})} ${L('cmp.legend')}</p>
    <div class="cmp-wrap"><table class="cmp"><thead>${head}</thead><tbody>${style}${body}</tbody></table></div></article>`}
 
+/* ---- data view: measured profile (profiles.py) ---- */
+let DT=(()=>{try{return localStorage.getItem('dl-tier')||'ranked'}catch(e){return'ranked'}})();
+const nf=(v,d=0)=>Number(v).toLocaleString(LOC,{minimumFractionDigits:d,maximumFractionDigits:d});
+const sg=(v,d=2)=>(v>=0?'+':'−')+nf(Math.abs(v),d);
+const kS=v=>nf(v/1000,v%1000?1:0)+'K';
+const dG=()=>D.profile[DT]||D.profile.ranked,dO=()=>D.profile[DT==='ranked'?'top':'ranked'];
+function minAt(nwq,nw){const p=[[0,0]].concat(Object.entries(nwq||{}).map(([m,v])=>[+m,v[1]]).sort((a,b)=>a[0]-b[0]));
+  for(let i=1;i<p.length;i++)if(nw<=p[i][1]&&p[i][1]>p[i-1][1])return p[i-1][0]+(p[i][0]-p[i-1][0])*(nw-p[i-1][1])/(p[i][1]-p[i-1][1]);return null}
+// diverging bar (CSS): value v on a symmetric scale [-m, m], optional ±2 standard error whisker
+function dvBar(v,m,se,tone){const pc=t=>50+Math.max(-1,Math.min(1,t/m))*49,col=tone||(v>=0?'var(--color-accent)':'var(--color-neutral)');
+  const a=pc(Math.min(0,v)),b=pc(Math.max(0,v));
+  return `<div class="dvb" aria-hidden="true"><span class="dvb__f" style="left:${a}%;width:${Math.max(.8,b-a)}%;background:${col}"></span>${se?`<span class="dvb__e" style="left:${pc(v-2*se)}%;width:${pc(v+2*se)-pc(v-2*se)}%"></span>`:''}<span class="dvb__z"></span></div>`}
+function dvTiles(){const g=dG(),o=dO(),P=D.profile,ln=g.lane||{},sp=g.spike||{},tb=P.time_bins;
+  const wr=g.wr.wr*100,wrBar=`<svg viewBox="0 0 200 14" aria-hidden="true"><rect y="4" width="200" height="6" rx="3" fill="var(--color-paper-3)"/><line x1="100" x2="100" y1="0" y2="14" stroke="var(--color-rule)" stroke-width="2"/><circle cx="${100+(wr-50)*10}" cy="7" r="6" fill="${wr>=50?'var(--color-accent)':'var(--color-neutral)'}" stroke="var(--color-paper-2)" stroke-width="2"/></svg>`;
+  const verdict=ln.kd10>=.2?'data.lane_win':ln.kd10<=-.2?'data.lane_lose':'data.lane_even';
+  const type=sp.flat||!sp.from?'':sp.to<=20000?'data.type_early':sp.from>=30000?'data.type_late':'data.type_mid';
+  const ti=g.timing.map((v,i)=>[v,i]).filter(x=>x[0]!=null).sort((a,b)=>b[0]-a[0])[0];
+  const fed=g.fed,fm=Math.max(.15,...fed.filter(v=>v!=null).map(Math.abs)),fedSvg=`<svg viewBox="0 0 200 46" aria-hidden="true">${fed.map((v,i)=>{const x=10+i*66,h=v==null?0:Math.abs(v)/fm*18;return `<rect x="${x}" y="${v>=0?20-h:20}" width="48" height="${Math.max(1,h)}" rx="2" fill="${v==null?'var(--color-rule)':v>=0?'var(--color-accent)':'var(--color-neutral)'}"/><text x="${x+24}" y="44" text-anchor="middle" style="fill:var(--color-neutral);font:600 9px var(--font-body)">${L(['data.ph_fed1','data.ph_fed2','data.ph_fed3'][i])}</text>`}).join('')}<line x1="0" x2="200" y1="20" y2="20" stroke="var(--color-rule)"/></svg>`;
+  const ah=g.antiheal;
+  const tile=(k,v,s,extra,tone)=>`<div class="dv-tile" style="--tone:${tone||'var(--color-rule)'}"><span class="dv-tile__k">${k}</span><span class="dv-tile__v">${v}</span>${extra||''}${s?`<span class="dv-tile__s">${s}</span>`:''}</div>`;
+  return `<div class="dv-tiles">
+   ${tile(L('data.wr'),nf(wr,1)+' %',L('data.games',{n:nf(g.wr.games)})+(o?` · ${DT==='ranked'?L('data.tier_top'):L('data.tier_all')} ${nf(o.wr.wr*100,1)} %`:''),wrBar,wr>=51?'var(--color-ok)':wr<=49?'var(--color-err)':'')}
+   ${tile(L('data.lane'),esc(L(verdict)),L('data.lane_detail',{kd:sg(ln.kd10),souls:sg(ln.duo_souls,0),min:nf(ln.end_min,1)}),dvBar(ln.kd10,1),ln.kd10>=.2?'var(--color-ok)':ln.kd10<=-.2?'var(--color-err)':'')}
+   ${tile(L('data.spike'),sp.from?`${kS(sp.from)}–${kS(sp.to)}`:esc(L('data.spike_flat')),sp.min_from!=null?L('data.spike_min',{a:nf(sp.min_from),b:nf(sp.min_to)}):'',type?`<span class="dv-badge">${L(type)}</span>`:'','var(--color-accent)')}
+   ${ti?tile(L('data.best'),tb[ti[1]][1]>60?L('data.best_after',{a:tb[ti[1]][0]}):L('data.best_val',{a:tb[ti[1]][0],b:tb[ti[1]][1]}),`${sg(ti[0])} / 10 min`,''):''}
+   ${tile(L('data.fed'),fed.some(v=>v!=null)?sg(Math.max(...fed.filter(v=>v!=null))):'—','',fedSvg)}
+   ${tile(L('data.antiheal'),ah?kS(ah.from):esc(L('data.antiheal_none')),ah?L('data.antiheal_val',{nw:kS(ah.from),ratio:nf(ah.ratio,1)}):'','',ah?'var(--color-err)':'')}
+  </div>`}
+// The power line: team fights after the lane by net worth, spike band, objectives placed at the hero's net worth
+function dvFights(){const P=D.profile,g=dG(),o=dO(),B=P.buckets,EV=P.events,nwq=g.nw_by_minute||{};
+  const W=820,H=340,m={l:46,r:18,t:66,b:52},X1=62500,pb=H-m.b;
+  const top=Math.max(.5,...g.fights.filter(v=>v!=null).map(Math.abs))*1.2;
+  const x=v=>m.l+v/X1*(W-m.l-m.r),y=v=>m.t+(top-v)/(2*top)*(pb-m.t),mid=i=>B[i]+1250;
+  const path=c=>{let d='',pen=false;c.forEach((v,i)=>{if(v==null){pen=false;return}d+=(pen?'L':'M')+x(mid(i)).toFixed(1)+' '+y(v).toFixed(1);pen=true});return d};
+  const pts=g.fights.map((v,i)=>v==null?null:[x(mid(i)),y(v)]).filter(Boolean);
+  const area=pts.length?`M${pts[0][0]} ${y(0)} `+pts.map(p=>`L${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ')+` L${pts[pts.length-1][0]} ${y(0)} Z`:'';
+  let s=`<defs><clipPath id="dvUp"><rect x="0" y="0" width="${W}" height="${y(0)}"/></clipPath><clipPath id="dvDn"><rect x="0" y="${y(0)}" width="${W}" height="${H}"/></clipPath><clipPath id="dvPlot"><rect x="${m.l}" y="${m.t-8}" width="${W-m.l-m.r}" height="${pb-m.t+8}"/></clipPath>
+    <linearGradient id="dvG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--color-accent)" stop-opacity=".55"/><stop offset="1" stop-color="var(--color-accent)" stop-opacity=".05"/></linearGradient></defs>`;
+  const sp=g.spike;if(sp&&sp.from){s+=`<rect x="${x(sp.from)}" y="${m.t-8}" width="${x(sp.to)-x(sp.from)}" height="${pb-m.t+8}" fill="var(--color-accent)" opacity=".1"/><text class="lbl-acc" x="${(x(sp.from)+x(sp.to))/2}" y="${m.t-12}" text-anchor="middle">SPIKE</text>`}
+  const step=top>2?1:top>1?.5:.25;for(let v=-Math.floor(top/step)*step;v<=top+1e-9;v+=step){const vv=Math.round(v*100)/100;
+    s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(vv)}" y2="${y(vv)}" stroke="var(--color-rule)" stroke-opacity="${vv===0?1:.45}" ${vv===0?'stroke-width="1.5"':''}/><text x="${m.l-8}" y="${y(vv)+4}" text-anchor="end">${vv===0?'0':sg(vv,step<.5?2:1)}</text>`}
+  s+=`<text x="${m.l+6}" y="${y(0)-6}">${L('data.ref_zero')}</text>`;
+  [['rift','◆','var(--color-accent-hi)'],['boss','●','var(--color-ok)'],['urn','■','var(--color-muted)']].forEach(([k,glyph,col],r)=>{const yy=14+r*15;
+    s+=`<text x="${m.l-8}" y="${yy+4}" text-anchor="end">${L('data.'+k)}</text><line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="var(--color-rule)" stroke-opacity=".5"/>`;
+    let last=-99;(EV[k]||[]).forEach(mn=>{const q=nwq[mn];if(!q||q[1]>X1)return;const xm=x(q[1]);
+      if(k!=='urn'){s+=`<rect x="${x(q[0])}" y="${yy-2}" width="${Math.max(2,x(Math.min(q[2],X1))-x(q[0]))}" height="4" rx="2" fill="${col}" opacity=".35"/><line x1="${xm}" x2="${xm}" y1="${m.t-8}" y2="${pb}" stroke="${col}" stroke-opacity=".25" stroke-dasharray="2 4"/>`}
+      s+=`<text x="${xm}" y="${yy+4}" text-anchor="middle" style="fill:${col};font-size:${k==='urn'?8:11}px">${glyph}</text>`;
+      if(xm-last>30){s+=`<text x="${xm+7}" y="${yy-3}" style="font-size:9px">${mn}'</text>`;last=xm}})});
+  for(let b=0;b<=60000;b+=10000){const mm=minAt(nwq,b);s+=`<line x1="${x(b)}" x2="${x(b)}" y1="${pb}" y2="${pb+5}" stroke="var(--color-neutral)"/><text class="lbl-strong" x="${x(b)}" y="${pb+19}" text-anchor="middle">${b?kS(b):'0'}</text>${mm!=null&&b?`<text x="${x(b)}" y="${pb+34}" text-anchor="middle">≈ ${nf(mm)}'</text>`:''}`}
+  s+=`<text x="${W-m.r}" y="${H-2}" text-anchor="end">${L('data.nw_axis')} · ≈ min</text>`;
+  if(area)s+=`<path d="${area}" fill="url(#dvG)" clip-path="url(#dvUp)"/><path d="${area}" fill="var(--color-neutral)" opacity=".18" clip-path="url(#dvDn)"/>`;
+  if(o)s+=`<path d="${path(o.fights)}" fill="none" stroke="var(--color-muted)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".7" clip-path="url(#dvPlot)"/>`;
+  s+=`<path d="${path(g.fights)}" fill="none" stroke="var(--color-accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+  s+=`<line class="dv-x" y1="${m.t-8}" y2="${pb}" stroke="var(--color-ink)" stroke-opacity=".5" visibility="hidden"/><circle class="dv-dot" r="5" fill="var(--color-accent)" stroke="var(--color-paper-2)" stroke-width="2" visibility="hidden"/>
+    <rect class="dv-hit" x="${m.l}" y="${m.t-8}" width="${W-m.l-m.r}" height="${pb-m.t+8}" fill="transparent"/>`;
+  const other=DT==='ranked'?L('data.tier_top'):L('data.tier_all'),cur=DT==='ranked'?L('data.tier_all'):L('data.tier_top');
+  return `<div class="dv-chart" data-chart="fights" data-w="${W}" data-ml="${m.l}" data-mr="${m.r}" data-x1="${X1}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(L('data.fights_title'))}">${s}</svg><div class="dv-tip" hidden></div></div>
+   <div class="dv-legend"><span><i style="--c:var(--color-accent)"></i>${esc(D.hero.name)} · ${cur}</span>${o?`<span><i class="dash" style="--c:var(--color-muted)"></i>${other}</span>`:''}<span><i class="band" style="--c:var(--color-accent)"></i>${L('data.spike')}</span></div>`}
+function dvTiming(){const P=D.profile,g=dG(),tb=P.time_bins,v=g.timing,mx=Math.max(.3,...v.filter(x=>x!=null).map(Math.abs));
+  return `<div class="dv-strip" style="--n:${tb.length}">${tb.map((b,i)=>{const t=v[i],evs=['rift','boss'].flatMap(k=>(P.events[k]||[]).filter(mn=>mn>=b[0]&&mn<b[1]).map(mn=>(k==='rift'?'◆ ':'● ')+mn+"'"));
+    const col=t==null?'var(--color-paper-3)':t>=0?'var(--color-accent)':'var(--color-neutral)',a=t==null?0:Math.round(15+Math.abs(t)/mx*55);
+    return `<div class="dv-cell" style="--c:${col};--a:${a}%"><b>${t==null?'—':sg(t)}</b><span>${b[1]>60?b[0]+"'+":b[0]+'–'+b[1]+"'"}</span><em>${evs.join(' ')}</em></div>`}).join('')}</div>`}
+function dvLaneItems(){const g=dG(),li=g.lane_items||[];if(!li.length)return'';const mx=Math.max(150,...li.map(x=>Math.abs(x.souls)+2*(x.souls_se||0)));
+  return `<div class="dv-rows">${li.map(x=>{const net=x.souls_se&&Math.abs(x.souls)>=2*x.souls_se;
+    return `<div class="dv-row ${net?'':'weak'}"><div class="mod ${esc(T(x.id).slot||'')}" tabindex="0" data-id="${x.id}">${gcard(x.id)}</div><div>
+     <h4>${esc(T(x.id).n||x.fr)} <span class="dv-pill">${L('data.share',{n:nf(x.share,0)})}</span>${net?'':` <span class="dv-pill">${L('data.not_clear')}</span>`}</h4>
+     <p>${L('data.lane_item_fx',{souls:sg(x.souls,0),kd:sg(x.kd)})}</p>
+     ${(x.against||[]).length?`<div class="dv-vs">${L('data.bought_vs')} ${x.against.slice(0,4).map(a=>`<span>${HN(a.id).img?`<img src="${esc(HN(a.id).img)}" alt="">`:''}${esc(HN(a.id).n)} ×${nf(a.lift,1)}</span>`).join('')}</div>`:''}</div>
+     <div class="dv-row__bar"><b class="${x.souls>=0?'up':'down'}">${sg(x.souls,0)}</b>${dvBar(x.souls,mx,x.souls_se)}</div></div>`}).join('')}</div>`}
+function dvItems(){const g=dG(),it=(g.items||[]).slice().sort((a,b)=>b.z-a.z).slice(0,8).sort((a,b)=>b.effect-a.effect);if(!it.length)return'';
+  const se=x=>x.z?Math.abs(x.effect/x.z):0,mx=Math.max(.5,...it.map(x=>Math.abs(x.effect)+2*se(x)));
+  return `<div class="dv-rows">${it.map(x=>{const net=x.z>=2.5;return `<div class="dv-row ${net||x.z<=-2.5?'':'weak'}"><div class="mod ${esc(T(x.id).slot||'')}" tabindex="0" data-id="${x.id}">${gcard(x.id)}</div><div>
+     <h4>${esc(T(x.id).n||x.fr)}${net?` <span class="dv-pill ok">✓</span>`:''}</h4>
+     <p>${L('data.item_cap',{fx:sg(x.effect),min:nf(x.minute),share:nf(x.share,0)})}</p></div>
+     <div class="dv-row__bar"><b class="${net?'up':''}">${sg(x.effect)}</b>${dvBar(x.effect,mx,se(x),net?'var(--color-accent)':'var(--color-neutral)')}</div></div>`}).join('')}</div>`}
+function dvFarm(){const g=dG(),ph=g.farm||[];const sh=s=>({lane:s.lanes,jungle:s.jungle,fights:s.fights,obj:s.objectives});
+  return `<div class="dv-farm">${ph.map((f,i)=>f?`<div class="dv-farm__r"><b>${L(['data.phase0','data.phase1','data.phase2','data.phase3'][i])}</b><div>${bar(sh(f.share))}${bar(sh(f.avg_share),'avg')}</div>
+    <span class="num">${L('data.spm',{n:nf(f.per_min)})}<br><small>${L('data.avg')} ${nf(f.avg_per_min)}</small></span></div>`:'').join('')}</div>${legendSrc()}`}
+function dvKeys(){const g=dG(),ks=g.key_resources||[];if(!ks.length)return `<p class="dv-empty">${L('data.keys_none')}</p>`;
+  const mx=Math.max(10,...ks.flatMap(k=>[Math.abs(k.gap),Math.abs(k.usual)]))*1.1,W=320,H=26,x=v=>W/2+v/mx*(W/2-8);
+  return `<div class="dv-keys">${ks.map(k=>{const what=k.what==='bonus'?L('data.res.bonus',{ab:esc(T(k.ability_id).n||k.ability)}):L('data.res.'+k.what);
+    const ref=k.what==='bonus'?L('data.ref_kills'):L('data.ref_others');
+    return `<div class="dv-key"><div><b>${what}</b><small>${L('data.key_line',{gap:sg(k.gap,1),usual:sg(k.usual,1),ref})}</small></div>
+     <svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><line x1="0" x2="${W}" y1="${H/2}" y2="${H/2}" stroke="var(--color-paper-3)" stroke-width="6" stroke-linecap="round"/><line x1="${W/2}" x2="${W/2}" y1="3" y2="${H-3}" stroke="var(--color-rule)" stroke-width="2"/>
+     <line x1="${x(k.usual)}" x2="${x(k.gap)}" y1="${H/2}" y2="${H/2}" stroke="var(--color-accent)" stroke-width="3" opacity=".6"/><circle cx="${x(k.usual)}" cy="${H/2}" r="5" fill="var(--color-neutral)"/><circle cx="${x(k.gap)}" cy="${H/2}" r="7" fill="var(--color-accent)" stroke="var(--color-paper)" stroke-width="2"/></svg></div>`}).join('')}</div>`}
+function dataPanel(){const P=D.profile,m=P.meta||{};
+  const seg=`<div class="dv-seg" role="group">${[['ranked','data.tier_all'],['top','data.tier_top']].map(([k,l])=>`<button type="button" data-tier="${k}" aria-pressed="${DT===k}">${L(l)}</button>`).join('')}</div>`;
+  return `<article class="panel"><p class="panel__src">${L('data.kicker',{n:nf(m.matches||0),from:m.first_match||'',to:m.last_match||''})}</p><h2>${L('data.title',{hero:esc(D.hero.name)})}</h2>
+   <div class="dv-top"><p class="facts">${L('data.desc')}</p>${seg}</div>${dvTiles()}
+   <section class="phase"><h3>${L('data.fights_title')}</h3><p class="phase__desc">${L('data.fights_desc')}</p>${dvFights()}</section>
+   <section class="phase"><h3>${L('data.timing_title')}</h3><p class="phase__desc">${L('data.timing_desc')}</p>${dvTiming()}</section>
+   ${(dG().lane_items||[]).length?`<section class="phase"><h3>${L('data.lane_items_title')}</h3><p class="phase__desc">${L('data.lane_items_desc')}</p>${dvLaneItems()}</section>`:''}
+   ${(dG().items||[]).length?`<section class="phase"><h3>${L('data.items_title')}</h3><p class="phase__desc">${L('data.items_desc')}</p>${dvItems()}</section>`:''}
+   <section class="phase"><h3>${L('data.farm_title')}</h3><p class="phase__desc">${L('data.farm_desc')}</p>${dvFarm()}</section>
+   <section class="phase"><h3>${L('data.keys_title')}</h3><p class="phase__desc">${L('data.keys_desc')}</p>${dvKeys()}</section></article>`}
+function bindData(root){root.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{DT=b.dataset.tier;try{localStorage.setItem('dl-tier',DT)}catch(e){}show('data',false)});
+  const ch=root.querySelector('[data-chart=fights]');if(!ch)return;const svg=ch.querySelector('svg'),tip=ch.querySelector('.dv-tip'),P=D.profile,B=P.buckets;
+  const W=+ch.dataset.w,ml=+ch.dataset.ml,mr=+ch.dataset.mr,X1=+ch.dataset.x1,cx=svg.querySelector('.dv-x'),dot=svg.querySelector('.dv-dot');
+  const vb=svg.viewBox.baseVal,top=Math.max(.5,...dG().fights.filter(v=>v!=null).map(Math.abs))*1.2;
+  const yOf=v=>66+(top-v)/(2*top)*(vb.height-52-66);
+  const move=e=>{const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,i=Math.max(0,Math.min(B.length-1,Math.floor((px-ml)/(W-ml-mr)*X1/2500)));
+    const g=dG(),o=dO(),v=g.fights[i],xx=ml+(B[i]+1250)/X1*(W-ml-mr),mn=minAt(g.nw_by_minute,B[i]+1250);
+    cx.setAttribute('x1',xx);cx.setAttribute('x2',xx);cx.setAttribute('visibility','visible');
+    if(v!=null){dot.setAttribute('cx',xx);dot.setAttribute('cy',yOf(v));dot.setAttribute('visibility','visible')}else dot.setAttribute('visibility','hidden');
+    const sp=g.spike,inS=sp&&sp.from&&B[i]>=sp.from&&B[i]<sp.to;
+    tip.innerHTML=`<b>${kS(B[i])} – ${kS(B[i]+2500)}${mn!=null?` · ≈ ${nf(mn)}'`:''}</b>
+      <div><span><i style="background:var(--color-accent)"></i>${DT==='ranked'?L('data.tier_all'):L('data.tier_top')}</span><span>${v==null?'—':sg(v)}</span></div>
+      ${o?`<div><span><i style="background:var(--color-muted)"></i>${DT==='ranked'?L('data.tier_top'):L('data.tier_all')}</span><span>${o.fights[i]==null?'—':sg(o.fights[i])}</span></div>`:''}
+      <small>${inS?'SPIKE · ':''}${L('data.ref_zero')} = 0 · /10 min</small>`;
+    tip.hidden=false;const tw=tip.offsetWidth,tx=xx/W*r.width;tip.style.left=Math.min(Math.max(4,tx+14),r.width-tw-4)+'px';tip.style.top='54px'};
+  const hit=svg.querySelector('.dv-hit');hit.addEventListener('pointermove',move);hit.addEventListener('pointerdown',move);
+  hit.addEventListener('pointerleave',()=>{tip.hidden=true;cx.setAttribute('visibility','hidden');dot.setAttribute('visibility','hidden')})}
+
 /* ---- navigation ---- */
 function show(v,push){if(!views.includes(v))v=views[0];
-  $('main').innerHTML=v==='tldr'?tldrPanel():v==='vs'?vsPanel():v==='compare'?comparePanel():v==='plan'?planPanel():buildPanel(D.builds.find(b=>b.key===v));
+  $('main').innerHTML=v==='tldr'?tldrPanel():v==='vs'?vsPanel():v==='compare'?comparePanel():v==='plan'?planPanel():v==='data'?dataPanel():buildPanel(D.builds.find(b=>b.key===v));
+  if(v==='data')bindData($('main'));
   $('main').querySelectorAll('[data-askc]').forEach(x=>x.onclick=async()=>{let ok=false;try{await navigator.clipboard.writeText(x.dataset.askc);ok=true}catch(e){}x.textContent=ok?L('inc.asked'):x.dataset.askc});
   $('main').querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>{show(x.dataset.go,true);scrollTo({top:0})});
   document.querySelectorAll('.pick').forEach(p=>p.setAttribute('aria-current',p.dataset.v===v));
