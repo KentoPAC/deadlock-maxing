@@ -365,7 +365,7 @@ def load_builds(folder, candidates, summaries, lang):
                        # texts in the author's own language are shown as written (never "corrected")
                        "authorWords": c["source"] != "OTP" and c.get("language") == GAME_LANGUAGE.get(lang),
                        "resume": summary.get("resume", ""), "points": summary.get("points", []),
-                       "cats": cats, "order": order, "video": video_ref(c)})
+                       "cats": cats, "order": order, "video": video_ref(c), "agent": c.get("agent")})
     return builds
 
 

@@ -108,6 +108,7 @@
   ]
  },
  "source_info": {
+  "DeadlockMax": "build written by DeadlockMax: it crosses players' builds, creators' videos, measured statistics and the kit, and explains every purchase",
   "OTP": "rebuilt from the real purchases of a player who mostly plays this hero",
   "Mobalytics": "official build from a Mobalytics expert, published in game",
   "Communauté": "popular public build, well explained, by a high-ranked author",
@@ -224,6 +225,7 @@
   "wr.long": "{n}% win rate",
   "fav.short": "{n} fav.",
   "src.OTP": "OTP",
+  "src.DeadlockMax": "DeadlockMax",
   "src.Mobalytics": "Mobalytics",
   "src.Communauté": "Community",
   "src.Vidéo": "Video",
@@ -596,6 +598,12 @@
   "cp.cc_hint": "stuns, silences, slows…",
   "cp.note": "Heroes ranked by their healing and damage taken in Phantom+ games (game class for spirit / gun). Items chosen by their in-game effects, among those {hero} players buy (the % = share of its players who buy it).",
   "st.wr": "Win rate",
+  "st.agent_from": "Built from",
+  "st.agent_from_s": "player builds, {otp} of them OTP, + videos and statistics",
+  "st.agent_core": "Core",
+  "st.agent_core_s": "items bought every game",
+  "st.agent_end": "Endgame",
+  "st.agent_end_s": "proposals to finish the 12 slots",
   "st.wr_over": "over {n} of the player's games",
   "st.wr_none": "not measured for a published build",
   "st.share": "of their games on {hero}",

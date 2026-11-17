@@ -902,7 +902,7 @@ function planPanel(){const P_=D.plan||{},G=(D.guides&&D.guides.guides)||[],measu
    ${table?`<section class="phase"><h3>${L('sec.best')}</h3>${table}</section>`:''}
    <section class="phase"><h3>${L('sec.sources')}</h3><ul class="srcs">${srcs||`<li>${L('plan.no_guide')}</li>`}
    ${measured.map(b=>`<li><b>${L('plan.stats_of',{author:esc(b.author)})}</b> — ${L('plan.games_since',{date:fmt(D.since)})}</li>`).join('')}</ul></section></article>`}
-function pickBuild(){const t=D.tldr||{};return D.builds.find(b=>b.key===t.pick)||D.builds.find(b=>b.code&&b.source==='OTP')||D.builds.find(b=>b.code)||D.builds[0]}
+function pickBuild(){const t=D.tldr||{};return D.builds.find(b=>b.key===t.pick)||D.builds.find(b=>b.code&&b.source==='DeadlockMax')||D.builds.find(b=>b.code&&b.source==='OTP')||D.builds.find(b=>b.code)||D.builds[0]}
 const K=()=>D.kit||{abilities:[],spikes:[],core:[]};
 function spikeGroups(){const g=[];for(const s of K().spikes){const last=g[g.length-1];if(last&&last.souls===s.souls)last.items.push(s);else g.push({souls:s.souls,min:s.min,items:[s]})}return g}
 const tierLbl=s=>s.kind==='item'?L('tier.item'):s.tier?`T${s.tier}`:L('tier.unlock');
@@ -1040,6 +1040,10 @@ function counterplay(compact){const C=D.counterplay;if(!C)return'';const rules=C
     <div class="cp__then"><span class="lbl">→ ${w[1]}</span>${r.items.map(x=>`<span class="ref ${esc(T(x.id).slot||'')}" tabindex="0" data-id="${x.id}">${img(x.id)}${esc(T(x.id).n)}</span>${x.rate?` <small>${pc(x.rate)}</small>`:''}`).join(' · ')}</div></div>`}).join('')}</div>
   <p class="phase__desc">${L('cp.note',{hero:esc(D.hero.name)})}</p>`}
 function statStrip(b){const f=buildFresh(b),t=wrTone(b.winrate);
+  if(b.agent){const a=b.agent,st=(k,v,s)=>`<div class="stat"><span class="stat__k">${k}</span><span class="stat__v num">${v}</span><span class="stat__s">${s}</span></div>`;
+    return `<div class="stats">${st(L('st.agent_from'),a.builds,L('st.agent_from_s',{otp:a.otp}))}${st(L('st.agent_core'),a.core,L('st.agent_core_s'))}
+     ${st(L('st.agent_end'),a.proposals,L('st.agent_end_s'))}
+     <div class="stat" data-lvl="${f.lvl}"><span class="stat__k">${L('st.updated')}</span><span class="stat__v">${esc(f.v)}</span><span class="stat__s">${esc(f.s)}</span></div></div>`}
   const wr=b.winrate!=null?`<div class="stat" data-tone="${t}"><span class="stat__k">${L('st.wr')}</span><span class="stat__v num">${pc(b.winrate)}</span>
     <span class="stat__s">${L('st.wr_over',{n:b.matches})}</span></div>`
     :`<div class="stat" data-tone="none"><span class="stat__k">${L('st.wr')}</span><span class="stat__v">—</span><span class="stat__s">${L('st.wr_none')}</span></div>`;

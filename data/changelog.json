@@ -245,6 +245,22 @@
    ],
    "auto": true,
    "todo": "Run report.py on the folder: the page gets the \"The data\" view drawn from the hero's measured profile (profiles.py): spike line with Rifts, Mid-Bosses and urns, timing by minute at equal game state, lane items, items that power the hero up, farm, key resources. No text to rewrite."
+  },
+  {
+   "version": 16,
+   "date": "2026-11-17",
+   "title": {
+    "fr": "Build DeadlockMax et fin de partie à 12 emplacements",
+    "en": "DeadlockMax build and 12-slot endgame"
+   },
+   "parts": [
+    "builds"
+   ],
+   "scripts": [
+    "find.py",
+    "finish.py"
+   ],
+   "todo": "Run find.py <hero> <folder> --refresh-otp (OTP builds read the late game from games of 35 min and more and get a \"Fin de partie : 12 emplacements\" category), then write the DeadlockMax build (\"agent_build\", see SKILL.md and agent_build.py): lane items reasoned per opponent, early / mid / late with when and why, the 12 endgame slots, situational categories, ability order; its {resume, points}; tldr.pick = dlmax."
   }
  ]
 }
