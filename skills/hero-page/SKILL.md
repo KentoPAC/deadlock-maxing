@@ -130,7 +130,8 @@ is missing.
    - **What good builds do** (352 most-favourited builds, 2026-11): about 35 items in ~6 categories (Lane /
      Core / Late, then Situational, Optional, Luxury groups): a wide pool of options, not a single list. Half mark
      their option groups `optional` (default here for every category but the first one and the core); builds with
-     an imbue item set its target ability (`"imbue": <ability id>`, required here); small passives get a Quickbuy
+     an imbue item set its target ability (`"imbue": <ability id>`, required here, and the note says which ability and
+     why, since the choice is made at purchase); small passives get a Quickbuy
      sell priority (default here: tier 1 = 95, tier 2 = 85, actives none; `"sell"` overrides).
    - **Slots**: 9 base slots + 3 extra slots, one per enemy Walker destroyed (wiki, 2025-11-21): a team behind
      plays with 9-11 items, so the endgame notes say what to keep first when slots are short.
