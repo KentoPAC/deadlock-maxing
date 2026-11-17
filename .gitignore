@@ -12,3 +12,6 @@ __pycache__/
 
 # Generated pages never live in the skill (they go to <project>/builds/)
 builds/
+
+# Generated game knowledge (refreshed per patch by scripts/knowledge.py)
+skills/deadlockmax-knowledge/ref/
