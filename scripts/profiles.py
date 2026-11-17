@@ -6,6 +6,7 @@ For each hero, in ranked matches (all ranks) and ranked Oracle+ (top players):
   and the spike window (shape vs his own average); timing by minute at equal game state (team soul lead, his share);
   value of being fed; soul sources by phase; kill participation, healing given, self-healing and when anti-heal is
   worth it; damage to heroes; median net worth by minute (to place Rifts, urns and Patrons);
+  items that make him stronger: team fights in the 5 min after a purchase vs before, beyond the usual change;
   key resources found blindly: every measured quantity (permanent ability bonuses, kills, ability kills, soul
   sources, healing...) whose high values win more at equal net worth for this hero than for the other heroes.
 
@@ -182,6 +183,47 @@ def key_resources(con, g):
     return out, bonus
 
 
+def lane_items(con, g, ids):
+    """Lane items (tier 1, never upgraded: bought for the lane, sold later): for each hero and item, the lane result
+    of the players who bought it before their lane ended vs those who did not, against the same lane opponent;
+    and the opponents it is bought against the most. Rows: hero, item, opponent, bought, n, kd sum, kd², souls sum."""
+    return q(con, f"""WITH p AS (SELECT * FROM ply WHERE {g}),
+      dd AS (SELECT p.match_id, p.player_slot, count(*) FILTER (WHERE d.vteam <> p.team) lk, count(*) FILTER (WHERE d.vteam = p.team) ld
+             FROM p LEFT JOIN deaths d ON d.match_id = p.match_id AND d.vlane = p.assigned_lane AND d.t < p.t_end GROUP BY 1, 2),
+      nw AS (SELECT match_id, player_slot, team, assigned_lane, nw_at(time_stamp_s, net_worth, t_end) me FROM p),
+      duo AS (SELECT a.match_id, a.player_slot, sum(CASE WHEN b.team = a.team THEN b.me ELSE -b.me END) souls
+              FROM nw a JOIN nw b ON b.match_id = a.match_id AND b.assigned_lane = a.assigned_lane GROUP BY 1, 2),
+      lp AS (SELECT p.match_id, p.player_slot, p.hero_id, p.team, p.assigned_lane, (dd.lk - dd.ld) / (p.t_end / 600.0) kd,
+                    duo.souls, [it.id FOR it IN p.items IF it.t < p.t_end] bought
+             FROM p JOIN dd USING (match_id, player_slot) JOIN duo USING (match_id, player_slot)
+             WHERE p.t_end >= 180),   -- a lane shorter than 3 min is a data glitch
+      x AS (SELECT lp.hero_id, item, o.hero_id opp, list_contains(lp.bought, item) has, lp.kd, lp.souls
+            FROM lp JOIN p o ON o.match_id = lp.match_id AND o.assigned_lane = lp.assigned_lane AND o.team <> lp.team,
+                 unnest(?::BIGINT[]) t(item))
+      SELECT hero_id, item, opp, has, count(*), sum(kd), sum(kd * kd), sum(souls), sum(souls * souls) FROM x GROUP BY ALL""", ids)
+
+
+def item_effects(con, g, window=300):
+    """What buying an item changes, not who buys it: the team kills minus deaths in the 5 min after a purchase minus
+    the 5 min before, minus the usual change for this hero at the same minute (any item). Win rates are never used:
+    a strong hero, or a purchase made while already winning, would inflate them."""
+    return q(con, f"""WITH p AS (SELECT match_id, team, hero_id, items, t_last FROM ply WHERE {g}),
+      dm AS (SELECT match_id, list(t) ts, list(vteam) vt FROM deaths GROUP BY 1),
+      ev AS (SELECT p.match_id, p.team, p.hero_id, it.id item, it.t t, dm.ts, dm.vt
+             FROM (SELECT *, unnest(items) it FROM p) p JOIN dm USING (match_id)
+             WHERE it.t >= {window} AND it.t <= p.t_last - {window}),
+      d AS (SELECT match_id, hero_id, item, t, (t / {window})::INT bin,
+             coalesce(list_sum([CASE WHEN z[2] <> team THEN 1 ELSE -1 END FOR z IN list_zip(ts, vt)
+                                IF z[1] >= t AND z[1] < t + {window}]), 0)
+           - coalesce(list_sum([CASE WHEN z[2] <> team THEN 1 ELSE -1 END FOR z IN list_zip(ts, vt)
+                                IF z[1] >= t - {window} AND z[1] < t]), 0) delta FROM ev),
+      b AS (SELECT hero_id, bin, avg(delta) usual FROM d GROUP BY 1, 2),
+      games AS (SELECT hero_id, count(*) n FROM p GROUP BY 1)
+      SELECT d.hero_id, item, count(*), count(DISTINCT match_id) / any_value(games.n), median(t) / 60,
+             avg(delta - usual), stddev_samp(delta - usual)
+      FROM d JOIN b USING (hero_id, bin) JOIN games USING (hero_id) GROUP BY 1, 2 HAVING count(*) >= 300""")
+
+
 # ---------------------------------------------------------------------------------------------- shaping (Python)
 
 def smooth(raw, weights, width):
@@ -213,6 +255,50 @@ def spike_window(curve, minutes, min_minutes):
     return {"from": B[lo], "to": B[hi] + 2500, "peak": B[pk], "gain": round(d[pk], 2)}
 
 
+def shape_lane_items(rows, hero, names, hero_names):
+    """Per lane item: share bought in lane, effect on the lane at equal opponent (souls, kills minus deaths per 10 min,
+    with standard errors), and the opponents it is bought against much more than usual."""
+    cells = {}
+    for h, item, opp, has, n, kd, kd2, souls, souls2 in rows:
+        if h == hero:
+            cells.setdefault(item, {}).setdefault(opp, {})[has] = (n, kd, kd2, souls, souls2)
+    out = []
+    for item, by_opp in cells.items():
+        buy = sum(c.get(True, (0,))[0] for c in by_opp.values())
+        total = buy + sum(c.get(False, (0,))[0] for c in by_opp.values())
+        if total == 0 or buy < 100:
+            continue
+        share = buy / total
+        fx = {"kd": [0.0, 0.0, 0.0], "souls": [0.0, 0.0, 0.0]}   # weighted sum, weight sum, variance sum
+        against = []
+        for opp, c in by_opp.items():
+            if True not in c or False not in c:
+                continue
+            (n1, k1, kk1, s1, ss1), (n0, k0, kk0, s0, ss0) = c[True], c[False]
+            if n1 < 20 or n0 < 20:
+                continue
+            w = n1 * n0 / (n1 + n0)
+            for key, a1, a2, b1, b2 in (("kd", k1, kk1, k0, kk0), ("souls", s1, ss1, s0, ss0)):
+                m1, m0 = a1 / n1, b1 / n0
+                var = max(a2 / n1 - m1 * m1, 0) / n1 + max(b2 / n0 - m0 * m0, 0) / n0
+                fx[key][0] += w * (m1 - m0)
+                fx[key][1] += w
+                fx[key][2] += w * w * var
+            lift = (n1 / (n1 + n0)) / share
+            if n1 >= 40 and lift >= 1.5:
+                against.append((round(lift, 1), opp))
+        if not fx["kd"][1]:
+            continue
+        res = {"id": item, "fr": names.get(item, (str(item), str(item)))[0], "en": names.get(item, (str(item), str(item)))[1],
+               "share": round(share * 100, 1)}
+        for key, (num, den, var) in fx.items():
+            res[key] = round(num / den, 3 if key == "kd" else 0)
+            res[key + "_se"] = round(var ** 0.5 / den, 3 if key == "kd" else 0)
+        res["against"] = [{"id": o, "name": hero_names.get(o, str(o)), "lift": lift} for lift, o in sorted(against, reverse=True)[:5]]
+        out.append(res)
+    return sorted(out, key=lambda r: -r["share"])
+
+
 def minute_at(nwq, nw):
     pts = [(0, 0)] + sorted((m, v[1]) for m, v in nwq.items())
     for (a, x), (b, y) in zip(pts, pts[1:]):
@@ -229,6 +315,14 @@ def build(db, out_dir, memory=DEFAULT_MEMORY):
     heroes_fr = {h["id"]: h for h in get("/v1/assets/heroes", language="french")}
     heroes_en = {h["id"]: h["name"] for h in get("/v1/assets/heroes")}
     abilities = {i["id"]: i for i in get("/v1/assets/items", language="french") if i.get("type") == "ability"}
+    shop_en = {i["id"]: i["name"] for i in get("/v1/assets/items") if i.get("shopable")}
+    shop_items = {i["id"]: (i["name"], shop_en.get(i["id"], i["name"]))
+                  for i in get("/v1/assets/items", language="french") if i.get("shopable")}
+    all_en = [i for i in get("/v1/assets/items", language="english") if i.get("type") == "upgrade"]
+    components = {c for i in all_en for c in (i.get("component_items") or [])}
+    # lane items: tier 1 shop items that no other item is built from (bought for the lane, sold when slots run out)
+    lane_item_ids = {i["id"] for i in all_en if i.get("shopable") and i.get("item_tier") == 1 and i["class_name"] not in components}
+    heroes_short = {h: heroes_fr[h]["name"] for h in heroes_fr}
     profiles = {}
     for gname, g in GROUPS.items():
         print(f"[{gname}] win rates, laning…", flush=True)
@@ -241,6 +335,16 @@ def build(db, out_dir, memory=DEFAULT_MEMORY):
         iv, fm, nwm = intervals(con, g), farm(con, g), nw_by_minute(con, g)
         print(f"[{gname}] key resources…", flush=True)
         kr, bonus = key_resources(con, g)
+        print(f"[{gname}] lane items…", flush=True)
+        lane_rows = lane_items(con, g, sorted(lane_item_ids))
+        print(f"[{gname}] item effects…", flush=True)
+        items_fx = {}
+        for h, it, n, share, minute, fx, sd in item_effects(con, g):
+            if it in shop_items:
+                z = fx / (sd / n ** 0.5) if sd else 0
+                items_fx.setdefault(h, []).append({"id": it, "fr": shop_items[it][0], "en": shop_items[it][1], "n": n,
+                                                   "share": round(share * 100, 1), "minute": round(minute, 1),
+                                                   "effect": round(fx * 2, 2), "z": round(z, 1)})
 
         sig, mins = {}, {}
         for h, b, s in ev:
@@ -343,7 +447,9 @@ def build(db, out_dir, memory=DEFAULT_MEMORY):
             p[gname] = {"wr": wr[h], "lane": lane.get(h), "fights": fights, "fight_minutes": m_curve, "spike": spike,
                         "timing": timing, "fed": fed, "damage": dmg, "kill_participation": kp, "ally_healing": ally,
                         "self_healing": self_heal, "self_healing_avg": self_avg, "antiheal": antiheal, "farm": farm_out,
-                        "nw_by_minute": nwq, "key_resources": res}
+                        "nw_by_minute": nwq, "key_resources": res,
+                        "items": sorted(items_fx.get(h, []), key=lambda x: -x["z"]),
+                        "lane_items": shape_lane_items(lane_rows, h, shop_items, heroes_short)}
     con.close()
     os.makedirs(out_dir, exist_ok=True)
     doc = {"meta": meta | {"generated": time.strftime("%Y-%m-%d")}, "buckets": B, "time_bins": TBINS, "events": EVENTS,
@@ -439,6 +545,21 @@ def summary(doc):
                 ref = "ses kills" if x["what"] == "bonus" else "les autres héros"
                 txt.append(f"{what} ({fmt(x['gap'], 1)} pts de victoire quand il est haut, contre {fmt(x['usual'], 1)} pour {ref})")
             lines.append("- Ressources clés trouvées à l'aveugle (parties de 30-40 min, à net worth égal) : " + " ; ".join(txt) + ".")
+        li = r.get("lane_items") or []
+        if li:
+            parts = []
+            for x in li:
+                sig = abs(x["souls"]) >= 2 * x["souls_se"] if x["souls_se"] else False
+                eff = (f"{fmt(x['souls'], 0)} âmes et {fmt(x['kd'])} kill pour 10 min sur la lane" + ("" if sig else " (pas net)"))
+                vs = ", ".join(o["name"] for o in x["against"][:3])
+                parts.append(f"{x['fr']} pris dans {fr(x['share'], 0)} % des lanes, {eff}" + (f", surtout contre {vs}" if vs else ""))
+            lines.append("- Objets de lane (T1 qui n'évoluent pas), à adversaire égal, avec vs sans : " + " ; ".join(parts) + ".")
+        boost = [x for x in r.get("items", []) if x["z"] >= 2.5 and x["share"] >= 10][:3]
+        if boost:
+            lines.append("- Objets qui le font monter en puissance (combats d'équipe dans les 5 min après l'achat vs avant, au-delà "
+                         "de la hausse habituelle) : " + " ; ".join(
+                             f"{x['fr']} ({fmt(x['effect'])} pour 10 min, acheté vers {fr(x['minute'], 0)} min dans {fr(x['share'], 0)} % "
+                             "des parties)" for x in boost) + ".")
         lines.append("")
     return "\n".join(lines)
 

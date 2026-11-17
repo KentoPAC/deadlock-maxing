@@ -27,6 +27,27 @@ from tooltips import UPGRADE_COST, item_data, plain, tier_text, tooltip  # noqa:
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
 TEMPLATE = os.path.join(SKILL, "templates", "hero.html")
+PROFILES = os.path.join(SKILL, "skills", "knowledge", "ref", "profiles.json")  # written by profiles.py (stats extra)
+
+
+def measured_profile(hero_id):
+    """The hero's measured profile (profiles.py), trimmed to what the "data" view draws; None when not generated."""
+    doc = load_json(PROFILES)
+    hero = next((h for h in (doc or {}).get("heroes", []) if h["id"] == hero_id), None)
+    if not hero:
+        return None
+    keep = ("wr", "lane", "fights", "fight_minutes", "spike", "timing", "fed", "farm", "antiheal", "self_healing",
+            "self_healing_avg", "damage", "kill_participation", "nw_by_minute")
+    out = {"meta": doc["meta"], "buckets": doc["buckets"], "time_bins": doc["time_bins"], "events": doc["events"]}
+    for group in doc.get("groups", []):
+        g = hero.get(group)
+        if not g:
+            continue
+        out[group] = {k: g.get(k) for k in keep}
+        out[group]["key_resources"] = [r for r in g.get("key_resources", []) if abs(r.get("z", 0)) >= 2.5 and abs(r["excess"]) >= 3][:4]
+        out[group]["items"] = [x for x in g.get("items", []) if x["share"] >= 10][:12]
+        out[group]["lane_items"] = g.get("lane_items", [])
+    return out
 GAMEPLAY_PATCH = re.compile(r"update|\d{2}-\d{2}-\d{4}|gameplay|patch", re.I)
 CORE_ITEM_PCT, CORE_ITEM_COST = 90, 1600
 # item power spikes: bought in >= 75% of games from tier II, or >= 60% from tier III (big late items are situational)
@@ -484,6 +505,12 @@ def build_page(folder, data, lang):
     if matchups and matchups.get("items"):
         used.update(x["id"] for x in matchups["items"])
     used.update(v["id"] for b in builds for v in (b.get("counters") or []))
+    profile = measured_profile(hero_id)
+    for group in ("ranked", "top"):
+        g = (profile or {}).get(group) or {}
+        used.update(x["id"] for x in g.get("items", []) + g.get("lane_items", []))
+        used.update(r["ability_id"] for r in g.get("key_resources", []) if r.get("ability_id"))
+        enemies |= {o["id"] for x in g.get("lane_items", []) for o in x.get("against", [])}
 
     state = completeness(folder)
     payload = {"sources": resolve_sources(summaries, data["candidates"], guides, roles), "videoTips": tips,
@@ -495,7 +522,7 @@ def build_page(folder, data, lang):
                "days": data["days"],
                "generated": datetime.datetime.fromtimestamp(data["generated"]).strftime(t("datetime_format")),
                "builds": builds, "items": item_data(all_items, used, keys), "links": links,
-               "lang": content_lang, "contentFallback": content_lang != lang}
+               "lang": content_lang, "contentFallback": content_lang != lang, "profile": profile}
     ui = {**table("ui"), "style_tags": table("style_tags")}
     page = fill_template(read_text(TEMPLATE), {
         "__LANG__": lang, "__HOME__": page_name(lang), "__LANG_LINKS__": language_links(lang),
