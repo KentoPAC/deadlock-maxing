@@ -52,8 +52,32 @@ the hero's one-tricks), cross-check with the hero's kit (**deadlockmax:knowledge
   buyers with non-buyers of the same hero at the same minute and team lead, or the hero's impact just before vs
   just after the purchase; explain the effect from the item description.
 
-## Status
+## Commands
 
-The profile pipeline (DuckDB cache + one profile per hero, summary for heroes.md, explorer page) is being moved into
-`.claude/skills/deadlockmax/scripts/`. Until it is there, the 2026-11-17 prototype lives in the session scratchpad: rebuild with
-these definitions rather than inventing new ones.
+From the plugin folder `P` = `.claude/skills/deadlockmax` (DuckDB is the optional `stats` dependency, pinned in
+`uv.lock`; it is capped at 3 GB of RAM and 4 threads and spills to disk beyond, `--memory` to change it):
+
+1. `uv run --extra stats python -I scripts/lake.py` (~1 min, ~1 GB in `~/.cache/deadlockmax/lake.duckdb`): ranked
+   matches of the latest complete data lake partition. `--unranked` also keeps unranked matches (player comparisons,
+   ~6x bigger), `--partitions 2` takes more days.
+2. `uv run --extra stats python -I scripts/profiles.py` (~2 min): one measured profile per hero, for all ranked
+   matches and for Oracle+ (top players), written next to the game references:
+   - `skills/knowledge/ref/profiles.md`: a short summary per hero (win rate, lane, spike window by net worth and
+     minute, best period at equal game state, value of being fed, farm, anti-heal, key resources). Read it with
+     `grep -n -A10 "^## Vindicta" …/profiles.md`.
+   - `skills/knowledge/ref/profiles.json`: everything (curves per net worth bucket, timing, farm per phase,
+     net worth quartiles by minute for Rifts / urns / Patrons, every key resource with its gap, usual gap,
+     excess and z-score) for hero pages and the explorer page.
+   Rebuild both after a patch or when the data is more than a few days old (`meta` in the JSON gives the dates).
+
+## Reading a profile
+
+- **Key resources** are found blindly: the agent is never told a hero's mechanics. A line like "le bonus permanent de
+  Saignée salutaire (+31,8 pts…, contre +8,8 pour ses kills)" means: at equal net worth, games where that ability's
+  permanent bonus is high are won far more often than games where the hero simply gets more kills. Explain *why* from
+  the ability description (**deadlockmax:knowledge**, heroes.md), and say when the data contradicts intuition
+  (e.g. Vindicta: kills matter much more than for other heroes, but a higher share of ability kills does not).
+- Only gaps of at least 2.5 standard errors and 3 points beyond the usual gap are listed; a quantity the hero barely
+  produces (median 0) is skipped.
+- Compare "Tous" and "Oracle+": when they disagree, top players are the reference, but say how many games Oracle+
+  has.

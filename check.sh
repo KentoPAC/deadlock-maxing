@@ -4,6 +4,8 @@ set -e
 cd "$(dirname "$0")"
 if command -v ruff >/dev/null 2>&1; then
     ruff check .
+elif command -v uvx >/dev/null 2>&1; then
+    uvx ruff check .
 else
     echo "ruff not installed: lint skipped" >&2
 fi

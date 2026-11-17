@@ -61,7 +61,8 @@ sentence keeps track of its sources.
   nothing about items is hard-coded. Pages compare their own data with the latest patches, live.
 - **Sourced and versioned.** Every written text cites its sources, and the analysis method is versioned: when the
   method changes, older pages list exactly what changed and offer a targeted update request.
-- **No dependencies.** Python standard library only (3.14+ for the built-in `compression.zstd`).
+- **Light dependencies.** The core uses the Python standard library only (3.14+ for the built-in `compression.zstd`);
+  measured statistics add DuckDB as an optional extra, pinned in `uv.lock` and capped at 3 GB of RAM.
 
 ## Install
 
@@ -115,6 +116,8 @@ python3 -I $S/scripts/find.py mina builds/search-mina      # candidates + analys
 python3 -I $S/scripts/report.py builds/search-mina         # regenerate the page
 python3 -I $S/scripts/fetch.py 123456 builds/123456        # one build, texts to translate
 python3 -I $S/scripts/codec.py --decode "$(wl-paste -n)"   # inspect a code copied in game
+(cd $S && uv run --extra stats python -I scripts/lake.py)       # match data cache (~1 min, ~1 GB)
+(cd $S && uv run --extra stats python -I scripts/profiles.py)   # hero profiles (~2 min)
 ```
 
 ## Project layout
@@ -124,6 +127,8 @@ python3 -I $S/scripts/codec.py --decode "$(wl-paste -n)"   # inspect a code copi
 skills/<name>/      one SKILL.md per skill: the instructions Claude follows (workflow, writing rules, sources)
 scripts/
   knowledge.py      items by effect + hero kits for the agent (skills/knowledge/ref, per patch)
+  lake.py           local DuckDB cache of recent ranked matches from the deadlock-api data lake
+  profiles.py       measured profile of every hero (lane, spikes, fed value, farm, key resources found blindly)
   find.py           build candidates (one-tricks, Mobalytics, community)
   fetch.py          one build by id or URL
   apply.py          translations -> build code (+ category layout, clipboard)
