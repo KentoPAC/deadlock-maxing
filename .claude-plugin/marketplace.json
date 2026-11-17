@@ -1,0 +1,17 @@
+{
+  "name": "deadlockmax",
+  "owner": {
+    "name": "KentoPAC",
+    "url": "https://github.com/KentoPAC"
+  },
+  "metadata": {
+    "description": "DeadlockMax, a Claude Code companion for the game Deadlock."
+  },
+  "plugins": [
+    {
+      "name": "deadlockmax",
+      "source": "./",
+      "description": "Game knowledge, hero pages with builds and how to play / counter, build codes, measured statistics, match analysis and creator video tips for Deadlock."
+    }
+  ]
+}

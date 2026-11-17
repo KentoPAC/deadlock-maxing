@@ -1,16 +1,16 @@
 ---
-name: deadlock-maxing
-description: Find the best Deadlock builds for a hero (high-ranked one-tricks, Mobalytics, community), analyse how to play and counter it (role, measured play style, matchups, abilities, power spikes), and produce English and French pages with a TLDR and codes to paste in game via "Paste build"; or translate one build (deadchaps.gg link or id). Use when the user asks for a hero's builds, how to play or counter a hero, to redo / update a hero page, opens the "all heroes" page, gives a build link or id to translate, or pastes a build code copied in game.
+name: hero-page
+description: Build or update a Deadlock hero page with DeadlockMax - the best builds (high-ranked one-tricks, Mobalytics, community, creator videos), how to play it (lane, phases, abilities, power spikes, measured play style) and how to counter it (matchups, counter items), in French and English with codes to paste in game. Use when the user asks for a hero's builds, how to play or counter a hero, to redo / update a hero page, or opens the "all heroes" page.
 ---
 
-# Deadlock builds: find, translate, import in game
+# DeadlockMax: hero pages
 
-Deadlock imports a build from the clipboard (**"Coller le build"** / "Paste build" button in the build editor).
-Format: `base64(zstd(protobuf CMsgHeroBuild))`, without a trailing newline (the game rejects it otherwise).
-This format has been verified in game.
-
-`S` = this skill's folder (`.claude/skills/deadlock-maxing`). Working folders in the project:
+`P` = the DeadlockMax plugin folder (`.claude/skills/deadlockmax`). Working folders in the project:
 `builds/<id>` for a single build, `builds/search-<hero>` for a search.
+
+Item and ability names, effects and kits: use the **deadlockmax:knowledge** skill. A single build link or code to
+translate: **deadlockmax:build-code**. A YouTube video: **deadlockmax:videos**. Measured statistics (spikes, lane,
+farm, healing, item effect at equal game state): **deadlockmax:stats**.
 
 Pages exist in **English** (default) and **French**: every text is written in French first (`summaries.json`), then
 in English with the same structure (`summaries.en.json`, official English item and ability names). Answer the user in
@@ -19,6 +19,9 @@ their language.
 Philosophy: statistical builds from ".gg" sites are not trusted (a win rate does not say *why* to buy an item).
 The goal is builds from strong players, **with early / mid / late explanations**. The win rate is never a ranking
 criterion, only displayed information.
+
+Statistics describe what players do, not what they should do: compare with top players (OTPs, Oracle+), with the
+hero's kit and with creators, and flag disagreements.
 
 ## A. "Find me the best <hero> builds": 2 calls
 
@@ -56,7 +59,7 @@ changes and a targeted request to copy. When that request comes in: apply only t
 (read changelog.json), without rewriting the rest; finish.py moves a page to the current version only once nothing
 is missing.
 
-1. `python3 -I S/scripts/find.py <hero> builds/search-<hero>` (~30 s; options `--days 60 --otp 2 --community 2`).
+1. `python3 -I .claude/skills/deadlockmax/scripts/find.py <hero> builds/search-<hero>` (~30 s; options `--days 60 --otp 2 --community 2`).
    Sources: **OTP** (Phantom+ players who mostly play the hero, build rebuilt from their real purchases:
    items in >= 75% of games sorted into early < 10 min / mid < 22 min / late, then situational 25-75%),
    **Mobalytics** (official accounts only), **Community** (popular, >= 150 characters of notes, Oracle+ authors),
@@ -68,7 +71,7 @@ is missing.
    - builds already in French get their `code.txt` right away.
 2. One call to finish everything (translations + analysis -> codes + page opened):
    ```
-   python3 -I S/scripts/finish.py builds/search-<hero> - <<'EOF'
+   python3 -I .claude/skills/deadlockmax/scripts/finish.py builds/search-<hero> - <<'EOF'
    {"tr": {"<key>": ["fr of [0]", "fr of [1]", …]},
     "intro": "What the builds agree on, the real differences, my advice",
     "<key>": {"resume": "2 sentences", "points": ["Early : …", "Mid : …", "Late : …", "Particularité : …"]},
@@ -113,14 +116,6 @@ is missing.
   `finish.py` with the missing fields.
 - **"Méthode changée"**: apply only the pending changelog `todo`s (see above).
 
-## B. Translate one build (link or id)
-
-1. `python3 -I S/scripts/fetch.py <url_or_id> builds/<id>`: compact summary + numbered "To translate" list.
-2. `python3 -I S/scripts/apply.py builds/<id> --fr - <<'EOF'` + JSON list of translations in order + `EOF`:
-   writes `build_fr.json`, `code.txt` and **copies the code**.
-3. Tell the user: in game, the hero's builds -> **"Coller le build"**. Summarise in a few lines.
-   To copy it again later: `wl-copy -n < builds/<id>/code.txt`.
-
 ## C. Details
 
 - **Home page**: `builds/index.html` (`hub.py`, rerun by report.py): every hero, stamps (À jour / À vérifier / Patch
@@ -129,7 +124,7 @@ is missing.
 - **Hero page**: `templates/hero.html` (official site look: charcoal, parchment, hero colour) + JSON data injected by
   `report.py`. No item data is hard-coded: names, icons, costs, categories and tooltips come from the API on every
   run (items change with every update). Banner / emblem (`assets/`) are copied to `builds/_assets/`.
-  Regenerate a page without refetching: `python3 -I S/scripts/report.py builds/search-<hero>`.
+  Regenerate a page without refetching: `python3 -I .claude/skills/deadlockmax/scripts/report.py builds/search-<hero>`.
   Hero theme (colour, background, name art, portrait, tags), rank emblems, FR + EN items (FR/EN toggle or `?lang=en`)
   and the patch list are all re-read from the API. The page compares dates with today and with patches itself
   (freshness stamp, ⚠ build older than a big patch, live check for new patches). find.py limits OTP games to the last
@@ -163,39 +158,6 @@ is missing.
   hero's players buy. Do not rewrite these lists by hand in the analysis: cite them.
   "against" part ("Le contrer" view): hero profile (heals / tanks / spirit / gun) -> most played late items (tier
   III-IV) of the category; matchups.py adds the counter items measured after 20 min.
-- **videos.py**: creator YouTube tips (`fetch <url>` = subtitles via yt-dlp split by chapter; `add <id> -` =
-  tips per hero with `"text"` (French) and `"en"`, English hero / item names converted to ids; fields left out keep
-  their saved value; `guide <id> <hero> <build_id>@<mm:ss>` = the video is a guide for that hero and recommends that
-  build; `list`). A hero guide video is the best source for `plan.lane` and the phase texts (cite
-  `video:<id>@<s>`); when the user mentions one, find it and use it. Data in `data/videos.json`, tips shown in
-  "Le contrer" ("L'avis des créateurs") with a timestamped link, the date, ⚠ when older than the last big patch, and
-  ✓ when a quoted item also stands out in the stats. An opinion is not a statistic: flag disagreements. Adding a
-  video = a changelog entry when it changes the method.
-  Reference: AndrewChicken, "1 Counter For EVERY Deadlock Hero" (C3yn9SdVHZ8); "Counter Buying…" (Zb82rYYumbY),
-  kept for the future live optimisation module (counter-buying during a game).
-  Guides: Paz, "The BEST Comprehensive Guide to VIOLET" (kW6zL2_22X4), recommends oses's build 897240.
-  Subtitles: only the original track is fetched (`en-orig`); asking for every translated track gets a 429.
 - **counters.py** (background, started by find.py, regenerates the page): items the OTPs buy clearly more against
   some heroes (statistical test). Steam pages are cached for a day (`~/.cache/deadlock-maxing`).
 - Power spikes and ability cards: computed by report.py (game level thresholds x the OTP's ability order).
-- **apply.py** `--lang fr|en` writes `build_<lang>.json` and the code (`code.txt` in French, `code.en.txt` in English);
-  `--tr -` fills that language's translations. It recomputes category width / height from the text length (the game cuts text with "..."); constants at
-  the top of the file, `--keep-layout` keeps the original. It mirrors an in-game copy, with author account id 0: the game
-  requires the field to show "Coller le build" but accepts any value, so codes contain nothing personal.
-- **Translation**: official French names of items and abilities (the summary already gives them). Nicknames
-  ("Cultist" = Sacrifice rituel, "E-Shift" = Refuge céleste…): compare `api.deadlock-api.com/v1/assets/items?language=<lang>`
-  with `?language=french`. Natural French gamer tone (lane, farm, focus… are fine). `#Citadel_HeroBuilds_*` labels are
-  not translated. End the description translation with "Traduit du build <id>.".
-
-## Troubleshooting
-
-- Pasting fails: ask the user to copy any build in game ("Copier dans le presse-papier"), then
-  `python3 -I S/scripts/codec.py --decode "$(wl-paste -n)"` and compare.
-- Reference protobuf: `CMsgHeroBuild` in
-  `https://raw.githubusercontent.com/SteamDatabase/GameTracking-Deadlock/master/Protobufs/citadel_gcmessages_common.proto`.
-- Game limit: 16,000 raw bytes per build (checked by apply.py).
-- `assets.deadlock-api.com` may not answer: use `api.deadlock-api.com/v1/assets/...`.
-- Useful endpoints: `/v1/analytics/scoreboards/players` (OTPs), `/v1/analytics/item-stats` and
-  `/v1/analytics/ability-order-stats` (filterable by `account_id`), `/v1/builds` (`search_name`, `author_id`,
-  `sort_by`), `/v1/players/rank`. Full schema: `https://api.deadlock-api.com/openapi.json`.
-- Python 3.14+ required (built-in `compression.zstd`).

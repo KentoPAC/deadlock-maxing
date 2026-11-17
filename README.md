@@ -65,12 +65,31 @@ sentence keeps track of its sources.
 
 ## Install
 
-The skill lives in a project's `.claude/skills/` folder; generated pages go to the project's `builds/` folder.
+DeadlockMax is a [Claude Code plugin](https://code.claude.com/docs/en/plugins). Its skills are namespaced
+`deadlockmax:<skill>`; generated pages go to the project's `builds/` folder.
+
+From GitHub (every project):
+
+```text
+/plugin marketplace add KentoPAC/deadlock-maxing
+/plugin install deadlockmax@deadlockmax
+```
+
+Or for one project only, as a repository plugin (loads in place, no install step):
 
 ```sh
 cd my-deadlock-project
-git clone https://github.com/KentoPAC/deadlock-maxing.git .claude/skills/deadlock-maxing
+git clone https://github.com/KentoPAC/deadlock-maxing.git .claude/skills/deadlockmax
 ```
+
+| Skill | Used for |
+| --- | --- |
+| `deadlockmax:knowledge` | What every item and ability does, items grouped by effect (anti-heal, % HP damage, crowd control…), refreshed per patch |
+| `deadlockmax:hero-page` | Hero pages: builds, how to play, how to counter |
+| `deadlockmax:build-code` | One build link or code: translation and in-game paste code |
+| `deadlockmax:stats` | Measured statistics: lane, power spikes, farm, healing, item effects at equal game state |
+| `deadlockmax:analyze` | One match, or a player's games compared with the same mode, ranked and Oracle+ players |
+| `deadlockmax:videos` | Tips from creator YouTube videos |
 
 Requirements: Python 3.14+, `wl-copy` (Wayland) or `xclip` (X11) to copy codes, and optionally
 [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) to import creator videos.
@@ -91,7 +110,7 @@ Requests work in French too (*"Trouve-moi les meilleurs builds Pocket"*).
 The scripts can also be run directly:
 
 ```sh
-S=.claude/skills/deadlock-maxing
+S=.claude/skills/deadlockmax
 python3 -I $S/scripts/find.py mina builds/search-mina      # candidates + analysis data
 python3 -I $S/scripts/report.py builds/search-mina         # regenerate the page
 python3 -I $S/scripts/fetch.py 123456 builds/123456        # one build, texts to translate
@@ -101,8 +120,10 @@ python3 -I $S/scripts/codec.py --decode "$(wl-paste -n)"   # inspect a code copi
 ## Project layout
 
 ```
-SKILL.md            instructions Claude follows (workflow, writing rules, sources)
+.claude-plugin/     plugin.json (the plugin manifest) and marketplace.json (install from GitHub)
+skills/<name>/      one SKILL.md per skill: the instructions Claude follows (workflow, writing rules, sources)
 scripts/
+  knowledge.py      items by effect + hero kits for the agent (skills/knowledge/ref, per patch)
   find.py           build candidates (one-tricks, Mobalytics, community)
   fetch.py          one build by id or URL
   apply.py          translations -> build code (+ category layout, clipboard)
