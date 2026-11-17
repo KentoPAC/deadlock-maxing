@@ -644,6 +644,18 @@ footer::before{content:"";display:block;height:5px;margin-bottom:var(--space-sm)
 .dv-legend i{display:inline-block;width:16px;height:3px;border-radius:2px;background:var(--c)}
 .dv-legend i.dash{background:repeating-linear-gradient(90deg,var(--c) 0 4px,transparent 4px 7px)}
 .dv-legend i.band{height:10px;width:14px;background:var(--c);opacity:.35}
+.dv-how{margin-top:var(--space-sm);font-size:var(--text-sm);color:var(--color-muted);max-width:80ch}
+.dv-how summary{cursor:pointer;width:max-content;font-weight:700;color:var(--color-accent-hi);list-style:none;padding:4px 0}
+.dv-how summary::-webkit-details-marker{display:none}
+.dv-how summary::before{content:"▸ ";display:inline-block;transition:transform var(--dur-micro)}
+.dv-how[open] summary::before{transform:rotate(90deg)}
+.dv-how summary:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
+.dv-how ol{margin:6px 0 0;padding-left:1.4em;display:grid;gap:6px;line-height:1.5}
+.dv-how__ex{margin:10px 0 0;padding:8px 12px;background:var(--color-paper-2);border:1px solid var(--color-rule);border-radius:var(--radius-sm);color:var(--color-ink);line-height:1.5}
+.dv-chart .lbl-lane{fill:var(--color-neutral);font:600 10px/1 var(--font-body);paint-order:stroke;stroke:var(--color-paper-2);stroke-width:4px}
+.tl-power__note{margin:6px 0 0;font-size:var(--text-xs);color:var(--color-neutral)}
+.tl-power__link{font:inherit;font-weight:700;color:var(--color-accent-hi);background:none;border:0;padding:0;cursor:pointer}
+.tl-power__link:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
 .dv-legend i.zero{height:2px;width:16px;background:var(--color-rule)}
 .dv-legend i.sw{height:10px;width:14px;border-radius:2px;background:color-mix(in oklch,var(--c) 55%,var(--color-paper-2))}
 .dv-legend i.dot{width:10px;height:10px;border-radius:50%}
@@ -1097,6 +1109,12 @@ const fxSentence=v=>v==null?L('data.tip_none'):Math.abs(v)<.05?L('data.tip_even'
 const pm=(v,se,d)=>sg(v,d)+(se?` <small>± ${nf(2*se,d)}</small>`:'');
 // Objectives whose median net worth falls in [a, b)
 const objsIn=(nwq,a,b)=>['rift','boss','urn'].flatMap(k=>(D.profile.events[k]||[]).filter(mn=>nwq[mn]&&nwq[mn][1]>=a&&nwq[mn][1]<b).map(mn=>`${OBJ[k][0]} ${L('data.'+k)} ${mn}'`));
+// Net worth reached at a given minute (median of his games), interpolated
+function nwAt(nwq,mn){const p=[[0,0]].concat(Object.entries(nwq||{}).map(([m,v])=>[+m,v[1]]).sort((a,b)=>a[0]-b[0]));
+  for(let i=1;i<p.length;i++)if(mn<=p[i][0])return p[i-1][1]+(p[i][1]-p[i-1][1])*(mn-p[i-1][0])/(p[i][0]-p[i-1][0]);return null}
+// "How it is computed": every chart says where its numbers come from, in plain steps, with a real example when possible
+const how=(steps,ex)=>`<details class="dv-how"><summary>${L('data.how')}</summary><ol>${steps.map(x=>`<li>${x}</li>`).join('')}</ol>${ex?`<p class="dv-how__ex">${ex}</p>`:''}</details>`;
+const fightRef=(g,i)=>g.fights_hero&&g.fights_hero[i]!=null&&g.fights[i]!=null?[g.fights_hero[i],g.fights_hero[i]-g.fights[i]]:null;
 const OBJ={rift:['◆','var(--color-accent-hi)'],boss:['●','var(--color-ok)'],urn:['■','var(--color-muted)']};
 // diverging bar (CSS): value v on a symmetric scale [-m, m], optional ±2 standard error whisker
 function dvBar(v,m,se,tone){const pc=t=>50+Math.max(-1,Math.min(1,t/m))*49,col=tone||(v>=0?'var(--color-accent)':'var(--color-neutral)');
@@ -1112,13 +1130,15 @@ function powerSvg(g,o,o_){const P=D.profile,B=P.buckets,nwq=g.nw_by_minute||{},X
   const area=pts.length?`M${pts[0][0]} ${y(0)} `+pts.map(p=>`L${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ')+` L${pts[pts.length-1][0]} ${y(0)} Z`:'';
   const id=mini?'tl':'dv';
   let s=`<defs><clipPath id="${id}Up"><rect x="0" y="0" width="${W}" height="${y(0)}"/></clipPath><clipPath id="${id}Dn"><rect x="0" y="${y(0)}" width="${W}" height="${H}"/></clipPath><clipPath id="${id}Plot"><rect x="${m.l}" y="${m.t-8}" width="${W-m.l-m.r}" height="${pb-m.t+8}"/></clipPath>
-    <linearGradient id="${id}G" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--color-accent)" stop-opacity=".55"/><stop offset="1" stop-color="var(--color-accent)" stop-opacity=".05"/></linearGradient></defs>`;
+    <linearGradient id="${id}G" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--color-accent)" stop-opacity=".55"/><stop offset="1" stop-color="var(--color-accent)" stop-opacity=".05"/></linearGradient>
+    <pattern id="${id}Hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--color-rule)" stroke-width="2" opacity=".55"/></pattern></defs>`;
   const sp=g.spike||{};if(sp.from)s+=`<rect x="${x(sp.from)}" y="${m.t-8}" width="${x(sp.to)-x(sp.from)}" height="${pb-m.t+8}" fill="var(--color-accent)" opacity="${mini?.14:.1}"/><text class="lbl-acc" x="${(x(sp.from)+x(sp.to))/2}" y="${m.t-12}" text-anchor="middle">SPIKE</text>`;
   if(!mini){const step=top>2?1:top>1?.5:.25;for(let v=-Math.floor(top/step)*step;v<=top+1e-9;v+=step){const vv=Math.round(v*100)/100;
     s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(vv)}" y2="${y(vv)}" stroke="var(--color-rule)" stroke-opacity="${vv===0?1:.45}" ${vv===0?'stroke-width="1.5"':''}/><text x="${m.l-8}" y="${y(vv)+4}" text-anchor="end">${vv===0?'0':sg(vv,step<.5?2:1)}</text>`}}
   else s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--color-rule)" stroke-width="1.5"/>`;
-  // what up and down mean, written in the plot
-  s+=`<text class="lbl-up" x="${m.l+6}" y="${m.t+4}">${L('data.ax_up')}</text><text class="lbl-dn" x="${m.l+6}" y="${pb-6}">${L('data.ax_down')}</text><text x="${W-m.r-4}" y="${y(0)-6}" text-anchor="end">${L('data.ref_zero')}</text>`;
+  // what up and down mean, written in the plot (right of the removed laning phase)
+  const laneNW=nwAt(nwq,(g.lane||{}).end_min),xa=(laneNW&&laneNW<X1?x(laneNW):m.l)+6;
+  s+=`<text class="lbl-up" x="${xa}" y="${m.t+4}">${L('data.ax_up')}</text><text class="lbl-dn" x="${xa}" y="${pb-6}">${L('data.ax_down')}</text><text x="${W-m.r-4}" y="${y(0)-6}" text-anchor="end">${L('data.ref_zero')}</text>`;
   if(!mini)Object.entries(OBJ).forEach(([k,[glyph,col]],r)=>{const yy=14+r*15;
     s+=`<text x="${m.l-8}" y="${yy+4}" text-anchor="end">${L('data.'+k)}</text><line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="var(--color-rule)" stroke-opacity=".5"/>`;
     let last=-99;(P.events[k]||[]).forEach(mn=>{const q=nwq[mn];if(!q||q[1]>X1)return;const xm=x(q[1]);
@@ -1128,6 +1148,8 @@ function powerSvg(g,o,o_){const P=D.profile,B=P.buckets,nwq=g.nw_by_minute||{},X
       s+=`<rect class="dv-obj" x="${xm-8}" y="${yy-8}" width="16" height="16" fill="transparent"${tt(ttBox(`${glyph} ${L('data.'+k)} · ${mn}'`,[],L('data.obj_tip',{min:mn,nw:kS(q[1]),lo:kS(q[0]),hi:kS(q[2])})))}/>`})});
   for(let b=mini?10000:0;b<=60000;b+=10000){const mm=minAt(nwq,b);s+=`${mini?'':`<line x1="${x(b)}" x2="${x(b)}" y1="${pb}" y2="${pb+5}" stroke="var(--color-neutral)"/>`}<text class="lbl-strong" x="${x(b)}" y="${pb+(mini?15:19)}" text-anchor="middle">${b?kS(b):'0'}</text>${mm!=null&&b?`<text x="${x(b)}" y="${pb+(mini?29:34)}" text-anchor="middle">≈ ${nf(mm)}'</text>`:''}`}
   if(!mini)s+=`<text x="${W-m.r}" y="${H-2}" text-anchor="end">${L('data.nw_axis')} · ≈ min</text>`;
+  if(laneNW&&laneNW<X1){const xl=x(laneNW);s+=`<rect x="${m.l}" y="${m.t-8}" width="${xl-m.l}" height="${pb-m.t+8}" fill="url(#${id}Hatch)"/><line x1="${xl}" x2="${xl}" y1="${m.t-8}" y2="${pb}" stroke="var(--color-neutral)" stroke-dasharray="3 3"/>
+    <text class="lbl-lane" transform="translate(${xl-7} ${(m.t+pb)/2}) rotate(-90)" text-anchor="middle">${L('data.lane_cut')}</text>`}
   if(area)s+=`<path d="${area}" fill="${mini?'var(--color-accent)':`url(#${id}G)`}" ${mini?'opacity=".28"':''} clip-path="url(#${id}Up)"/><path d="${area}" fill="var(--color-neutral)" opacity=".18" clip-path="url(#${id}Dn)"/>`;
   if(o)s+=`<path d="${path(o.fights)}" fill="none" stroke="var(--color-muted)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".7" clip-path="url(#${id}Plot)"/>`;
   s+=`<path d="${path(g.fights)}" fill="none" stroke="var(--color-accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
@@ -1143,7 +1165,8 @@ function tlPower(){const P=D.profile,g=P.ranked,sp=g.spike||{};
     ${objs.length?`<p class="tl-power__s">${L('tl.power_obj',{list:objs.join(', ')})}</p>`:''}
     <button type="button" class="tl-power__go" data-go="data">${L('tl.power_more')} →</button></div>
     <div>${powerSvg(g,null,{W:600,H:170,m:{l:10,r:10,t:22,b:34},mini:true})}
-    <div class="dv-legend"><span><i style="--c:var(--color-accent)"></i>${L('tl.power_line',{hero:esc(D.hero.name)})}</span><span><i class="band" style="--c:var(--color-accent)"></i>${L('data.lg_spike')}</span><span><i class="zero"></i>${L('data.lg_ref')}</span></div></div></div>`}
+    <div class="dv-legend"><span><i style="--c:var(--color-accent)"></i>${L('tl.power_line',{hero:esc(D.hero.name)})}</span><span><i class="band" style="--c:var(--color-accent)"></i>${L('data.lg_spike')}</span><span><i class="zero"></i>${L('data.lg_ref')}</span></div>
+    <p class="tl-power__note">${L('tl.power_note',{n:nf((P.meta||{}).matches||0)})} <button type="button" class="tl-power__link" data-go="data">${L('data.how')} →</button></p></div></div>`}
 function dvTiles(){const g=dG(),o=dO(),P=D.profile,ln=g.lane||{},sp=g.spike||{},tb=P.time_bins;
   const wr=g.wr.wr*100,wrBar=`<svg viewBox="0 0 200 14" aria-hidden="true"><rect y="4" width="200" height="6" rx="3" fill="var(--color-paper-3)"/><line x1="100" x2="100" y1="0" y2="14" stroke="var(--color-rule)" stroke-width="2"/><circle cx="${100+Math.max(-9.5,Math.min(9.5,wr-50))*10}" cy="7" r="6" fill="${wr>=50?'var(--color-accent)':'var(--color-neutral)'}" stroke="var(--color-paper-2)" stroke-width="2"/></svg>`;
   const verdict=ln.kd10>=.2?'data.lane_win':ln.kd10<=-.2?'data.lane_lose':'data.lane_even';
@@ -1168,15 +1191,21 @@ function dvTiles(){const g=dG(),o=dO(),P=D.profile,ln=g.lane||{},sp=g.spike||{},
      ttBox(L('data.antiheal'),ah?[[L('data.row_from'),kS(ah.from)],[L('data.row_heal'),nf(ah.hp_min)+' PV/min'],[L('data.row_ratio'),'×'+nf(ah.ratio,1)]]:[],L('data.help_antiheal')))}
   </div>`}
 // The power line: team fights after the lane by net worth, spike band, objectives placed at the hero's net worth
+function howFights(){const g=dG(),P=D.profile,B=P.buckets,m=P.meta||{},sp=g.spike||{};
+  let i=sp.peak!=null?B.indexOf(sp.peak):-1;if(i<0||!fightRef(g,i)){let best=-1;g.fights.forEach((v,j)=>{if(fightRef(g,j)&&(best<0||Math.abs(v)>Math.abs(g.fights[best])))best=j});i=best}
+  const fr=i>=0?fightRef(g,i):null;
+  return how([L('data.how.f1',{n:nf(m.matches||0),from:m.first_match||'',to:m.last_match||''}),L('data.how.f2',{min:nf((g.lane||{}).end_min||0,1)}),L('data.how.f3'),L('data.how.f4'),L('data.how.f5'),L('data.how.f6'),L('data.how.f7'),L('data.how.f8')],
+    fr?L('data.how.fex',{a:kS(B[i]),b:kS(B[i]+2500),hero:esc(D.hero.name),h:sg(fr[0]),r:sg(fr[1]),d:sg(g.fights[i])}):'')}
 function dvFights(){const g=dG(),o=dO(),other=DT==='ranked'?'top':'ranked';
   return powerSvg(g,o,{W:820,H:340,m:{l:46,r:18,t:66,b:52}})
    +`<div class="dv-legend"><span><i style="--c:var(--color-accent)"></i>${esc(D.hero.name)} · ${tierName(DT)}</span>${o?`<span><i class="dash" style="--c:var(--color-muted)"></i>${esc(D.hero.name)} · ${tierName(other)}</span>`:''}<span><i class="band" style="--c:var(--color-accent)"></i>${L('data.lg_spike')}</span><span><i class="zero"></i>${L('data.lg_ref')}</span>
-     <span>${Object.entries(OBJ).map(([k,[gl,c]])=>`<b style="color:${c}">${gl}</b> ${L('data.'+k)}`).join(' &nbsp;')} : ${L('data.lg_obj')}</span><span class="dv-legend__hint">${L('data.lg_hover')}</span></div>`}
+     <span>${Object.entries(OBJ).map(([k,[gl,c]])=>`<b style="color:${c}">${gl}</b> ${L('data.'+k)}`).join(' &nbsp;')} : ${L('data.lg_obj')}</span><span class="dv-legend__hint">${L('data.lg_hover')}</span></div>`+howFights()}
 function dvTiming(){const P=D.profile,g=dG(),tb=P.time_bins,v=g.timing,mx=Math.max(.3,...v.filter(x=>x!=null).map(Math.abs));
   return `<div class="dv-strip" style="--n:${tb.length}">${tb.map((b,i)=>{const t=v[i],evs=['rift','boss'].flatMap(k=>(P.events[k]||[]).filter(mn=>mn>=b[0]&&mn<b[1]).map(mn=>(k==='rift'?'◆ ':'● ')+mn+"'"));
     const col=t==null?'var(--color-paper-3)':t>=0?'var(--color-accent)':'var(--color-neutral)',a=t==null?0:Math.round(15+Math.abs(t)/mx*55),lab=b[1]>60?b[0]+"'+":b[0]+'–'+b[1]+"'";
     return `<div class="dv-cell" style="--c:${col};--a:${a}%"${tt(ttBox(lab,[[esc(D.hero.name),t==null?'—':sg(t)+' /10 min',col]].concat(evs.length?[[L('data.row_obj'),evs.join(' ')]]:[]),fxSentence(t)+' '+L('data.timing_tip')))}><b>${t==null?'—':sg(t)}</b><span>${lab}</span><em>${evs.join(' ')}</em></div>`}).join('')}</div>
-   <div class="dv-legend"><span><i class="sw" style="--c:var(--color-accent)"></i>${L('data.lg_more')}</span><span><i class="sw" style="--c:var(--color-neutral)"></i>${L('data.lg_less')}</span><span>◆ ${L('data.rift')} · ● ${L('data.boss')}</span><span class="dv-legend__hint">${L('data.lg_hover')}</span></div>`}
+   <div class="dv-legend"><span><i class="sw" style="--c:var(--color-accent)"></i>${L('data.lg_more')}</span><span><i class="sw" style="--c:var(--color-neutral)"></i>${L('data.lg_less')}</span><span>◆ ${L('data.rift')} · ● ${L('data.boss')}</span><span class="dv-legend__hint">${L('data.lg_hover')}</span></div>`
+   +how([L('data.how.t1'),L('data.how.t2'),L('data.how.t3'),L('data.how.t4')])}
 function dvLaneItems(){const g=dG(),li=g.lane_items||[];if(!li.length)return'';const mx=Math.max(150,...li.map(x=>Math.abs(x.souls)+2*(x.souls_se||0)));
   return `<div class="dv-rows">${li.map(x=>{const net=x.souls_se&&Math.abs(x.souls)>=2*x.souls_se,name=esc(T(x.id).n||x.fr);
     const help=ttBox(name,[[L('data.row_souls'),pm(x.souls,x.souls_se,0)],[L('data.row_kd'),pm(x.kd,x.kd_se,2)],[L('data.row_share'),nf(x.share,0)+' %']]
@@ -1185,7 +1214,7 @@ function dvLaneItems(){const g=dG(),li=g.lane_items||[];if(!li.length)return'';c
      <h4>${name} <span class="dv-pill">${L('data.share',{n:nf(x.share,0)})}</span>${net?'':` <span class="dv-pill">${L('data.not_clear')}</span>`}</h4>
      <p>${L('data.lane_item_fx',{souls:sg(x.souls,0),kd:sg(x.kd)})}</p>
      ${(x.against||[]).length?`<div class="dv-vs">${L('data.bought_vs')} ${x.against.slice(0,4).map(a=>`<span>${HN(a.id).img?`<img src="${esc(HN(a.id).img)}" alt="">`:''}${esc(HN(a.id).n)} ×${nf(a.lift,1)}</span>`).join('')}</div>`:''}</div>
-     <div class="dv-row__bar"${tt(help)}><b class="${x.souls>=0?'up':'down'}">${sg(x.souls,0)} <small>${L('data.unit_souls')}</small></b>${dvBar(x.souls,mx,x.souls_se)}</div></div>`}).join('')}</div>${barLegend()}`}
+     <div class="dv-row__bar"${tt(help)}><b class="${x.souls>=0?'up':'down'}">${sg(x.souls,0)} <small>${L('data.unit_souls')}</small></b>${dvBar(x.souls,mx,x.souls_se)}</div></div>`}).join('')}</div>${barLegend()}${how([L('data.how.l1'),L('data.how.l2'),L('data.how.l3'),L('data.how.l4'),L('data.how.l5')])}`}
 function dvItems(){const g=dG(),it=(g.items||[]).slice().sort((a,b)=>b.z-a.z).slice(0,8).sort((a,b)=>b.effect-a.effect);if(!it.length)return'';
   const se=x=>x.z?Math.abs(x.effect/x.z):0,mx=Math.max(.5,...it.map(x=>Math.abs(x.effect)+2*se(x)));
   return `<div class="dv-rows">${it.map(x=>{const net=x.z>=2.5,name=esc(T(x.id).n||x.fr);
@@ -1194,14 +1223,14 @@ function dvItems(){const g=dG(),it=(g.items||[]).slice().sort((a,b)=>b.z-a.z).sl
     return `<div class="dv-row ${net||x.z<=-2.5?'':'weak'}"><div class="mod ${esc(T(x.id).slot||'')}" tabindex="0" data-id="${x.id}">${gcard(x.id)}</div><div>
      <h4>${name}${net?` <span class="dv-pill ok">✓</span>`:''}</h4>
      <p>${L('data.item_cap',{fx:sg(x.effect),min:nf(x.minute),share:nf(x.share,0)})}</p></div>
-     <div class="dv-row__bar"${tt(help)}><b class="${net?'up':''}">${sg(x.effect)} <small>/10 min</small></b>${dvBar(x.effect,mx,se(x),net?'var(--color-accent)':'var(--color-neutral)')}</div></div>`}).join('')}</div>${barLegend()}`}
+     <div class="dv-row__bar"${tt(help)}><b class="${net?'up':''}">${sg(x.effect)} <small>/10 min</small></b>${dvBar(x.effect,mx,se(x),net?'var(--color-accent)':'var(--color-neutral)')}</div></div>`}).join('')}</div>${barLegend()}${how([L('data.how.i1'),L('data.how.i2'),L('data.how.i3'),L('data.how.i4')])}`}
 function dvFarm(){const g=dG(),ph=g.farm||[];const sh=s=>({lane:s.lanes,jungle:s.jungle,fights:s.fights,obj:s.objectives});
   const PHS=['data.phase0','data.phase1','data.phase2','data.phase3'];
   return `<div class="dv-farm">${ph.map((f,i)=>{if(!f)return'';const a=sh(f.share),b=sh(f.avg_share);
     const help=ttBox(L(PHS[i]),SRC.map(([k,l])=>[l,`${nf(a[k]||0,0)} % <small>(${L('data.avg').toLowerCase()} ${nf(b[k]||0,0)} %)</small>`,`var(--src-${k})`]).concat([[L('data.row_spm'),`${nf(f.per_min)} <small>(${nf(f.avg_per_min)})</small>`]]),L('data.farm_tip'));
     return `<div class="dv-farm__r"${tt(help)}><b>${L(PHS[i])}</b><div class="dv-farm__bars"><span class="dv-farm__l">${esc(D.hero.name)}</span>${bar(a)}<span class="dv-farm__l">${L('data.avg')}</span>${bar(b,'avg')}</div>
-    <span class="num">${L('data.spm',{n:nf(f.per_min)})}<br><small>${L('data.avg')} ${nf(f.avg_per_min)}</small></span></div>`}).join('')}</div>${legendSrc()}`}
-function dvKeys(){const g=dG(),ks=g.key_resources||[];if(!ks.length)return `<p class="dv-empty">${L('data.keys_none')}</p>`;
+    <span class="num">${L('data.spm',{n:nf(f.per_min)})}<br><small>${L('data.avg')} ${nf(f.avg_per_min)}</small></span></div>`}).join('')}</div>${legendSrc()}${how([L('data.how.r1'),L('data.how.r2'),L('data.how.r3')])}`}
+function dvKeys(){const g=dG(),ks=g.key_resources||[],hk=how([L('data.how.k1'),L('data.how.k2'),L('data.how.k3'),L('data.how.k4')]);if(!ks.length)return `<p class="dv-empty">${L('data.keys_none')}</p>`+hk;
   const mx=Math.max(10,...ks.flatMap(k=>[Math.abs(k.gap),Math.abs(k.usual)]))*1.1,W=320,H=26,x=v=>W/2+v/mx*(W/2-8);
   return `<div class="dv-keys">${ks.map(k=>{const what=k.what==='bonus'?L('data.res.bonus',{ab:esc(T(k.ability_id).n||k.ability)}):L('data.res.'+k.what);
     const ref=k.what==='bonus'?L('data.ref_kills'):L('data.ref_others');
@@ -1209,7 +1238,7 @@ function dvKeys(){const g=dG(),ks=g.key_resources||[];if(!ks.length)return `<p c
     return `<div class="dv-key"${tt(help)}><div><b>${what}</b><small>${L('data.key_line',{gap:sg(k.gap,1),usual:sg(k.usual,1),ref})}</small></div>
      <svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><line x1="0" x2="${W}" y1="${H/2}" y2="${H/2}" stroke="var(--color-paper-3)" stroke-width="6" stroke-linecap="round"/><line x1="${W/2}" x2="${W/2}" y1="3" y2="${H-3}" stroke="var(--color-rule)" stroke-width="2"/>
      <line x1="${x(k.usual)}" x2="${x(k.gap)}" y1="${H/2}" y2="${H/2}" stroke="var(--color-accent)" stroke-width="3" opacity=".6"/><circle cx="${x(k.usual)}" cy="${H/2}" r="5" fill="var(--color-neutral)"/><circle cx="${x(k.gap)}" cy="${H/2}" r="7" fill="var(--color-accent)" stroke="var(--color-paper)" stroke-width="2"/></svg></div>`}).join('')}</div>
-   <div class="dv-legend"><span><i class="dot" style="--c:var(--color-accent)"></i>${esc(D.hero.name)}</span><span><i class="dot" style="--c:var(--color-neutral)"></i>${L('data.lg_usual')}</span><span><i class="zero"></i>${L('data.lg_key_zero')}</span><span class="dv-legend__hint">${L('data.lg_hover')}</span></div>`}
+   <div class="dv-legend"><span><i class="dot" style="--c:var(--color-accent)"></i>${esc(D.hero.name)}</span><span><i class="dot" style="--c:var(--color-neutral)"></i>${L('data.lg_usual')}</span><span><i class="zero"></i>${L('data.lg_key_zero')}</span><span class="dv-legend__hint">${L('data.lg_hover')}</span></div>`+hk}
 function dataPanel(){const P=D.profile,m=P.meta||{};
   const seg=`<div class="dv-seg" role="group">${[['ranked','data.tier_all'],['top','data.tier_top']].map(([k,l])=>`<button type="button" data-tier="${k}" aria-pressed="${DT===k}">${L(l)}</button>`).join('')}</div>`;
   return `<article class="panel"><p class="panel__src">${L('data.kicker',{n:nf(m.matches||0),from:m.first_match||'',to:m.last_match||''})}</p><h2>${L('data.title',{hero:esc(D.hero.name)})}</h2>
@@ -1230,10 +1259,12 @@ function bindPower(root){root.querySelectorAll('[data-chart=power]').forEach(ch=
     cx.setAttribute('x1',xx);cx.setAttribute('x2',xx);cx.setAttribute('visibility','visible');
     if(v!=null){dot.setAttribute('cx',xx);dot.setAttribute('cy',yOf(v));dot.setAttribute('visibility','visible')}else dot.setAttribute('visibility','hidden');
     const sp=g.spike||{},inS=sp.from&&B[i]>=sp.from&&B[i]<sp.to,ev=objsIn(g.nw_by_minute||{},B[i],B[i]+2500);
-    const rows=[[`${esc(D.hero.name)} · ${tierName(k)}`,v==null?'—':sg(v),'var(--color-accent)']];
+    const fr=fightRef(g,i),rows=fr?[[L('data.row_hero_rate',{hero:esc(D.hero.name)}),sg(fr[0])],[L('data.row_ref_rate'),sg(fr[1])],[`${L('data.row_gap')} · ${tierName(k)}`,sg(v),'var(--color-accent)']]
+      :[[`${esc(D.hero.name)} · ${tierName(k)}`,v==null?'—':sg(v),'var(--color-accent)']];
+    const ln=nwAt(g.nw_by_minute,(g.lane||{}).end_min),inLane=ln&&B[i]+2500<=ln;
     if(o)rows.push([`${esc(D.hero.name)} · ${tierName(k==='ranked'?'top':'ranked')}`,o.fights[i]==null?'—':sg(o.fights[i]),'var(--color-muted)']);
     if(ev.length)rows.push([L('data.row_obj'),ev.join(' ')]);
-    tip.innerHTML=`${inS?'<em class="dv-tip__spike">SPIKE</em>':''}`+ttBox(`${kS(B[i])} – ${kS(B[i]+2500)} ${L('data.unit_souls')}${mn!=null?` · ≈ ${nf(mn)} min`:''}`,rows,fxSentence(v));
+    tip.innerHTML=`${inS?'<em class="dv-tip__spike">SPIKE</em>':''}`+ttBox(`${kS(B[i])} – ${kS(B[i]+2500)} ${L('data.unit_souls')}${mn!=null?` · ≈ ${nf(mn)} min`:''}`,rows,fxSentence(v)+(inLane?' '+L('data.lane_cut_tip'):''));
     tip.hidden=false;const tw=tip.offsetWidth,tx=xx/W*r.width;tip.style.left=(tx+14+tw>r.width-4?tx-14-tw:tx+14)+'px';tip.style.top=Math.max(4,(mt-8)/svg.viewBox.baseVal.height*r.height)+'px'};
   const hit=svg.querySelector('.dv-hit');hit.addEventListener('pointermove',move);hit.addEventListener('pointerdown',move);
   hit.addEventListener('pointerleave',()=>{tip.hidden=true;cx.setAttribute('visibility','hidden');dot.setAttribute('visibility','hidden')})})}
