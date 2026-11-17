@@ -117,18 +117,20 @@ is missing.
    - **Lane**: the starting items, then the 4 lane items that never upgrade (Restorative Shot, Extra Regen,
      Rebuttal, Golden Goose Egg) reasoned against the kit and the lane opponent: which one if you poke, if you are
      bullied, against melee heroes (lane_items: effect at equal opponent, who they are bought against).
-   - **Core** (`"core": true`): the items bought every game, in purchase order, each note saying when (minute or
-     souls) and why for THIS hero (which ability or stat it feeds, which spike it prepares).
-   - **Endgame** (`"endgame": true`): the tier 4 items that replace the smaller ones, in order, each saying when to
-     pick it and which item it replaces. At the end the 12 slots hold tier 4 items, except actives worth their slot
-     (a key combo item like Slowing Hex, a save). 12 is a floor, not a target: list every useful endgame item, and
-     when there are more than 12, each note says in which situation to pick it over another.
+   - **Core** (`"core": true`): the build taken every game, read left to right in purchase order; each note says
+     when (minute or souls) and why for THIS hero (which ability or stat it feeds, which spike it prepares).
+   - **Situational, cheap** (one category per situation: "Contre les soins", "Contre les contrôles"…): tier 1-3
+     items slipped into the core when something in the game disrupts it; each note says "if <situation>, buy it
+     between <core item> and <core item>, because <reason>".
+   - **Endgame** (`"endgame": true`): no order, picked against the enemy team. Each note says against what or
+     when to take it ("against a team that heals", "if you get stunned before swapping"). At the end the slots hold
+     tier 4 items, except actives worth their slot (a key combo item, a save): smaller passives are sold for room.
+     12 is a floor, not a target: list every useful endgame item; when there are more than 12, the notes say which
+     one to pick in which situation.
    - **Evolutions**: items upgrade (Long Range → Sharpshooter, Superior Cooldown → Transcendent Cooldown): plan the
      core so its components grow into the endgame items, and say it in the note ("it becomes …"). Items that never
      evolve: tier 4 items (final), some tier 2-3 items (kept or sold for a tier 4) and the 4 tier 1 lane items.
      Check paths in items.md (`component_items`) or the page tooltips.
-   - **Situational**: one category per situation ("Contre les soins", "Contre les tanks", "Si tu es en retard"…),
-     each note written "if <situation>, buy <item> around <time>, because <reason>".
    - `abilities`: the point order (the OTPs' most common order unless the kit or a creator says otherwise), with
      `ability_notes` on the unlocks.
    Never justify an item by its win or pick rate (Farmingbip trap): a statistic is a clue to explain with the kit.

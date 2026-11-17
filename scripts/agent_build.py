@@ -9,8 +9,9 @@ Input (the "agent_build" key of finish.py), texts in the content language, the s
    "ability_notes": {"<ability id>": "..."},     # optional
    "en": {"name": "...", "description": "...", "categories": [{"name": "...", "description": "...", "notes": ["..."]}],
           "ability_notes": {"<ability id>": "..."}}}
-Organisation: lane, one "core": true category (bought every game, in order), one "endgame": true category (a few
-proposals to finish the inventory, each saying when to pick it and what it replaces), then situational categories.
+Organisation: lane, one "core": true category (bought every game, left to right), cheap situational categories
+(slipped into the core when the game calls for it), one "endgame": true category (no order: picked against the
+enemy team, each note saying against what).
 Core + endgame list at least 12 tier 4 or active items (more when more are useful: the notes say which one to pick
 in which situation); the smaller passives are sold one by one to make room (an upgrade takes its component's slot).
 """
