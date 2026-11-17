@@ -602,7 +602,7 @@
   "mod.sell": "↺ revendu en premier",
   "mod.sell_title": "Priorité de revente {n}/100 : avec l'achat rapide, le jeu le revend tout seul quand tes emplacements sont pleins",
   "imb.k": "À imprégner",
-  "imb.desc": "En l'achetant, tu choisis la capacité qu'il renforce (imprégnation).",
+  "imb.desc": "En l'achetant, tu choisis la capacité qu'il renforce (imprégnation). Choisis-la bien : on ne peut plus la changer ensuite.",
   "mod.imbue_free": "capacité au choix",
   "evo.from": "Se construit à partir de",
   "evo.up": "Évolue en",
