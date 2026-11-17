@@ -52,6 +52,36 @@ class AgentBuildTest(unittest.TestCase):
         s["categories"][0]["mods"][0]["note"] = "Pick Rate: 62% WR: +1%"
         self.assertIn("the note must say when and why", " ".join(agent_build.check(s, 7)))
 
+    def test_imbue_target_sell_priority_and_optional_categories(self):
+        s = spec(range(2, 11), (11, 12, 13, 14))
+        ITEMS[12]["imbue"] = True
+        try:
+            self.assertIn("imbues an ability", " ".join(agent_build.check(s, 7)))
+            s["categories"][2]["mods"][1]["imbue"] = 103
+            self.assertEqual(agent_build.check(s, 7), [])
+            cats = agent_build.to_build(s, 7)["details"]["mod_categories"]
+        finally:
+            del ITEMS[12]["imbue"]
+        self.assertEqual([c["optional"] for c in cats], [False, False, True])
+        mods = {m["ability_id"]: m for c in cats for m in c["mods"]}
+        self.assertEqual(mods[12]["imbue_target_ability_id"], 103)
+        self.assertNotIn("sell_priority", mods[1])                       # tier 3: no default
+        self.assertNotIn("sell_priority", mods[2])                       # tier 2 active: kept
+
+    def test_an_item_that_evolves_in_the_build_is_not_sold_first(self):
+        ITEMS.update({20: {"id": 20, "class_name": "c20", "type": "upgrade", "shopable": True, "item_tier": 1},
+                      21: {"id": 21, "class_name": "c21", "type": "upgrade", "shopable": True, "item_tier": 1}})
+        try:
+            s = spec(range(2, 11), (11, 12, 13, 14))
+            s["categories"][0]["mods"] += [{"id": 20, "note": NOTE}, {"id": 21, "note": NOTE}]
+            s["en"]["categories"][0]["notes"] += ["n", "n"]
+            ITEMS[11]["component_items"] = ["c20"]
+            mods = {m["ability_id"]: m for c in agent_build.to_build(s, 7)["details"]["mod_categories"] for m in c["mods"]}
+            self.assertNotIn("sell_priority", mods[20])                  # evolves into 11
+            self.assertEqual(mods[21]["sell_priority"], 95)
+        finally:
+            del ITEMS[20], ITEMS[21], ITEMS[11]["component_items"]
+
     def test_ability_order_becomes_unlocks_then_upgrades(self):
         order = agent_build.to_build(spec(range(1, 11)), 7)["details"]["ability_order"]["currency_changes"]
         self.assertEqual([(c["ability_id"], c["currency_type"]) for c in order],

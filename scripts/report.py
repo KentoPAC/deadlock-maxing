@@ -84,6 +84,10 @@ def mod_data(mod):
         out.update(pct=parsed[0], min=parsed[1], sold=parsed[2])
     elif note:
         out["note"] = note
+    if mod.get("imbue_target_ability_id"):
+        out["imbue"] = mod["imbue_target_ability_id"]
+    if mod.get("sell_priority"):
+        out["sell"] = mod["sell_priority"]
     return out
 
 

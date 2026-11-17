@@ -127,6 +127,13 @@ is missing.
      tier 4 items, except actives worth their slot (a key combo item, a save): smaller passives are sold for room.
      12 is a floor, not a target: list every useful endgame item; when there are more than 12, the notes say which
      one to pick in which situation.
+   - **What good builds do** (352 most-favourited builds, 2026-11): about 35 items in ~6 categories (Lane /
+     Core / Late, then Situational, Optional, Luxury groups): a wide pool of options, not a single list. Half mark
+     their option groups `optional` (default here for every category but the first one and the core); builds with
+     an imbue item set its target ability (`"imbue": <ability id>`, required here); small passives get a Quickbuy
+     sell priority (default here: tier 1 = 95, tier 2 = 85, actives none; `"sell"` overrides).
+   - **Slots**: 9 base slots + 3 extra slots, one per enemy Walker destroyed (wiki, 2025-11-21): a team behind
+     plays with 9-11 items, so the endgame notes say what to keep first when slots are short.
    - **Evolutions**: items upgrade (Long Range → Sharpshooter, Superior Cooldown → Transcendent Cooldown): plan the
      core so its components grow into the endgame items, and say it in the note ("it becomes …"). Items that never
      evolve: tier 4 items (final), some tier 2-3 items (kept or sold for a tier 4) and the 4 tier 1 lane items.

@@ -4,7 +4,10 @@ the kit), then checked here and turned into a candidate like the others (key "dl
 Input (the "agent_build" key of finish.py), texts in the content language, the same texts in English under "en":
   {"name": "...", "description": "...",
    "categories": [{"name": "...", "description": "...", "core": false, "endgame": false,
-                   "mods": [{"id": <item id>, "note": "if <situation>, buy it around <minute> because <reason>"}]}],
+                   "optional": <default: every category but the first one and the core>,
+                   "mods": [{"id": <item id>, "note": "if <situation>, buy it around <minute> because <reason>",
+                             "imbue": <ability id, required for items that imbue an ability>,
+                             "sell": <0-100, default 95 for tier 1 and 85 for tier 2 passives: sold first by Quickbuy>}]}],
    "abilities": [<ability id>, ...],            # point order: the first time an ability appears is its unlock
    "ability_notes": {"<ability id>": "..."},     # optional
    "en": {"name": "...", "description": "...", "categories": [{"name": "...", "description": "...", "notes": ["..."]}],
@@ -73,6 +76,8 @@ def check(spec, hero_id):
             if not item or item.get("type") != "upgrade" or not item.get("shopable"):
                 errors.append(f"{where}: {m.get('id')} is not a shop item")
                 continue
+            if item.get("imbue") and m.get("imbue") not in (hero_abilities(hero_id) or {m.get("imbue")}):
+                errors.append(f"{where}: {item['name']} imbues an ability: say which one (\"imbue\": <ability id>)")
             note = STAT_NOTE.sub("", m.get("note") or "").strip()
             if len(note) < MIN_NOTE:
                 errors.append(f"{where}: {item['name']}: the note must say when and why ({MIN_NOTE}+ characters, no pick or win rates)")
@@ -85,17 +90,39 @@ def check(spec, hero_id):
     return errors
 
 
+SELL_PRIORITY = {1: 95, 2: 85}   # what good builds do: small passives are sold first when slots run out
+
+
+def game_fields(mod, upgraded=()):
+    """Imbue target and Quickbuy sell priority of an item (game build fields). Items that evolve into another item
+    of the build get no default priority: they are upgraded, not sold."""
+    item = items().get(mod["id"], {})
+    out = {}
+    if mod.get("imbue"):
+        out["imbue_target_ability_id"] = mod["imbue"]
+    default = None if item.get("is_active_item") or mod["id"] in upgraded else SELL_PRIORITY.get(item.get("item_tier"))
+    sell = mod.get("sell", default)
+    if sell:
+        out["sell_priority"] = sell
+    return out
+
+
 def to_build(spec, hero_id, lang_field=None):
     """Game build format; lang_field="en" takes the English texts (same structure, same items)."""
     en = spec.get("en") or {}
     tx = (lambda key, base: en.get(key)) if lang_field else (lambda key, base: spec.get(key))
+    all_items = items()
+    ids = {m["id"] for c in spec["categories"] for m in c["mods"]}
+    classes = {c for i in ids for c in all_items.get(i, {}).get("component_items") or []}
+    upgraded = {i for i in ids if all_items.get(i, {}).get("class_name") in classes}
     cats = []
     for ci, cat in enumerate(spec["categories"]):
         ce = en["categories"][ci] if lang_field else {}
         cats.append({"name": ce.get("name") if lang_field else cat["name"],
                      "description": ce.get("description") if lang_field else cat["description"],
-                     "mods": [{"ability_id": m["id"], "annotation": ce["notes"][mi] if lang_field else m["note"]}
-                              for mi, m in enumerate(cat["mods"])]})
+                     "optional": cat.get("optional", ci > 0 and not cat.get("core")),
+                     "mods": [dict({"ability_id": m["id"], "annotation": ce["notes"][mi] if lang_field else m["note"]},
+                                   **game_fields(m, upgraded)) for mi, m in enumerate(cat["mods"])]})
     notes = (en.get("ability_notes") if lang_field else spec.get("ability_notes")) or {}
     changes, seen = [], {}
     for a in spec.get("abilities") or []:
