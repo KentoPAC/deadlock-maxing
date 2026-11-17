@@ -602,7 +602,7 @@
   "mod.sell": "↺ sold first",
   "mod.sell_title": "Sell priority {n}/100: with Quickbuy, the game sells it automatically when your slots are full",
   "imb.k": "Imbue",
-  "imb.desc": "When you buy it, you pick the ability it powers (imbue).",
+  "imb.desc": "When you buy it, you pick the ability it powers (imbue). Pick it well: it cannot be changed afterwards.",
   "mod.imbue_free": "ability of your choice",
   "evo.from": "Built from",
   "evo.up": "Evolves into",
