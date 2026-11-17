@@ -11,6 +11,15 @@ class CommonTest(unittest.TestCase):
         self.assertEqual(common.short_note("Pris dans 60 % de ses parties, vers 12 min."), "60%@12m")
         self.assertEqual(common.short_note("Une note d'auteur"), "Une note d'auteur")
 
+    def test_pick_and_win_rates_are_not_explanations(self):
+        stats = {"description": "", "details": {"mod_categories": [
+            {"description": "", "mods": [{"annotation": "Pick Rate: 62%\nWR: +0%"},
+                                         {"annotation": "vs tanks\nPick Rate: 90%\nWR: +1%"}]}]}}
+        self.assertEqual(common.text_amount(stats), len("vs tanks"))
+        human = {"description": "Bomb go boom",
+                 "details": {"mod_categories": [{"description": "", "mods": [{"annotation": "make bomba big"}]}]}}
+        self.assertEqual(common.text_amount(human), len("Bomb go boom") + len("make bomba big"))
+
     def test_rank_label(self):
         i18n.use("fr")
         self.assertEqual(common.rank_label(114), "Éternus 4")
