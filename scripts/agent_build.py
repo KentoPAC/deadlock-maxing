@@ -10,8 +10,9 @@ Input (the "agent_build" key of finish.py), texts in the content language, the s
    "en": {"name": "...", "description": "...", "categories": [{"name": "...", "description": "...", "notes": ["..."]}],
           "ability_notes": {"<ability id>": "..."}}}
 Organisation: lane, one "core": true category (bought every game, in order), one "endgame": true category (a few
-proposals to finish the inventory, each saying when to pick it), then situational categories. Core + proposals
-must fill the 12 slots (an upgrade listed with its component takes one slot).
+proposals to finish the inventory, each saying when to pick it and what it replaces), then situational categories.
+Core + endgame list at least 12 tier 4 or active items (more when more are useful: the notes say which one to pick
+in which situation); the smaller passives are sold one by one to make room (an upgrade takes its component's slot).
 """
 import os
 import time
@@ -48,8 +49,13 @@ def check(spec, hero_id):
             errors.append(f"{n} categories marked {flag}: exactly one lists {what}")
     final = [m.get("id") for c in cats if c.get("core") or c.get("endgame") for m in c.get("mods") or []]
     slots = {i for i in final if not any(all_items.get(i, {}).get("class_name") in comps(j) for j in final if j != i)}
-    if len(slots) < SLOTS:
-        errors.append(f"core + endgame proposals fill {len(slots)} slots: they must fill the {SLOTS} item slots")
+    # the final inventory is tier 4, except actives worth their slot: smaller passives are sold to make room
+    lasting = {i for i in slots if all_items.get(i, {}).get("item_tier") == 4 or all_items.get(i, {}).get("is_active_item")}
+    if len(lasting) < SLOTS:
+        sold = sorted(all_items.get(i, {}).get("name", str(i)) for i in slots - lasting)
+        errors.append(f"core + endgame give {len(lasting)} tier 4 or active items: list at least enough to fill the {SLOTS} "
+                      f"slots, more if they are useful, each note saying when to pick it "
+                      f"(passives sold for room: {', '.join(sold) or 'none'})")
     for ci, cat in enumerate(cats):
         where = f"category {ci + 1} ({cat.get('name')})"
         ce = cats_en[ci] if ci < len(cats_en) else {}
