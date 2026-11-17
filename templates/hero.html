@@ -856,6 +856,7 @@ function modCard(m,num){const i=T(m.id);
   const into=CUR_IDS?[...famOf(m.id)].filter(x=>x!==+m.id&&CUR_IDS.has(x)&&upChains(+m.id).some(c=>c.includes(x))):[];
   if(into.length)chips+=`<div class="mod__evo">→ ${into.map(x=>esc(T(x).n)).join(', ')}</div>`;
   if(m.imbue)chips+=`<div class="mod__evo mod__imb" title="${esc(L('mod.imbue_title',{ab:T(m.imbue).n||''}))}">◆ ${esc(T(m.imbue).n||'')}</div>`;
+  else if(i.imb)chips+=`<div class="mod__evo mod__imb" title="${esc(L('imb.desc'))}">◆ ${L('mod.imbue_free')}</div>`;
   if(m.sell)chips+=`<div class="mod__sell" title="${esc(L('mod.sell_title',{n:m.sell}))}">${L('mod.sell')}</div>`;
   return `<div class="mod ${esc(i.slot||'')}" tabindex="0" data-id="${m.id}"${m.note?` data-note="${esc(m.note)}"`:''}>${num?`<span class="nmark">${num}</span>`:''}${gcard(m.id)}${chips}</div>`}
 
@@ -1347,6 +1348,7 @@ function tipHtml(t){if(t.ab)return tipAbility(t);let h=`<div class="h ${esc(t.sl
   const st=l=>l.map(x=>`<div class="st"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('');
   if(t.innate.length)h+=st(t.innate);
   t.blocks.forEach((b,k)=>{if(k||t.innate.length)h+='<div class="sep"></div>';if(b.d)h+=`<div class="d">${b.d}</div>`;h+=st(b.s)});
+  if(t.imb)h+=`<div class="sep"></div><div class="evo"><div class="evo__k">◆ ${L('imb.k')}</div><div class="evo__n">${L('imb.desc')}</div></div>`;
   return h+evoHtml(t._id)+'</div>'}
 function place(x,y){const r=tip.getBoundingClientRect();let l=x+16,t=y+16;
   if(l+r.width>innerWidth-8)l=x-r.width-16;if(t+r.height>innerHeight-8)t=Math.max(8,innerHeight-r.height-8);
