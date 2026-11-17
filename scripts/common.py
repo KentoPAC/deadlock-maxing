@@ -132,13 +132,20 @@ def write_candidate(folder, build, prefill=False):
     return strings
 
 
+# "Pick Rate: 62% WR: +0%" notes, as in builds generated from statistics: they say what people buy, never why.
+STAT_NOTE = re.compile(r"(?i)\b(?:pick\s*rate|win\s*rate|wr|pr)\b\s*[:=]?\s*[+-]?\d+(?:[.,]\d+)?\s*%")
+
+
 def text_amount(build):
-    """Amount of written explanation in a build (characters)."""
+    """Amount of written explanation in a build (characters), not counting pick / win rate figures."""
     details = build["details"]
-    n = len(build.get("description") or "")
+
+    def size(text):
+        return len(STAT_NOTE.sub("", text or "").strip())
+    n = size(build.get("description"))
     for cat in details["mod_categories"]:
-        n += len(cat.get("description") or "")
-        n += sum(len(m.get("annotation") or "") for m in cat.get("mods", []))
+        n += size(cat.get("description"))
+        n += sum(size(m.get("annotation")) for m in cat.get("mods", []))
     return n
 
 
