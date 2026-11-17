@@ -17,9 +17,9 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import GAME_LANGUAGE, get, heroes, items, parse_otp_note, rank_label, read_json, read_text, write_text  # noqa: E402
+from common import GAME_LANGUAGE, get, heroes, items, parse_otp_note, rank_label, read_json, read_text, write_json, write_text  # noqa: E402
 from i18n import CONTENT_LANG, DEFAULT_LANG, LANGS, t, table, use  # noqa: E402
-from status import completeness, load_json, resolve_sources  # noqa: E402
+from status import ANALYSIS_VERSION, CHANGELOG, completeness, load_json, resolve_sources  # noqa: E402
 from textlinks import link_index, short_names, signature_abilities  # noqa: E402
 from writing import filler, repeats  # noqa: E402
 from tooltips import UPGRADE_COST, item_data, plain, tier_text, tooltip  # noqa: E402
@@ -534,9 +534,23 @@ def build_page(folder, data, lang):
     return path, state
 
 
+def apply_report_changes(folder):
+    """Method changes marked "auto" whose only script is report.py are applied by generating the page: when they are
+    all that is pending and nothing is missing, the page moves to the current method version."""
+    path = f"{folder}/summaries.json"
+    summaries = load_json(path)
+    if not summaries or summaries.get("version", 1) >= ANALYSIS_VERSION:
+        return
+    pending = [c for c in CHANGELOG if c["version"] > summaries.get("version", 1)]
+    if all(c.get("auto") and set(c.get("scripts") or []) <= {"report.py"} for c in pending) and not completeness(folder)["missing"]:
+        summaries["version"] = ANALYSIS_VERSION
+        write_json(path, summaries, indent=1)
+
+
 def main():
     folder = sys.argv[1]
     data = read_json(f"{folder}/candidates.json")
+    apply_report_changes(folder)
     for lang in LANGS:
         path, state = build_page(folder, data, lang)
         print(f"Page ({lang}): {os.path.abspath(path)}")
