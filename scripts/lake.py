@@ -11,6 +11,7 @@ DuckDB is capped at 3 GB of RAM and 4 threads by default (it spills to ~/.cache/
 Tables in the database (default ~/.cache/deadlockmax/lake.duckdb):
   mp        one row per player and match (ranked, + unranked with --unranked; normal mode): stats.* series under their own
             names (net_worth, kills...), end-of-match values as final_net_worth, final_kills...
+  (mp.items = shop purchases: [{id, t, sold}], times in seconds, sold 0 when kept)
   ply       mp + t_end (end of his laning phase: first Tier 1 guardian of his lane, either side)
   deaths    one row per death: match, victim team, victim lane, time
   teamnw    per match and team: snapshot times and average net worth of the team
@@ -43,12 +44,22 @@ COLUMNS = ["match_id", "start_time", "duration_s", "match_mode", "average_badge"
            "assists final_assists", "ability_stats",
            '"death_details.game_time_s"', '"objectives.destroyed_time_s"', '"objectives.team_objective"',
            '"objectives.team"', '"mid_boss.destroyed_time_s"', '"mid_boss.team_killed"']
+ASSETS = "https://api.deadlock-api.com/v1/assets/items/by-type/upgrade"
+
+
+def fetch(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "deadlockmax/1.0"})
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        return json.load(resp)
 
 
 def manifest():
-    req = urllib.request.Request(MANIFEST, headers={"User-Agent": "deadlockmax/1.0"})
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        return json.load(resp)
+    return fetch(MANIFEST)
+
+
+def shop_items():
+    """Ids of the items sold in the shop (the purchase list also holds every ability point)."""
+    return sorted(i["id"] for i in fetch(ASSETS) if i.get("shopable"))
 
 
 def latest_files(n_partitions):
@@ -76,13 +87,20 @@ def connect(db_path, read_only=False, memory=DEFAULT_MEMORY, threads=DEFAULT_THR
 
 def build(db_path, n_partitions, memory=DEFAULT_MEMORY, unranked=False):
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    for old in (db_path, db_path + ".wal"):  # start from a new file: DuckDB never shrinks one
+        if os.path.exists(old):
+            os.remove(old)
     parts, urls = latest_files(n_partitions)
     print(f"Partitions {parts}: {len(urls)} files")
     con = connect(db_path, memory=memory)
     con.execute("INSTALL httpfs; LOAD httpfs")
     src = "read_parquet([" + ",".join(f"'{u}'" for u in urls) + "])"
     modes = "'Ranked', 'Unranked'" if unranked else "'Ranked'"
-    cols = ", ".join(COLUMNS + [f'"stats.{s}"::BIGINT[] "{s}"' for s in STATS])
+    shop = "[" + ",".join(map(str, shop_items())) + "]"
+    # purchases of shop items only: [{id, t (bought, s), sold (s, 0 = kept)}]
+    items = (f'[{{"id": z[1], "t": z[2], "sold": z[3]}} for z in list_zip("items.item_id", "items.game_time_s", '
+             f'"items.sold_time_s") if list_contains({shop}, z[1])] items')
+    cols = ", ".join(COLUMNS + [items] + [f'"stats.{s}"::BIGINT[] "{s}"' for s in STATS])
     t = time.time()
     con.execute(f"""CREATE OR REPLACE TABLE mp AS SELECT {cols} FROM {src}
         WHERE game_mode = 'Normal' AND match_mode IN ({modes}) AND len("stats.time_stamp_s") > 2""")
