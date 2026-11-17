@@ -229,6 +229,22 @@
     "find.py"
    ],
    "todo": "Rerun find.py on the folder (community builds whose notes are only pick / win rates are now left out), then rewrite plan and tldr from the hero's measured profile (deadlockmax:stats, profiles.md: lane, spike window by net worth and minute, best period at equal game state, value of being fed, farm, key resources), crossed with the kit and the creators; cite it as stat:profile. Say how the hero becomes strong (its key resource) and give item choices as situations: if <situation>, buy <item> around <minute / net worth>, because <description>."
+  },
+  {
+   "version": 15,
+   "date": "2026-11-17",
+   "title": {
+    "fr": "Vue « Les données »",
+    "en": "\"The data\" view"
+   },
+   "parts": [
+    "data"
+   ],
+   "scripts": [
+    "report.py"
+   ],
+   "auto": true,
+   "todo": "Run report.py on the folder: the page gets the \"The data\" view drawn from the hero's measured profile (profiles.py): spike line with Rifts, Mid-Bosses and urns, timing by minute at equal game state, lane items, items that power the hero up, farm, key resources. No text to rewrite."
   }
  ]
 }
