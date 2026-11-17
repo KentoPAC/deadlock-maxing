@@ -580,6 +580,7 @@ footer::before{content:"";display:block;height:5px;margin-bottom:var(--space-sm)
 .evo__i img{width:18px;height:18px;object-fit:contain}.evo__i small{color:var(--color-muted);font-size:10px}
 .evo__i.weapon{box-shadow:inset 2px 0 var(--color-weapon)}.evo__i.vitality{box-shadow:inset 2px 0 var(--color-vitality)}.evo__i.spirit{box-shadow:inset 2px 0 var(--color-spirit)}
 .evo__n{font-size:var(--text-xs);color:var(--color-muted);line-height:1.35}
+.mod__imb{color:var(--color-spirit)}.mod__sell{font:600 10px/1.2 var(--font-body);color:var(--color-neutral)}
 .mod__evo{font:600 10px/1.2 var(--font-body);color:var(--color-accent-hi);text-align:center;max-width:84px}
 .fam-on .mod.fam .gcard{box-shadow:0 0 0 2px var(--color-accent-hi),0 0 18px color-mix(in oklch,var(--color-accent) 60%,transparent);transform:translateY(-3px)}
 .fam-on .ref.fam,.fam-on [data-id].fam:not(.mod){outline:2px solid var(--color-accent-hi);outline-offset:2px;border-radius:3px}
@@ -854,6 +855,8 @@ function modCard(m,num){const i=T(m.id);
     +(m.sold!=null?`<span class="chip" title="${L('mod.sold_title',{n:m.sold})}">${L('mod.sold',{n:m.sold})}</span>`:'')+'</div>';
   const into=CUR_IDS?[...famOf(m.id)].filter(x=>x!==+m.id&&CUR_IDS.has(x)&&upChains(+m.id).some(c=>c.includes(x))):[];
   if(into.length)chips+=`<div class="mod__evo">→ ${into.map(x=>esc(T(x).n)).join(', ')}</div>`;
+  if(m.imbue)chips+=`<div class="mod__evo mod__imb" title="${esc(L('mod.imbue_title',{ab:T(m.imbue).n||''}))}">◆ ${esc(T(m.imbue).n||'')}</div>`;
+  if(m.sell)chips+=`<div class="mod__sell" title="${esc(L('mod.sell_title',{n:m.sell}))}">${L('mod.sell')}</div>`;
   return `<div class="mod ${esc(i.slot||'')}" tabindex="0" data-id="${m.id}"${m.note?` data-note="${esc(m.note)}"`:''}>${num?`<span class="nmark">${num}</span>`:''}${gcard(m.id)}${chips}</div>`}
 
 function abilityGrid(order){if(!order.length)return'';
