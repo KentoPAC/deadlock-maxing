@@ -77,7 +77,11 @@ is missing.
     "<key>": {"resume": "2 sentences", "points": ["Early : …", "Mid : …", "Late : …", "Particularité : …"]},
     "tldr": {…}, "plan": {…}, "sources": {…},
     "en": {"intro": "…", "<key>": {…}, "tldr": {…}, "plan": {…}},
-    "tr_en": {"<key>": ["en of [0]", …]}}
+    "tr_en": {"<key>": ["en of [0]", …]},
+    "agent_build": {"name": "…", "description": "…", "categories": [{"name": "…", "description": "…",
+                    "core": false, "endgame": false, "mods": [{"id": 0, "note": "…"}]}], "abilities": [0, …],
+                    "ability_notes": {"<id>": "…"}, "en": {"name": "…", "description": "…",
+                    "categories": [{"name": "…", "description": "…", "notes": ["…"]}], "ability_notes": {}}}}
    EOF
    ```
    `tr`: one list per key, **in the exact order** of "To translate" (or a partial `{"n": "fr"}`).
@@ -104,6 +108,26 @@ is missing.
    Write "l'objet Fléau" for the item (page links give priority to the hero's ability).
    Analysis: only from the data shown; flag inconsistencies. The page computes the "Comparer" view (shared items)
    itself: the intro does not need to list them all.
+   **The DeadlockMax build** (`"agent_build"`, candidate key `dlmax`, shown first and advised by default): the real
+   builds are kept as references; this one is ours, the best build we can write by crossing everything gathered:
+   what the OTPs actually buy and keep (incl. their "Fin de partie : 12 emplacements" category), creators' videos and
+   guides, the measured profile (deadlockmax:stats: spike window, items that power it up, lane items, anti-heal,
+   farm) and the kit (deadlockmax:knowledge). Format and checks: `scripts/agent_build.py` (refused with the list of
+   problems if a rule is broken). Organisation, in this order:
+   - **Lane**: the starting items, then the 4 lane items that never upgrade (Restorative Shot, Extra Regen,
+     Rebuttal, Golden Goose Egg) reasoned against the kit and the lane opponent: which one if you poke, if you are
+     bullied, against melee heroes (lane_items: effect at equal opponent, who they are bought against).
+   - **Core** (`"core": true`): the items bought every game, in purchase order, each note saying when (minute or
+     souls) and why for THIS hero (which ability or stat it feeds, which spike it prepares).
+   - **Endgame proposals** (`"endgame": true`): a few items to finish the inventory, each saying when to pick it
+     and what to sell for room. Core + proposals fill the 12 slots (an upgrade takes its component's slot).
+   - **Situational**: one category per situation ("Contre les soins", "Contre les tanks", "Si tu es en retard"…),
+     each note written "if <situation>, buy <item> around <time>, because <reason>".
+   - `abilities`: the point order (the OTPs' most common order unless the kit or a creator says otherwise), with
+     `ability_notes` on the unlocks.
+   Never justify an item by its win or pick rate (Farmingbip trap): a statistic is a clue to explain with the kit.
+   Every note quotes its reason; `sources` can cite `build:dlmax/...` paths like the other texts. Write its
+   `{resume, points}` like the other builds and set `tldr.pick` to `dlmax` unless a real build is clearly better.
 3. Reply briefly: the candidates, my advice, the page link. No screenshot unless the user reports a display
    issue. Counter items (counters.py) arrive ~2 min later in the background: the page regenerates itself.
 

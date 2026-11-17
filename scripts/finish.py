@@ -8,7 +8,8 @@ Input JSON:
    "<key>": {"resume": "2 sentences", "points": ["Early : ...", "Mid : ...", "Late : ...", "Particularité : ..."]},
    "tldr": {...}, "plan": {...}, "sources": {"<text path>": ["<ref>", ...]},
    "en": {"intro": ..., "<key>": {...}, "tldr": {...}, "plan": {...}},       # the same texts in English
-   "tr_en": {"<key>": [...]}}                                                 # English texts of non-English builds
+   "tr_en": {"<key>": [...]},                                                 # English texts of non-English builds
+   "agent_build": {...}}       # the DeadlockMax build written by the agent (format: agent_build.py), key "dlmax"
 "tr" may also be {"<n>": "fr"} to translate only some texts. "plan", "tldr" and "sources" are merged into
 the existing analysis; any other key is replaced. Sources are shared by every language (same text paths).
 Builds whose author wrote in English, and texts generated from the locales, need no "tr_en".
@@ -21,6 +22,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import agent_build  # noqa: E402
 from common import fill, read_json, write_json  # noqa: E402
 from i18n import CONTENT_LANG, LANGS  # noqa: E402
 from status import ANALYSIS_VERSION, completeness  # noqa: E402
@@ -64,6 +66,8 @@ def apply_all(folder, candidates):
 def main():
     folder, src = sys.argv[1], sys.argv[2]
     data = json.load(sys.stdin) if src == "-" else read_json(src)
+    if data.get("agent_build"):  # checked first: a refused build stops before anything is written
+        agent_build.publish(folder, data.pop("agent_build"))
     # Build translations: "tr" for the content language, "tr_<lang>" for the others.
     for lang in LANGS:
         field = "tr" if lang == CONTENT_LANG else f"tr_{lang}"

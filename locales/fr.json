@@ -108,6 +108,7 @@
   ]
  },
  "source_info": {
+  "DeadlockMax": "build écrit par DeadlockMax : il croise les builds des joueurs, les vidéos des créateurs, les statistiques mesurées et le kit, et explique chaque achat",
   "OTP": "reconstitué d'après les vrais achats d'un joueur qui joue surtout ce héros",
   "Mobalytics": "build officiel d'un expert Mobalytics, publié en jeu",
   "Communauté": "build public populaire, bien expliqué, d'un auteur bien classé",
@@ -224,6 +225,7 @@
   "wr.long": "{n} % de victoires",
   "fav.short": "{n} fav.",
   "src.OTP": "OTP",
+  "src.DeadlockMax": "DeadlockMax",
   "src.Mobalytics": "Mobalytics",
   "src.Communauté": "Communauté",
   "src.Vidéo": "Vidéo",
@@ -596,6 +598,12 @@
   "cp.cc_hint": "stun, silence, ralentissements…",
   "cp.note": "Héros classés d’après leurs soins et dégâts encaissés chez les Fantôme+ (classe du jeu pour spirit / arme). Objets choisis par leurs effets dans le jeu, parmi ceux que les joueurs de {hero} achètent (le % = part de ses joueurs qui le prennent).",
   "st.wr": "Victoires",
+  "st.agent_from": "Construit à partir de",
+  "st.agent_from_s": "builds de joueurs, dont {otp} OTP, + vidéos et statistiques",
+  "st.agent_core": "Core",
+  "st.agent_core_s": "objets achetés à chaque partie",
+  "st.agent_end": "Endgame",
+  "st.agent_end_s": "propositions pour finir les 12 emplacements",
   "st.wr_over": "sur {n} parties du joueur",
   "st.wr_none": "non mesuré pour un build publié",
   "st.share": "de ses parties sur {hero}",
