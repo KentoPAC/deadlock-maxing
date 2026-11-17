@@ -153,7 +153,8 @@ def text_amount(build):
 # Builds may have been generated in any language, so every locale is recognised.
 OTP_NOTES = [re.compile(pattern("otp.note", lang=lang) + "(?:" + pattern("otp.note_sold", lang=lang) + ")?$") for lang in LANGS]
 OTP_DESC = re.compile("^(?:" + "|".join(pattern(k, ".+", lang=lang) for lang in LANGS for k in (
-    "otp.cat.early", "otp.cat.mid", "otp.cat.late", "otp.cat.situational_desc", "otp.cat.situational_late_desc")) + ")")
+    "otp.cat.early", "otp.cat.mid", "otp.cat.late", "otp.cat.situational_desc", "otp.cat.situational_late_desc",
+    "otp.cat.endgame_desc", "otp.cat.endgame_options_desc")) + ")")
 
 
 def parse_otp_note(note):
@@ -166,7 +167,9 @@ def parse_otp_note(note):
 
 
 # Texts generated for OTP builds, in the order they are tried (the note with a resale is tried before the plain one).
-GENERATED_KEYS = ("otp.name", "otp.description", "otp.cat.early", "otp.cat.mid", "otp.cat.late", "otp.cat.situational",
+GENERATED_KEYS = ("otp.note_long", "otp.note_kept", "otp.note_endgame", "otp.cat.endgame", "otp.cat.endgame_desc",
+                  "otp.cat.endgame_options", "otp.cat.endgame_options_desc",
+                  "otp.name", "otp.description", "otp.cat.early", "otp.cat.mid", "otp.cat.late", "otp.cat.situational",
                   "otp.cat.situational_desc", "otp.cat.situational_late", "otp.cat.situational_late_desc")
 
 
