@@ -152,7 +152,8 @@
   "items": "Données du jeu : objets, coûts, effets (API assets)",
   "patch": "Notes de patch officielles (liste des patchs de l'API)",
   "lanes": "Lanes en duo mesurées : victoires par lane et par partenaire de lane (deadlock-api lane-matchup-stats)",
-  "laning": "Lanes mesurées : avance en âmes à 9 min selon le héros d'en face (deadlock-api lane-matchup-stats)"
+  "laning": "Lanes mesurées : avance en âmes à 9 min selon le héros d'en face (deadlock-api lane-matchup-stats)",
+  "profile": "Profil mesuré DeadlockMax (data lake deadlock-api, parties classées et Oracle+ : lane, spike, timing à état de partie égal, valeur d'être fed, farm, ressources clés)"
  },
  "source.build": "Build {source} de {author}",
  "source.guide": "« {title} » de {author}",

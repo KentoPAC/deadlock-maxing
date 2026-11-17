@@ -212,6 +212,23 @@
    ],
    "auto": true,
    "todo": "Run laning.py, then report.py: the counter view shows which heroes win or lose the lane against the hero (soul lead at 9 min, Phantom+ duo lanes) and the lane items (bought before 9 min) that win clearly more against it. No text to rewrite; plan.lane may cite it (source stat:laning)."
+  },
+  {
+   "version": 14,
+   "date": "2026-11-17",
+   "title": {
+    "fr": "Profil mesuré et builds statistiques écartés",
+    "en": "Measured profile, statistical builds left out"
+   },
+   "parts": [
+    "plan",
+    "tldr",
+    "builds"
+   ],
+   "scripts": [
+    "find.py"
+   ],
+   "todo": "Rerun find.py on the folder (community builds whose notes are only pick / win rates are now left out), then rewrite plan and tldr from the hero's measured profile (deadlockmax:stats, profiles.md: lane, spike window by net worth and minute, best period at equal game state, value of being fed, farm, key resources), crossed with the kit and the creators; cite it as stat:profile. Say how the hero becomes strong (its key resource) and give item choices as situations: if <situation>, buy <item> around <minute / net worth>, because <description>."
   }
  ]
 }

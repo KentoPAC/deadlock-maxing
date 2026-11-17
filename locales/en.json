@@ -152,7 +152,8 @@
   "items": "Game data: items, costs, effects (API assets)",
   "patch": "Official patch notes (API patch list)",
   "lanes": "Measured duo lanes: win rate by lane and by lane partner (deadlock-api lane-matchup-stats)",
-  "laning": "Measured lanes: soul lead at 9 min depending on the enemy hero (deadlock-api lane-matchup-stats)"
+  "laning": "Measured lanes: soul lead at 9 min depending on the enemy hero (deadlock-api lane-matchup-stats)",
+  "profile": "DeadlockMax measured profile (deadlock-api data lake, ranked and Oracle+ matches: lane, spike, timing at equal game state, value of being fed, farm, key resources)"
  },
  "source.build": "{source} build by {author}",
  "source.guide": "\"{title}\" by {author}",

@@ -23,6 +23,11 @@
      }
     ]
    }
+  },
+  "JouUab99B4Y": {
+   "title": "Every Deadlock Character’s REAL Role (5 Role System Explained)",
+   "author": "Metro Deadlock",
+   "date": "2026-10-21"
   }
  },
  "tips": {
@@ -425,6 +430,16 @@
     ],
     "translations": {
      "en": "Her Kinetic Carbine scales with her gun damage, but it deals spirit damage. Spirit Resilience counters it, and Spellbreaker even more: that big hit is enough to trigger its strong spirit damage reduction."
+    }
+   },
+   {
+    "video": "JouUab99B4Y",
+    "t": 1022,
+    "text": "Metro classe Paradox parmi les initiateurs : Permutation paradoxale sert à attraper un adversaire isolé, et l'équipe qui attrape la première gagne presque toujours le combat en milieu et fin de partie. Quand elle disparaît de la carte, ne joue pas seul sur une lane isolée : reste près de ton équipe, sinon chaque recharge de son ultime lui donne un kill gratuit.",
+    "lang": "fr",
+    "items": [],
+    "translations": {
+     "en": "Metro ranks Paradox among the initiators: Paradoxical Swap is there to catch an isolated enemy, and the team that gets the first catch almost always wins mid and late game fights. When she disappears from the map, do not stay alone on an isolated lane: stay close to your team, or every cooldown of her ultimate gives her a free kill."
     }
    }
   ],
