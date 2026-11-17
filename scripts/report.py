@@ -36,7 +36,7 @@ def measured_profile(hero_id):
     hero = next((h for h in (doc or {}).get("heroes", []) if h["id"] == hero_id), None)
     if not hero:
         return None
-    keep = ("wr", "lane", "fights", "fight_minutes", "spike", "timing", "fed", "farm", "antiheal", "self_healing",
+    keep = ("wr", "lane", "fights", "fights_hero", "fight_minutes", "spike", "timing", "fed", "farm", "antiheal", "self_healing",
             "self_healing_avg", "damage", "kill_participation", "nw_by_minute")
     out = {"meta": doc["meta"], "buckets": doc["buckets"], "time_bins": doc["time_bins"], "events": doc["events"]}
     for group in doc.get("groups", []):

@@ -385,7 +385,10 @@ def build(db, out_dir, memory=DEFAULT_MEMORY):
             p = profiles.setdefault(h, {"id": h, "fr": heroes_fr[h]["name"], "en": heroes_en.get(h, heroes_fr[h]["name"])})
             fights = [None if mins.get((h, b), 0) < min_minutes / 3 or b < 5000 else
                       sig.get((h, b), 0) / mins[(h, b)] * 10 - sig.get(("ALL", b), 0) / mins[("ALL", b)] * 10 for b in B]
-            fights = smooth(fights, [mins.get((h, b), 0) for b in B], 2)
+            weights = [mins.get((h, b), 0) for b in B]
+            fights = smooth(fights, weights, 2)
+            # the hero's own rate, smoothed the same way: the page shows it next to the reference (hero - fights)
+            fights_hero = smooth([None if v is None else sig.get((h, b), 0) / mins[(h, b)] * 10 for v, b in zip(fights, B)], weights, 2)
             m_curve = [round(mins.get((h, b), 0)) for b in B]
             timing, fed = [], []
             for tb in range(len(TBINS)):
@@ -444,7 +447,8 @@ def build(db, out_dir, memory=DEFAULT_MEMORY):
             nwq = nwm.get(h, {})
             if spike and not spike.get("flat"):
                 spike["min_from"], spike["min_to"] = minute_at(nwq, spike["from"]), minute_at(nwq, spike["to"])
-            p[gname] = {"wr": wr[h], "lane": lane.get(h), "fights": fights, "fight_minutes": m_curve, "spike": spike,
+            p[gname] = {"wr": wr[h], "lane": lane.get(h), "fights": fights, "fights_hero": fights_hero,
+                        "fight_minutes": m_curve, "spike": spike,
                         "timing": timing, "fed": fed, "damage": dmg, "kill_participation": kp, "ally_healing": ally,
                         "self_healing": self_heal, "self_healing_avg": self_avg, "antiheal": antiheal, "farm": farm_out,
                         "nw_by_minute": nwq, "key_resources": res,
