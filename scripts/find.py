@@ -32,6 +32,10 @@ MIN_BADGE = 90          # Fantôme (Phantom) and above for OTPs
 CORE_PCT = 0.75         # an item is "core" when bought in >= 75% of games
 SITUATIONAL_PCT = 0.25  # below this: ignored
 EARLY_MIN, MID_MIN = 10, 22
+LONG_MIN = 35           # the late game is read from the player's games of 35 min and more (short games dilute it)
+MIN_LONG_GAMES = 15
+SLOTS = 12              # item slots at the end of a game
+ENDGAME_NW, ENDGAME_BADGE = 60000, 100  # full inventories: Oracle and above players who end with 60K souls
 MIN_PATCH_DAYS = 21     # the OTP window starts at the last big patch if that patch is at least 3 weeks old
 ANALYSIS_MODULES = ("playstyle.py", "guides.py", "roles.py", "matchups.py", "laning.py", "counterplay.py")
 
@@ -89,6 +93,63 @@ def ability_order(hero_id, account_id, since):
     return order
 
 
+def held(s, n):
+    """Share of games where the item is still in the inventory at the end (bought and never sold or upgraded)."""
+    return (s["matches"] - (s.get("sold") or 0)) / n
+
+
+_endgame_cache = {}
+
+
+def endgame_stats(hero_id, since):
+    """Final inventories of Oracle+ players of this hero who end with ENDGAME_NW souls (cached per hero)."""
+    if (hero_id, since) not in _endgame_cache:
+        all_items = items()
+        st = get("/v1/analytics/item-stats", hero_id=hero_id, min_unix_timestamp=since,
+                 min_average_badge=ENDGAME_BADGE, min_networth=ENDGAME_NW)
+        _endgame_cache[(hero_id, since)] = [s for s in st if all_items.get(s["item_id"], {}).get("type") == "upgrade"]
+    return _endgame_cache[(hero_id, since)]
+
+
+def endgame_slots(hero_id, since, own, n_own):
+    """The 12 items of a full endgame inventory: what the player keeps in their long games, completed with what
+    Oracle+ players keep at ENDGAME_NW souls. An upgrade replaces its component. Returns (slots, options)
+    as lists of (stat, annotation), in purchase order."""
+    all_items = items()
+    by_class = {i.get("class_name"): i["id"] for i in all_items.values()}
+    comps = lambda item_id: {by_class.get(c) for c in all_items.get(item_id, {}).get("component_items") or []}
+    picks = {}
+
+    def add(s, text):
+        for c in comps(s["item_id"]) & set(picks):
+            del picks[c]                                      # the upgrade takes its component's slot
+        if any(s["item_id"] in comps(other) for other in picks):
+            return                                            # its upgrade is already there
+        picks[s["item_id"]] = (s, text)
+
+    if n_own >= MIN_LONG_GAMES:
+        for s in sorted(own, key=lambda s: -held(s, n_own)):
+            if held(s, n_own) >= 0.5:
+                add(s, t("otp.note_kept", pct=round(100 * held(s, n_own)), duration=LONG_MIN,
+                         minute=round(s["avg_buy_time_s"] / 60)))
+    pop = endgame_stats(hero_id, since)
+    n_pop = max((s["matches"] for s in pop), default=0)
+    options = []
+    if n_pop >= 30:
+        for s in sorted(pop, key=lambda s: -held(s, n_pop)):
+            h = held(s, n_pop)
+            if s["item_id"] in picks or h < 0.2:
+                continue
+            text = t("otp.note_endgame", pct=round(100 * h), rank=rank_label(ENDGAME_BADGE), souls=ENDGAME_NW // 1000,
+                     minute=round(s["avg_buy_time_s"] / 60))
+            if len(picks) < SLOTS and h >= 0.4:
+                add(s, text)
+            elif len(options) < 6 and not any(s["item_id"] in comps(o) for o in picks):
+                options.append((s, text))
+    order = lambda xs: sorted(xs, key=lambda x: x[0]["avg_buy_time_s"])
+    return order(list(picks.values()))[:SLOTS], order(options)
+
+
 def otp_build(hero, player, since):
     """Rebuild a player's build from their purchase stats (localized texts: they go into the game)."""
     hero_id = hero["id"]
@@ -102,6 +163,9 @@ def otp_build(hero, player, since):
     winrate = 100 * most_bought["wins"] / max(1, most_bought["wins"] + most_bought["losses"])
 
     def note(s):
+        if s.get("_long"):
+            return t("otp.note_long", pct=round(100 * s["matches"] / s["_long"]), duration=LONG_MIN,
+                     minute=round(s["avg_buy_time_s"] / 60))
         pct = round(100 * s["matches"] / n)
         text = t("otp.note", pct=pct, minute=round(s["avg_buy_time_s"] / 60))
         if s.get("sold") and s["sold"] / s["matches"] >= 0.4 and s.get("avg_sell_time_s"):
@@ -116,8 +180,23 @@ def otp_build(hero, player, since):
             groups["early" if minute < EARLY_MIN else "mid" if minute < MID_MIN else "late"].append(s)
         elif pct >= SITUATIONAL_PCT:
             groups["situational" if minute < MID_MIN else "situational_late"].append(s)
+    # Late game: read from their long games, where late items are not diluted by games that ended before
+    long_ = get("/v1/analytics/item-stats", hero_id=hero_id, account_id=player["account_id"], min_unix_timestamp=since,
+                min_duration_s=LONG_MIN * 60)
+    long_ = [s for s in long_ if all_items.get(s["item_id"], {}).get("type") == "upgrade"]
+    n_long = max((s["matches"] for s in long_), default=0)
+    if n_long >= MIN_LONG_GAMES:
+        core = {s["item_id"] for k in ("early", "mid") for s in groups[k]}
+        late = [s for s in long_ if s["item_id"] not in core and s["avg_buy_time_s"] >= MID_MIN * 60]
+        for s in late:
+            s["_long"] = n_long
+        groups["late"] = [s for s in late if s["matches"] / n_long >= CORE_PCT]
+        groups["situational_late"] = [s for s in late if SITUATIONAL_PCT <= s["matches"] / n_long < CORE_PCT]
+        taken = {s["item_id"] for k in ("late", "situational_late") for s in groups[k]}
+        groups["situational"] = [s for s in groups["situational"] if s["item_id"] not in taken]
     for k in ("situational", "situational_late"):
         groups[k].sort(key=lambda s: -s["matches"])
+    slots, options = endgame_slots(hero_id, since, long_, n_long)
 
     def category(name, desc, group):
         return {"name": name, "description": desc,
@@ -130,6 +209,10 @@ def otp_build(hero, player, since):
         category("#Citadel_HeroBuilds_LateGame", t("otp.cat.late", minute=MID_MIN), groups["late"]),
         category(t("otp.cat.situational"), t("otp.cat.situational_desc"), groups["situational"]),
         category(t("otp.cat.situational_late"), t("otp.cat.situational_late_desc"), groups["situational_late"]),
+        {"name": t("otp.cat.endgame", n=len(slots)), "description": t("otp.cat.endgame_desc", duration=LONG_MIN),
+         "mods": [{"ability_id": s["item_id"], "annotation": text} for s, text in slots]},
+        {"name": t("otp.cat.endgame_options"), "description": t("otp.cat.endgame_options_desc"),
+         "mods": [{"ability_id": s["item_id"], "annotation": text} for s, text in options]},
     ] if c["mods"]]
 
     build = {
@@ -277,6 +360,24 @@ def videos_only(hero, out):
 
 # ---------------------------------------------------------------------- main
 
+def refresh_otp(hero, out):
+    """Rebuild the OTP builds of a folder after a change of method; translations of unchanged texts are kept."""
+    data = read_json(f"{out}/candidates.json")
+    # folders made before "since" was saved: same window as when they were generated
+    data.setdefault("since", last_big_patch_since(data.get("generated", int(time.time())) - data.get("days", 60) * 86400))
+    for c in data["candidates"]:
+        if c["source"] != "OTP":
+            continue
+        player = dict(account_id=c["author_id"], name=c["author"], badge=c.get("badge") or 0, matches=c["matches"],
+                      share=c["share"])
+        result = otp_build(hero, player, data["since"])
+        if result:
+            write_candidate(f"{out}/{c['key']}", result[0], prefill=True)
+            c.update(result[1])
+            print(f"{c['key']}:\n{summarize(result[0])}\n")
+    write_json(f"{out}/candidates.json", data, indent=1)
+
+
 def last_big_patch_since(since):
     """Move the window start to the last big patch when that patch is old enough to have data."""
     try:
@@ -298,11 +399,15 @@ def main():
     parser.add_argument("--otp", type=int, default=2)
     parser.add_argument("--community", type=int, default=2)
     parser.add_argument("--videos-only", action="store_true", help="only add the builds recommended in guide videos")
+    parser.add_argument("--refresh-otp", action="store_true",
+                        help="rebuild the OTP builds of an existing folder (same players and period), nothing else")
     args = parser.parse_args()
     use(CONTENT_LANG)  # builds are written and translated in the content language
     hero = find_hero(args.hero)
     if args.videos_only:
         return videos_only(hero, args.out)
+    if args.refresh_otp:
+        return refresh_otp(hero, args.out)
     since = last_big_patch_since(int(time.time()) - args.days * 86400)
     os.makedirs(args.out, exist_ok=True)
     candidates = []
