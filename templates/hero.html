@@ -573,6 +573,17 @@ footer::before{content:"";display:block;height:5px;margin-bottom:var(--space-sm)
 .mod .gcard{transition:transform .22s var(--ease-pop),filter .25s var(--ease-out),box-shadow .2s var(--ease-out)}
 .mod:hover .gcard,.mod:focus-visible .gcard{transform:translateY(-5px) scale(1.07) rotate(-1.5deg);box-shadow:0 0 0 2px var(--corner),0 7px 0 var(--color-shade);
   animation:breathe 1.1s var(--ease-in-out) .2s infinite alternate}
+.evo{display:grid;gap:4px}
+.evo__k{font:700 var(--text-xs)/1.2 var(--font-display);letter-spacing:.1em;color:var(--color-accent);text-transform:uppercase;margin-top:2px}
+.evo__l{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.evo__l i{font-style:normal;color:var(--color-muted)}
+.evo__i{display:inline-flex;align-items:center;gap:4px;padding:2px 6px 2px 2px;border-radius:3px;background:var(--color-paper-3);font-size:var(--text-xs);color:var(--color-ink)}
+.evo__i img{width:18px;height:18px;object-fit:contain}.evo__i small{color:var(--color-muted);font-size:10px}
+.evo__i.weapon{box-shadow:inset 2px 0 var(--color-weapon)}.evo__i.vitality{box-shadow:inset 2px 0 var(--color-vitality)}.evo__i.spirit{box-shadow:inset 2px 0 var(--color-spirit)}
+.evo__n{font-size:var(--text-xs);color:var(--color-muted);line-height:1.35}
+.mod__evo{font:600 10px/1.2 var(--font-body);color:var(--color-accent-hi);text-align:center;max-width:84px}
+.fam-on .mod.fam .gcard{box-shadow:0 0 0 2px var(--color-accent-hi),0 0 18px color-mix(in oklch,var(--color-accent) 60%,transparent);transform:translateY(-3px)}
+.fam-on .ref.fam,.fam-on [data-id].fam:not(.mod){outline:2px solid var(--color-accent-hi);outline-offset:2px;border-radius:3px}
+.fam-on .mods .mod.fam,.fam-on .tl-items .mod.fam{filter:none!important}
 .mods:has(.mod:hover) .mod:not(:hover),.tl-items:has(.mod:hover) .mod:not(:hover){filter:saturate(.3) brightness(.65);transition:filter .25s var(--ease-out)}
 .mod{transition:filter .25s var(--ease-out)}
 /* rail picks: hero-colour brush stroke wipes in behind the name */
@@ -755,7 +766,7 @@ const BUILTIN={EarlyGame:'Early game',MidGame:'Mid game',LateGame:'Late game',Ea
 const catName=n=>{if(PH[n])return PH[n];const m=/^#Citadel_HeroBuilds_(.+)$/i.exec(n||'');
   return m?(BUILTIN[m[1]]||m[1].replace(/_/g,' ')):(n||L('cat.unnamed'))};
 let NOTES=false;try{NOTES=localStorage.getItem('dl-notes')==='1'}catch(e){}
-const T=id=>IT[id]||{};
+const T=id=>IT[id]?(IT[id]._id=+id,IT[id]):{};
 const LINKS=(D.links||[]).slice().sort((a,b)=>b.name.length-a.name.length);
 const LRE=LINKS.length?new RegExp('(?<![\\p{L}\\p{N}])('+LINKS.map(l=>esc(l.name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(?![\\p{L}\\p{N}])','gu'):null;
 const LBY=Object.fromEntries(LINKS.map(l=>[esc(l.name),l]));
@@ -836,10 +847,13 @@ const itemCard=(id,cap)=>`<div class="mod ${esc(T(id).slot||'')}" tabindex="0" d
 function gcard(id){const i=T(id);
   return `<div class="gcard${i.act?' gcard--active':''}">${img(id,'gcard__art')}${i.tier?`<span class="gcard__tier">${ROMAN[i.tier]||i.tier}</span>`:''}
   ${i.imb?'<i class="gcard__imbue">IMBUE</i>':''}<div class="gcard__name">${esc(i.n||id)}</div></div>`}
+let CUR_IDS=null;  // items of the build being drawn: a card says which of them it evolves into
 function modCard(m,num){const i=T(m.id);
   let chips='';
   if(m.pct!=null)chips=`<div class="mod__chips"><span class="chip chip--hi num">${pc(m.pct)}</span><span class="chip num">${m.min} min</span>`
     +(m.sold!=null?`<span class="chip" title="${L('mod.sold_title',{n:m.sold})}">${L('mod.sold',{n:m.sold})}</span>`:'')+'</div>';
+  const into=CUR_IDS?[...famOf(m.id)].filter(x=>x!==+m.id&&CUR_IDS.has(x)&&upChains(+m.id).some(c=>c.includes(x))):[];
+  if(into.length)chips+=`<div class="mod__evo">→ ${into.map(x=>esc(T(x).n)).join(', ')}</div>`;
   return `<div class="mod ${esc(i.slot||'')}" tabindex="0" data-id="${m.id}"${m.note?` data-note="${esc(m.note)}"`:''}>${num?`<span class="nmark">${num}</span>`:''}${gcard(m.id)}${chips}</div>`}
 
 function abilityGrid(order){if(!order.length)return'';
@@ -1060,7 +1074,7 @@ function buildPanel(b){
     :`<button class="copy cham" disabled title="${L('copy.todo_title')}">${L('copy.todo')}</button>`;
   let nn=0;const nTotal=b.cats.reduce((a,c)=>a+c.mods.filter(m=>m.note).length,0);
   const cats=`<div class="cats-bar"><h3>${L('bp.items')}</h3>${nTotal?`<button type="button" class="notes-btn" aria-pressed="${NOTES}">${L('bp.notes',{n:nTotal})}</button>`:''}</div>
-  <div class="cats">`+b.cats.map(c=>{const nums=c.mods.map(m=>m.note?++nn:0);
+  <div class="cats">`+(CUR_IDS=new Set(b.cats.flatMap(c=>c.mods.map(m=>+m.id))),'')+b.cats.map(c=>{const nums=c.mods.map(m=>m.note?++nn:0);
     const notes=c.mods.map((m,k)=>m.note?`<li><span>${nums[k]}</span><span><b>${esc(T(m.id).n||'')}</b> — ${lk(m.note)}</span></li>`:'').join('');
     const fit=Math.min(c.mods.length,11)*92+18,w=`flex-basis:${Math.max(Math.min(Math.round((c.width||0)*.98),1100),fit>1100?0:fit,200)}px`;
     return `<section class="catp${c.optional?' catp--opt':''}" style="${w}"><div class="catp__h">${esc(catName(c.name))}${c.optional?`<span class="opt">${L('cat.optional')}</span>`:''}</div>`
@@ -1311,12 +1325,26 @@ function tipAbility(t){const sec=s=>`${s.d?`<div class="d">${s.d}</div>`:''}${s.
   ${t.secs.map(sec).join('<div class="sep"></div>')}
   ${t.ups&&t.ups.some(Boolean)?`<div class="tab__ups">${t.ups.map((u,k)=>`<div style="--c:${C[k]}"><b>◆ ${P[k]}</b>${esc(u)||'—'}</div>`).join('')}</div>`:''}
   ${t.secs.some(s=>s.imp.concat(s.basic).some(p=>p.scale))?`<div style="margin-top:6px;font-size:var(--text-xs);color:var(--color-neutral)">✦ ×N = ${L('tip.per_point')}</div>`:''}</div>`}
+/* ---- item evolutions: what an item is built from and what it evolves into; its family glows on hover ---- */
+function upChains(id,seen=new Set()){const up=(T(id).up||[]).filter(u=>!seen.has(u));if(!up.length)return[[id]];seen.add(id);
+  return up.flatMap(u=>upChains(u,new Set(seen)).map(c=>[id,...c]))}
+function famOf(id){const out=new Set(),todo=[+id];while(todo.length){const x=todo.pop();if(out.has(x))continue;out.add(x);const t=T(x);todo.push(...(t.from||[]),...(t.up||[]))}return out}
+const evoRef=id=>`<span class="evo__i ${esc(T(id).slot||'')}">${T(id).icon?`<img src="${esc(T(id).icon)}" alt="">`:''}${esc(T(id).n||id)}<small>T${T(id).tier||'?'}</small></span>`;
+function evoHtml(id){const t=T(id);if(t.ab||!t.tier)return'';let h='';
+  if((t.from||[]).length)h+=`<div class="evo__k">${L('evo.from')}</div><div class="evo__l">${t.from.map(evoRef).join('<i>+</i>')}</div>`;
+  if((t.up||[]).length)h+=`<div class="evo__k">${L('evo.up')}</div>`+upChains(+id).map(c=>`<div class="evo__l">${c.slice(1).map(evoRef).join('<i>→</i>')}</div>`).join('');
+  else{const k=t.tier>=4?'evo.final':t.tier===1&&!(t.from||[]).length?'evo.lane':'evo.none';
+    h+=`<div class="evo__k">${L(k)}</div><div class="evo__n">${L(k+'_desc')}</div>`}
+  return h?`<div class="sep"></div><div class="evo">${h}</div>`:''}
+function famOn(id){const f=famOf(id);if(f.size<2)return;document.body.classList.add('fam-on');
+  document.querySelectorAll('main [data-id]').forEach(el=>{const x=+el.dataset.id;if(f.has(x))el.classList.add(x===+id?'fam-self':'fam')})}
+function famOff(){document.body.classList.remove('fam-on');document.querySelectorAll('.fam,.fam-self').forEach(el=>el.classList.remove('fam','fam-self'))}
 function tipHtml(t){if(t.ab)return tipAbility(t);let h=`<div class="h ${esc(t.slot)}"><img src="${esc(t.img||'')}" alt=""><div><div class="tn">${esc(t.n)}`
   +(t.key?`<span class="tg">${L('tip.ability')} ${t.key}${t.key===4?L('tip.ult'):''}</span>`:'')+(t.act?`<span class="tg">${L('tip.active')}</span>`:'')+'</div>'+(t.c?`<div class="tc num">${t.c} ${L('souls')}</div>`:'')+'</div></div><div class="b">';
   const st=l=>l.map(x=>`<div class="st"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('');
   if(t.innate.length)h+=st(t.innate);
   t.blocks.forEach((b,k)=>{if(k||t.innate.length)h+='<div class="sep"></div>';if(b.d)h+=`<div class="d">${b.d}</div>`;h+=st(b.s)});
-  return h+'</div>'}
+  return h+evoHtml(t._id)+'</div>'}
 function place(x,y){const r=tip.getBoundingClientRect();let l=x+16,t=y+16;
   if(l+r.width>innerWidth-8)l=x-r.width-16;if(t+r.height>innerHeight-8)t=Math.max(8,innerHeight-r.height-8);
   tip.style.left=Math.max(8,l)+'px';tip.style.top=t+'px'}
@@ -1346,6 +1374,8 @@ function bindTT(root){root.querySelectorAll('[data-tt]').forEach(el=>{
   el.addEventListener('focus',()=>o());el.addEventListener('click',()=>{tip.style.display==='block'?hide():o()});
   ['mouseleave','blur'].forEach(n=>el.addEventListener(n,hide))})}
 function bindTips(root){bindPos(root);bindTT(root);root.querySelectorAll('[data-id]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>famOn(el.dataset.id));el.addEventListener('focus',()=>famOn(el.dataset.id));
+  ['mouseleave','blur'].forEach(n=>el.addEventListener(n,famOff));
   el.addEventListener('mouseenter',e=>{clearTimeout(tmr);tmr=setTimeout(()=>open(el,e.clientX,e.clientY),250)});
   el.addEventListener('mousemove',e=>{if(tip.style.display==='block')place(e.clientX,e.clientY)});
   el.addEventListener('focus',()=>open(el));

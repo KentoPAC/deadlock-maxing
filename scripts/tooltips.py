@@ -149,8 +149,38 @@ def tooltip(item):
             "tier": item.get("item_tier"), "imb": bool(item.get("imbue")), "innate": innate, "blocks": blocks}
 
 
+def upgrade_links(all_items):
+    """{item id: (component ids, upgrade ids)} for shop items: an item is built from its components and evolves
+    into the items that list it as a component."""
+    by_class = {i.get("class_name"): i["id"] for i in all_items.values()}
+    links = {}
+    for item in all_items.values():
+        if item.get("type") != "upgrade":
+            continue
+        comps = [by_class[c] for c in item.get("component_items") or [] if c in by_class]
+        links.setdefault(item["id"], ([], []))[0].extend(comps)
+        for c in comps:
+            links.setdefault(c, ([], []))[1].append(item["id"])
+    return links
+
+
+def family(links, item_id):
+    """Every item linked to this one by evolutions, up and down, transitively."""
+    seen, todo = set(), [item_id]
+    while todo:
+        x = todo.pop()
+        if x in seen:
+            continue
+        seen.add(x)
+        todo += links.get(x, ([], []))[0] + links.get(x, ([], []))[1]
+    return seen
+
+
 def item_data(all_items, used, keys=None):
-    """Tooltips of the used items and abilities, in the language of `all_items`."""
+    """Tooltips of the used items and abilities, in the language of `all_items`, plus every item of their
+    evolution families (shown in the tooltips). Items get "from" (components) and "up" (upgrades)."""
+    links = upgrade_links(all_items)
+    used = set(used) | {f for i in used if i in links for f in family(links, i)}
     out = {}
     for item_id in used:
         if item_id not in all_items:
@@ -158,5 +188,7 @@ def item_data(all_items, used, keys=None):
         data = tooltip(all_items[item_id])
         if keys and item_id in keys:
             data["key"] = keys[item_id]
+        if item_id in links:
+            data["from"], data["up"] = links[item_id]
         out[str(item_id)] = data
     return out
