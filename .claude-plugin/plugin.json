@@ -1,0 +1,12 @@
+{
+  "name": "deadlockmax",
+  "description": "Deadlock companion: game knowledge (items by effect, hero kits, per patch), hero pages with builds and how to play / counter, build codes to paste in game, measured statistics (lane, power spikes, farm, healing, item effects at equal game state), match analysis and creator video tips.",
+  "version": "0.2.0",
+  "author": {
+    "name": "KentoPAC",
+    "url": "https://github.com/KentoPAC"
+  },
+  "repository": "https://github.com/KentoPAC/deadlock-maxing",
+  "license": "MIT",
+  "keywords": ["deadlock", "builds", "statistics", "valve"]
+}

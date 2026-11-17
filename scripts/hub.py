@@ -22,8 +22,20 @@ from report import fill_template, language_links, page_name, patches  # noqa: E4
 from status import completeness  # noqa: E402
 
 SKILL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# The skill lives in <project>/.claude/skills/<name>/: pages go to <project>/builds/.
-PROJECT_BUILDS = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(SKILL))), "builds")
+
+
+def project_root(start):
+    """The Claude Code project that uses this code: the first parent folder holding a .claude/ folder."""
+    path = start
+    while os.path.dirname(path) != path:
+        path = os.path.dirname(path)
+        if os.path.isdir(os.path.join(path, ".claude")):
+            return path
+    return os.path.dirname(start)
+
+
+# Pages go to <project>/builds/ (the code lives in <project>/deadlockmax/ or in <project>/.claude/skills/<name>/).
+PROJECT_BUILDS = os.path.join(project_root(SKILL), "builds")
 TEMPLATE = os.path.join(SKILL, "templates", "hub.html")
 
 

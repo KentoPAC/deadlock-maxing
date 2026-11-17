@@ -14,4 +14,4 @@ __pycache__/
 builds/
 
 # Generated game knowledge (refreshed per patch by scripts/knowledge.py)
-skills/deadlockmax-knowledge/ref/
+skills/knowledge/ref/
