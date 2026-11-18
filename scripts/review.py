@@ -130,11 +130,18 @@ def _cached(folder, name, fetch):
 def good_builds(folder, hero_id, since):
     """The hero's most favourited builds of the patch: [{favorites, items: [ids], imbue: {id: ability}}]."""
     def fetch():
-        rows = get("/v1/builds", hero_id=hero_id, sort_by="favorites", only_latest="true", limit=GOOD_MAX * 2,
-                   min_unix_timestamp=since)
+        # all-time favourites are missing for some heroes (Violet, 2026-11): the weekly count stands in, as in guides.py
+        rows, seen = [], set()
+        for sort in ("favorites", "weekly_favorites"):
+            for x in get("/v1/builds", hero_id=hero_id, sort_by=sort, only_latest="true", limit=GOOD_MAX * 2,
+                         min_unix_timestamp=since):
+                if x["hero_build"]["hero_build_id"] not in seen:
+                    seen.add(x["hero_build"]["hero_build_id"])
+                    rows.append(dict(x, num_favorites=max(x.get("num_favorites") or 0, x.get("num_weekly_favorites") or 0)))
+        rows.sort(key=lambda x: -x["num_favorites"])
         out = []
         for x in rows:
-            if (x.get("num_favorites") or 0) < FAV_MIN:
+            if x["num_favorites"] < FAV_MIN:
                 continue
             cats = x["hero_build"]["details"]["mod_categories"]
             mods = [m for c in cats for m in c.get("mods") or []]
