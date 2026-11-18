@@ -145,6 +145,12 @@ is missing.
      evolve: tier 4 items (final), some tier 2-3 items (kept or sold for a tier 4) and the 4 tier 1 lane items.
      Check paths in items.md (`component_items`) or the page tooltips. agent_build.py refuses an item whose
      component is neither in the build nor named in its note (e.g. Compress Cooldown before Superior Cooldown).
+   - **Name and description** (the user publishes these builds online): the name is "DeadlockMaxing · <hero>".
+     The description says, in a friendly tone, how the build was made: the best one-tricks' real purchases on the
+     current patch, creators' guides and counter tips, then checked item by item against the kit (one or two kit
+     examples); how to read it (core left to right, optional categories by situation, tier 4 endgame, a note on
+     every item). Statistics only in passing ("what really works on this hero"): stat-driven builds are frowned
+     upon by the community. No numbers, no win rates.
    - **In-game import** (verified 2026-11-18): paste into a NEW build (Build Browser → Create New Build → paste).
      The game ignores the build description on paste, so agent_build.py puts it in a first item-less category
      "À lire"; category descriptions, item notes, tags (`"tags"`: up to 3 game tags) and the ability order import.

@@ -17,8 +17,8 @@ def spec(core_ids, endgame_ids=(11, 12)):
     cats = [{"name": "Lane", "description": "Pour la lane.", "mods": [{"id": 1, "note": NOTE}]},
             {"name": "Core", "description": "Toujours.", "core": True, "mods": [{"id": i, "note": NOTE} for i in core_ids]},
             {"name": "Fin", "description": "Au choix.", "endgame": True, "mods": [{"id": i, "note": NOTE} for i in endgame_ids]}]
-    return {"name": "B", "description": "D", "categories": cats, "abilities": [101, 102, 103, 104, 101],
-            "en": {"name": "B", "description": "D",
+    return {"name": "DeadlockMaxing · H", "description": "D", "categories": cats, "abilities": [101, 102, 103, 104, 101],
+            "en": {"name": "DeadlockMaxing · H", "description": "D",
                    "categories": [{"name": c["name"], "description": "x", "notes": ["n"] * len(c["mods"])} for c in cats]}}
 
 
