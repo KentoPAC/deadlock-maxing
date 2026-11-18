@@ -26,6 +26,7 @@ from common import STAT_NOTE, fill, heroes, items, make_strings, read_json, writ
 from i18n import CONTENT_LANG, LANGS
 
 KEY, SOURCE = "dlmax", "DeadlockMax"
+BUILD_NAME = "DeadlockMaxing"   # the project's name, first in every agent build's title (builds get published)
 # Build tags of the game (ids from the game data, as copied builds carry them): up to 3 per build.
 TAGS = {"Weapon": 47026193, "Vitality": 4213205702, "Spirit": 36498494, "For New Players": 1052421347,
         "For Intermediate Players": 1150155374, "For Advanced Players": 3797987367, "Damage": 2592289373,
@@ -54,6 +55,9 @@ def check(spec, hero_id):
     for field in ("name", "description"):
         if not spec.get(field) or not en.get(field):
             errors.append(f"{field}: missing (in both languages)")
+    for name in (spec.get("name") or "", en.get("name") or ""):
+        if not name.startswith(BUILD_NAME):
+            errors.append(f"name: starts with \"{BUILD_NAME}\", the project's name (e.g. \"{BUILD_NAME} · <hero>\")")
     if len(cats) != len(cats_en):
         errors.append(f"en.categories: {len(cats_en)} categories for {len(cats)}")
     for flag, what in (("core", "the items bought every game"), ("endgame", "the endgame proposals")):
