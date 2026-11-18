@@ -78,10 +78,14 @@ is missing.
     "tldr": {…}, "plan": {…}, "sources": {…},
     "en": {"intro": "…", "<key>": {…}, "tldr": {…}, "plan": {…}},
     "tr_en": {"<key>": ["en of [0]", …]},
-    "agent_build": {"name": "…", "description": "…", "categories": [{"name": "…", "description": "…",
-                    "core": false, "endgame": false, "mods": [{"id": 0, "note": "…"}]}], "abilities": [0, …],
-                    "en": {"name": "…", "description": "…",
-                    "categories": [{"name": "…", "description": "…", "notes": ["…"]}]}}}
+    "agent_build": {"name": "DeadlockMaxing · <hero>", "description": "…", "tags": ["Weapon", "Spirit", "…"],
+                    "categories": [{"name": "…", "description": "…", "core": false, "endgame": false,
+                                    "optional": true,
+                                    "mods": [{"id": 0, "note": "…", "imbue": <ability id, imbue items only>,
+                                              "sell": <0-100, optional>}]}],
+                    "abilities": [<ability id>, …],
+                    "en": {"name": "DeadlockMaxing · <hero>", "description": "…",
+                           "categories": [{"name": "…", "description": "…", "notes": ["…"]}]}}}
    EOF
    ```
    `tr`: one list per key, **in the exact order** of "To translate" (or a partial `{"n": "fr"}`).
@@ -108,7 +112,8 @@ is missing.
    Write "l'objet Fléau" for the item (page links give priority to the hero's ability).
    Analysis: only from the data shown; flag inconsistencies. The page computes the "Comparer" view (shared items)
    itself: the intro does not need to list them all.
-   **The DeadlockMax build** (`"agent_build"`, candidate key `dlmax`, shown first and advised by default): the real
+   **The DeadlockMax build** (`"agent_build"`, candidate key `dlmax`, shown first and advised by default; full
+   reference: `skills/hero-page/examples/paradox_agent_build.json`, read it before writing one): the real
    builds are kept as references; this one is ours, the best build we can write by crossing everything gathered:
    what the OTPs actually buy and keep (incl. their "Fin de partie : 12 emplacements" category), creators' videos and
    guides, the measured profile (deadlockmax:stats: spike window, items that power it up, lane items, anti-heal,
