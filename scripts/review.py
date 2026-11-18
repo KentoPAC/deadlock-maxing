@@ -156,7 +156,7 @@ def otp_items(folder):
     return out
 
 
-def build_flags(spec, good, otps):
+def build_flags(spec, good, otps, matched=None):
     if len(good) < GOOD_MIN:
         return {}
     all_items = items()
@@ -173,7 +173,10 @@ def build_flags(spec, good, otps):
     for i in sorted(pool - every, key=lambda i: -share(i)):
         item = all_items.get(i) or {}
         if share(i) >= MISSING_SHARE and item.get("type") == "upgrade" and item.get("shopable"):
-            flags[f"missing:{i}"] = f"{item['name']} is in {share(i):.0%} of the good builds and not in this one"
+            seen = (matched or {}).get(i)
+            data = (f"; the hero's players bought it in {seen['matches']:,} games, {seen['delta']:+.1f} points at equal "
+                    f"souls" if seen else "")
+            flags[f"missing:{i}"] = f"{item['name']} is in {share(i):.0%} of the good builds and not in this one{data}"
     for c in cats:
         for m in c.get("mods") or []:
             targets = [b["imbue"][str(m["id"])] for b in good if str(m["id"]) in b["imbue"]]
@@ -225,12 +228,14 @@ def flags(folder, spec, hero_id, since):
     except Exception as e:  # noqa: BLE001
         good = []
         print(f"(good builds unavailable: {e})", file=sys.stderr)
-    out = investment_flags(spec, good)
-    out.update(build_flags(spec, good, otp_items(folder)))
     try:
-        out.update(weak_flags(spec, matched_winrates(folder, hero_id, since)))
+        matched = matched_winrates(folder, hero_id, since)
     except Exception as e:  # noqa: BLE001
+        matched = {}
         print(f"(win rates at equal souls unavailable: {e})", file=sys.stderr)
+    out = investment_flags(spec, good)
+    out.update(build_flags(spec, good, otp_items(folder), matched))
+    out.update(weak_flags(spec, matched))
     return out
 
 

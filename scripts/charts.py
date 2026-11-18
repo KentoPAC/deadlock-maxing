@@ -257,8 +257,8 @@ MEASURED_ROLE = {
 
 
 def measured_style(g):
-    """(scaling, farm ratio): scaling is "late" when the impact at an equal game state grows by 0.3 or more from
-    before 20 min to 25-45 min, "early" when it drops as much or the power spike ends by 20K souls."""
+    """(scaling, farm ratio): scaling is "early" when the power spike ends by 20K souls or the impact at an equal
+    game state drops by 0.3 or more from before 20 min to 25-45 min, "late" when it grows as much."""
     t = g.get("timing") or []
     early = [v for v in t[:2] if v is not None]
     late = [v for v in t[3:6] if v is not None]
@@ -266,10 +266,12 @@ def measured_style(g):
     sp = g.get("spike") or {}
     farm = [x["per_min"] / x["avg_per_min"] for x in (g.get("farm") or [])[1:] if x and x.get("avg_per_min")]
     ratio = sum(farm) / len(farm) if farm else 1
-    if trend >= 0.3:
-        return "late", ratio
+    # a power spike over by 20K souls comes first: a deficit that only shrinks late (Pocket, never above the
+    # other heroes at an equal game state) does not make a late-game hero
     if trend <= -0.3 or (sp.get("to") and sp["to"] <= 20000):
         return "early", ratio
+    if trend >= 0.3:
+        return "late", ratio
     return "steady", ratio
 
 
