@@ -20,6 +20,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import get  # noqa: E402
+import patchnotes  # noqa: E402
 from tooltips import number, plain  # noqa: E402
 
 # tag -> (French label, English label, technical properties that define it)
@@ -171,6 +172,10 @@ def generate(out_dir):
         index += [f"- {label(r)} : {short(r['desc_fr'])}" for r in sorted(hits, key=lambda r: (r["tier"], r["cost"]))]
         index.append("")
 
+    try:
+        recent = patchnotes.changes(120)["items"]
+    except Exception:
+        recent = {}
     items_md = ["# Tous les objets de la boutique", "", head, ""]
     for slot in ("weapon", "vitality", "spirit"):
         items_md += [f"## {SLOT[slot][0]} ({SLOT[slot][1]})", ""]
@@ -180,6 +185,9 @@ def generate(out_dir):
                          f"Effets : {tag_txt}.", "", r["desc_fr"] or "(pas de description)", ""]
             if r["stats"]:
                 items_md += ["Stats : " + " ; ".join(r["stats"]), ""]
+            if recent.get(r["id"]):
+                items_md += ["Changements récents (notes de patch, à prendre en compte avant de le conseiller) :"]
+                items_md += [f"- {c['date']} : {c['text']}" for c in recent[r["id"]]] + [""]
 
     heroes_fr = {h["id"]: h for h in get("/v1/assets/heroes", language="french")}
     heroes_en = {h["id"]: h for h in get("/v1/assets/heroes")}

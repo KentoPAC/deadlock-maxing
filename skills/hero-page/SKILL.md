@@ -161,6 +161,11 @@ is missing.
      "À lire"; category descriptions, item notes, tags (`"tags"`: up to 3 game tags) and the ability order import.
    - `abilities`: the point order (the OTPs' most common order unless the kit or a creator says otherwise). No
      notes on the ability order: the game refuses to paste such a build; ability advice goes in `plan.abilities`.
+   - **Recent patches**: OTP and lane data can start before the last big patch (it is used only once it is 3
+     weeks old), so an item nerfed since then still looks good in them (Radiant Regeneration, nerfed on 10-14 and
+     10-30, was picked for Lady Geist). find.py prints "Changed AFTER the start of the data" and items.md lists each
+     item's recent changes (`patchnotes.py`): judge those items on their current values. agent_build.py refuses
+     any such item without a `"patch_review": {"<id>": "why it stays"}` entry.
    Never justify an item by its win or pick rate (Farmingbip trap): a statistic is a clue to explain with the kit.
    Every note quotes its reason; `sources` can cite `build:dlmax/...` paths like the other texts. Write its
    `{resume, points}` like the other builds and set `tldr.pick` to `dlmax` unless a real build is clearly better.

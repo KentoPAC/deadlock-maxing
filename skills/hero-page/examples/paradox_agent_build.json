@@ -323,7 +323,19 @@
    "Weapon",
    "Spirit",
    "Crowd Control"
-  ]
+  ],
+  "patch_review": {
+   "365620721": "Renforcé le 30/10 (dégâts d'arme de 80 à 85 %) : il reste, encore meilleur qu'avant.",
+   "619484391": "Renforcé le 30/10 (PV bonus de 50 à 90) : il reste, le silence ne change pas.",
+   "690458959": "Légèrement affaibli le 30/10 (−5 % de dégâts sur le tir secondaire) : il reste la rafale qui achève la cible permutée, aucun autre objet ne fait ce travail.",
+   "1662311306": "Affaibli le 30/10 (recharge de 45 à 55 s) : il reste une alternative de l'endgame, moins souvent disponible, à prendre seulement si ton équipe se fait souvent attraper.",
+   "1955841979": "Renforcé le 30/10 (réduit aussi les dégâts d'esprit qui suivent le coup) : il reste contre les gros coups d'esprit.",
+   "2462046703": "Renforcé le 30/10 (malus de dégâts de 15 à 12 %) : il reste seulement pour une lane calme.",
+   "2603935618": "Affaibli le 30/10 et le 05/11 (soin par kill de 275 à 170, cumul moins efficace) : il reste pour son anti-soin contre Victor ou Dame Geist, qui ne change pas.",
+   "3077079169": "Affaibli le 30/10 (vitesse des balles de 60 à 45 %, ses améliorations ne sont pas touchées) : il reste la base de Tir d'élite, Balles ouvrantes et Tir express.",
+   "3884003354": "Renforcé le 30/10 (anti-soin de 35 à 40 %) : il reste, encore meilleur contre les équipes qui se soignent.",
+   "4204808176": "Affaibli le 30/10 (réduction de recharge de la parade de 1,75 à 1,25 s) : il reste contre Abrams ou Billy en lane, la parade renvoie toujours les dégâts."
+  }
  },
  "dlmax": {
   "resume": "Le build écrit par DeadlockMax : un core Carabine cinétique à prendre à chaque partie, des objets de situation pas chers à y intercaler, et un endgame de T4 choisi selon l'équipe adverse.",

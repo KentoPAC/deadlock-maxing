@@ -26,6 +26,7 @@ from common import (GAME_LANGUAGE, LANG_FR, find_hero, get, items, rank_label, r
                     text_amount, todo_list, write_candidate, write_json)
 from i18n import CONTENT_LANG, t, use  # noqa: E402
 from videos import guide_videos  # noqa: E402
+import patchnotes  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MIN_BADGE = 90          # Fantôme (Phantom) and above for OTPs
@@ -378,6 +379,27 @@ def refresh_otp(hero, out):
     write_json(f"{out}/candidates.json", data, indent=1)
 
 
+def print_changes(hero, out, since):
+    """Balance changes made after the start of the data window: the builds above mix games before and after them."""
+    try:
+        recent = patchnotes.since(patchnotes.changes(120), since)
+    except Exception as e:
+        print(f"\n(Patch notes unavailable: {e})")
+        return
+    used = {m["ability_id"] for c in read_json(f"{out}/candidates.json")["candidates"]
+            for cat in read_json(f"{out}/{c['key']}/original.json")["details"]["mod_categories"] for m in cat.get("mods", [])}
+    names = items()
+    lines = [f"- {names.get(i, {}).get('name', i)} : " + " ; ".join(f"{c['date']} {c['text']}" for c in cs)
+             for i, cs in recent["items"].items() if i in used]
+    lines += [f"- {hero['name']} : " + " ; ".join(f"{c['date']} {c['text']}" for c in recent["heroes"].get(hero["id"], []))] \
+        if recent["heroes"].get(hero["id"]) else []
+    if lines:
+        print(f"\n### Changed AFTER the start of the data ({datetime.date.fromtimestamp(since)}): the builds above mix "
+              "games before and after these changes. Judge each item on its current values (agent_build.py asks for "
+              "a \"patch_review\" of every such item it uses).")
+        print("\n".join(lines))
+
+
 def last_big_patch_since(since):
     """Move the window start to the last big patch when that patch is old enough to have data."""
     try:
@@ -452,6 +474,7 @@ def main():
 
     for c in candidates:
         print_candidate(c, args.out)
+    print_changes(hero, args.out, since)
     # Measured play style + community advice (for the "how to play" view).
     sys.stdout.flush()  # keep our output before the modules' output when piped
     for module in ANALYSIS_MODULES:
