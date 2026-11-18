@@ -122,6 +122,11 @@ is missing.
    - **Situational, cheap** (one category per situation: "Contre les soins", "Contre les contrôles"…): tier 1-3
      items slipped into the core when something in the game disrupts it; each note says "if <situation>, buy it
      between <core item> and <core item>, because <reason>".
+   - **Counter-buy** (one category per threat: "Contre les héros qui volent ou fuient", "Contre les carries à
+     l'arme", "Contre les ultimes"…): the items anyone can buy against a given enemy (Knockdown, Disarming Hex,
+     Silence Wave, Warp Stone…), listed by `videos.py counter-items <hero>` from the creators' counter tips. Each
+     note names the enemy heroes and says how it combines with THIS kit (e.g. swap the target, then Knockdown);
+     cite the tip (`video:<id>@<s>`).
    - **Endgame** (`"endgame": true`): no order, picked against the enemy team. Each note says against what or
      when to take it ("against a team that heals", "if you get stunned before swapping"). At the end the slots hold
      tier 4 items, except actives worth their slot (a key combo item, a save): smaller passives are sold for room.
