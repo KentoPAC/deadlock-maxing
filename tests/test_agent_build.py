@@ -109,6 +109,8 @@ class AgentBuildTest(unittest.TestCase):
         s = spec(range(2, 11), (11, 12, 13, 14))
         s["categories"][0]["description"] = "Lane □ forte"
         self.assertIn("□", " ".join(agent_build.check(s, 7)))
+        s["categories"][0]["description"] = "Lane\u00a0forte"
+        self.assertTrue(agent_build.check(s, 7))                          # no-break space: refused by the game
         s["categories"][0]["description"] = "Lane ◆ forte · ≈13' → « joue » ■"
         self.assertEqual(agent_build.check(s, 7), [])
 
