@@ -9,9 +9,9 @@ Input (the "agent_build" key of finish.py), texts in the content language, the s
                              "imbue": <ability id, required for items that imbue an ability>,
                              "sell": <0-100, default 95 for tier 1 and 85 for tier 2 passives: sold first by Quickbuy>}]}],
    "abilities": [<ability id>, ...],            # point order: the first time an ability appears is its unlock
-   "ability_notes": {"<ability id>": "..."},     # optional
+   (advice on abilities goes in plan.abilities: the game refuses a build with notes on its ability order)
    "en": {"name": "...", "description": "...", "categories": [{"name": "...", "description": "...", "notes": ["..."]}],
-          "ability_notes": {"<ability id>": "..."}}}
+          }}
 Organisation: lane, one "core": true category (bought every game, left to right), cheap situational categories
 (slipped into the core when the game calls for it), one "endgame": true category (no order: picked against the
 enemy team, each note saying against what).
@@ -123,14 +123,11 @@ def to_build(spec, hero_id, lang_field=None):
                      "optional": cat.get("optional", ci > 0 and not cat.get("core")),
                      "mods": [dict({"ability_id": m["id"], "annotation": ce["notes"][mi] if lang_field else m["note"]},
                                    **game_fields(m, upgraded)) for mi, m in enumerate(cat["mods"])]})
-    notes = (en.get("ability_notes") if lang_field else spec.get("ability_notes")) or {}
     changes, seen = [], {}
     for a in spec.get("abilities") or []:
         k = seen[a] = seen.get(a, 0) + 1
         change = ({"ability_id": a, "currency_type": 2, "delta": -1} if k == 1 else
                   {"ability_id": a, "currency_type": 1, "delta": -[1, 2, 5][min(k - 2, 2)]})
-        if k == 1 and notes.get(str(a)):
-            change["annotation"] = notes[str(a)]
         changes.append(change)
     return {"hero_id": hero_id, "name": tx("name", None), "description": tx("description", None), "language": 2,
             "details": {"mod_categories": cats, "ability_order": {"currency_changes": changes}}, "tags": []}
