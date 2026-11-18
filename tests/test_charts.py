@@ -25,6 +25,16 @@ class ChartsTest(unittest.TestCase):
         self.assertEqual(spike.count("▔"), 6)                 # 30K to 37.5K = 3 buckets of 2 characters
         self.assertIn("R", next(line for line in out if "repères" in line))
 
+    def test_ingame_power_is_one_bar_per_5000_souls_with_the_strong_window_marked(self):
+        doc = {"buckets": BUCKETS, "events": EVENTS}
+        curve = [None, None] + [0.5 if 12 <= i < 15 else -0.3 for i in range(2, 26)]
+        cat = charts.ingame_power(doc, {"ranked": group(curve)}, "en")
+        lines = cat["description"].split("\n")
+        self.assertEqual(len([x for x in lines if x[:1].isdigit()]), 9)   # one bar per 5K, 10K to 50K
+        self.assertTrue(all(ch not in cat["description"] for ch in "█▁░│─"))  # characters the game cannot draw
+        self.assertIn("◆ STRONG", next(x for x in lines if x.startswith("30K")))
+        self.assertIn("30K and 37.5K", lines[-1])
+
     def test_numbers_use_the_french_decimal_comma(self):
         self.assertEqual(charts.k(27500), "27,5K")
         self.assertEqual(charts.num(-0.25), "−0,25")

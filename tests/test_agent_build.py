@@ -24,11 +24,12 @@ def spec(core_ids, endgame_ids=(11, 12)):
 
 class AgentBuildTest(unittest.TestCase):
     def setUp(self):
-        self._i, self._h = agent_build.items, agent_build.heroes
+        self._i, self._h, self._p = agent_build.items, agent_build.heroes, agent_build.power_category
+        agent_build.power_category = lambda hero_id, lang: None          # no measured profile in these tests
         agent_build.items, agent_build.heroes = (lambda lang=None: ITEMS), (lambda: HEROES)
 
     def tearDown(self):
-        agent_build.items, agent_build.heroes = self._i, self._h
+        agent_build.items, agent_build.heroes, agent_build.power_category = self._i, self._h, self._p
 
     def test_valid_build(self):
         self.assertEqual(agent_build.check(spec(range(2, 11), (11, 12, 13, 14)), 7), [])

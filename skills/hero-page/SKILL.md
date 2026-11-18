@@ -159,6 +159,10 @@ is missing.
    - **In-game import** (verified 2026-11-18): paste into a NEW build (Build Browser → Create New Build → paste).
      The game ignores the build description on paste, so agent_build.py puts it in a first item-less category
      "À lire"; category descriptions, item notes, tags (`"tags"`: up to 3 game tags) and the ability order import.
+     A second item-less category "Quand il est fort" is added automatically: the measured power line drawn as text
+     (charts.ingame_power: one line per 5,000 souls, a bar of ■, ◆ on the strong window). The game's font is
+     proportional and cannot draw block or box characters (█ ▁ ░ │ ─): in-game text uses only plain characters
+     and ■ ◆ ▲ ▼ ● ▸ → · (verified 2026-11-18).
    - `abilities`: the point order (the OTPs' most common order unless the kit or a creator says otherwise). No
      notes on the ability order: the game refuses to paste such a build; ability advice goes in `plan.abilities`.
    - **Recent patches**: OTP and lane data can start before the last big patch (it is used only once it is 3

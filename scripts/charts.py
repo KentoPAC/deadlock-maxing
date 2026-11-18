@@ -21,8 +21,9 @@ FIRST, LAST = 2, 24          # buckets drawn: 5K to 60K souls (2,500 souls each)
 ROWS = 4                     # rows above and below the zero line
 
 
-def k(v):
-    return f"{v / 1000:.0f}K" if v % 1000 == 0 else f"{v / 1000:.1f}K".replace(".", ",")
+def k(v, lang="fr"):
+    s = f"{v / 1000:.0f}K" if v % 1000 == 0 else f"{v / 1000:.1f}K"
+    return s.replace(".", ",") if lang == "fr" else s
 
 
 def num(v, d=2):
@@ -148,6 +149,52 @@ def farm(g):
         out.append(f"{name:>12} lui  {stacked(f['share'])} {f['per_min']} âmes/min")
         out.append(f"{'':>12} moy. {stacked(f['avg_share'])} {f['avg_per_min']} âmes/min")
     return out
+
+
+INGAME = {
+    "fr": {"title": "Quand il est fort", "head": "Son impact sur les combats selon ses âmes (■ = plus fort), mesuré après la lane :",
+           "strong": "◆ FORT", "window": "Fort entre {a} et {b} âmes (vers {ma} à {mb} min)", "obj": " : force {list}.",
+           "rift": "le Rift de {m}'", "boss": "le Patron de {m}'", "and": " et ",
+           "flat": "Pas de pic net : son impact reste à peu près le même toute la partie."},
+    "en": {"title": "When it is strong", "head": "Its impact on fights by souls (■ = stronger), measured after the lane:",
+           "strong": "◆ STRONG", "window": "Strong between {a} and {b} souls (around minute {ma} to {mb})", "obj": ": force {list}.",
+           "rift": "the {m}' Rift", "boss": "the {m}' Mid-Boss", "and": " and ",
+           "flat": "No clear peak: its impact stays about the same all game."},
+}
+
+
+def ingame_power(doc, p, lang="fr", group="ranked"):
+    """The power line as in-game text (category description): one line per 5,000 souls with a bar of ■, the only
+    kind of chart the game's font can draw (proportional font, no block characters; verified 2026-11-18).
+    Bars are relative to the hero's own range: the longest line is where it weighs most on fights."""
+    g, T = p.get(group), INGAME[lang]
+    if not g:
+        return None
+    buckets, fights, nwq, sp = doc["buckets"], g["fights"], g.get("nw_by_minute") or {}, g.get("spike") or {}
+    rows = []
+    for nw in range(10000, 50001, 5000):
+        vals = [fights[i] for i in range(len(buckets)) if nw - 2500 <= buckets[i] < nw + 2500 and fights[i] is not None]
+        if vals:
+            rows.append((nw, sum(vals) / len(vals)))
+    if len(rows) < 3:
+        return None
+    lo, hi = min(v for _, v in rows), max(v for _, v in rows)
+    lines = [T["head"]]
+    for nw, v in rows:
+        n = 1 + round((v - lo) / (hi - lo) * 9) if hi > lo else 5
+        mm = minute_at(nwq, nw)
+        strong = sp.get("from") and sp["from"] <= nw < sp["to"] + 2500
+        when = f" ≈{mm:.0f}'" if mm is not None else ""
+        lines.append(f"{k(nw, lang)}{when} {'■' * n}" + (f" {T['strong']}" if strong else ""))
+    if sp.get("from") and not sp.get("flat"):
+        txt = T["window"].format(a=k(sp["from"], lang), b=k(sp["to"], lang),
+                                 ma=f"{sp.get('min_from') or 0:.0f}", mb=f"{sp.get('min_to') or 0:.0f}")
+        objs = [T[key].format(m=mn) for key in ("rift", "boss") for mn in doc["events"].get(key, [])
+                if sp.get("min_from") is not None and sp["min_from"] <= mn <= sp["min_to"]]
+        lines.append(txt + (T["obj"].format(list=T["and"].join(objs)) if objs else "."))
+    else:
+        lines.append(T["flat"])
+    return {"name": T["title"], "description": "\n".join(lines)}
 
 
 def hero_charts(doc, p, group="ranked"):
