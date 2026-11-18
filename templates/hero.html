@@ -384,6 +384,8 @@ kbd{display:inline-block;min-width:15px;padding:0 3px;border-radius:3px;backgrou
 .copy:hover{background:var(--color-accent-hi);transform:rotate(-2deg) translate(-1px,-1px);box-shadow:7px 7px 0 var(--color-shade)}
 .copy:active{transform:rotate(-2deg) translate(3px,3px);box-shadow:2px 2px 0 var(--color-shade)}
 .copy:disabled{cursor:not-allowed;background:var(--color-paper-3);color:var(--color-neutral);box-shadow:3px 3px 0 var(--color-shade);transform:rotate(-2deg)}
+.copy-row{display:inline-flex;flex-wrap:wrap;align-items:center;gap:var(--space-sm)}
+.copy--sub{background:none;color:var(--color-accent-hi);box-shadow:inset 0 0 0 1px var(--color-accent-dim);font-size:var(--text-sm)}
 .copy[data-state=loading]{cursor:progress;background:var(--color-accent-lo)}
 .copy[data-state=success]{background:var(--color-ok)}
 .copy[data-state=success]::after{content:"✓"}
@@ -1074,8 +1076,10 @@ function statStrip(b){const f=buildFresh(b),t=wrTone(b.winrate);
     <div class="stat" data-lvl="${f.lvl}"><span class="stat__k">${b.source==='OTP'?L('st.period'):L('st.updated')}</span><span class="stat__v">${esc(f.v)}</span><span class="stat__s">${esc(f.s)}</span></div></div>`}
 
 function buildPanel(b){
-  const btn=b.code?`<button class="copy cham" data-code="${esc(b.code)}">${L('copy.label')}</button>`
-    :`<button class="copy cham" disabled title="${L('copy.todo_title')}">${L('copy.todo')}</button>`;
+  // the game does not import the build description on paste: a second button copies it for its own field
+  const btn='<span class="copy-row">'+(b.code?`<button class="copy cham" data-code="${esc(b.code)}">${L('copy.label')}</button>`
+    :`<button class="copy cham" disabled title="${L('copy.todo_title')}">${L('copy.todo')}</button>`)
+    +(b.code&&b.desc?`<button class="copy copy--sub cham" data-code="${esc(b.desc)}" data-label="${esc(L('copy.desc'))}" data-ok="${esc(L('copy.desc_ok'))}" title="${esc(L('copy.desc_title'))}">${L('copy.desc')}</button>`:'')+'</span>';
   let nn=0;const nTotal=b.cats.reduce((a,c)=>a+c.mods.filter(m=>m.note).length,0);
   const cats=`<div class="cats-bar"><h3>${L('bp.items')}</h3>${nTotal?`<button type="button" class="notes-btn" aria-pressed="${NOTES}">${L('bp.notes',{n:nTotal})}</button>`:''}</div>
   <div class="cats">`+(CUR_IDS=new Set(b.cats.flatMap(c=>c.mods.map(m=>+m.id))),'')+b.cats.map(c=>{const nums=c.mods.map(m=>m.note?++nn:0);
@@ -1312,11 +1316,11 @@ document.querySelector('.tldr-btn').onclick=()=>show('tldr',true);
 
 /* ---- copy (8 states: default/hover/focus/active/disabled/loading/error/success) ---- */
 function bindCopy(){document.querySelectorAll('.copy[data-code]').forEach(btn=>btn.onclick=async()=>{
-  const label=L('copy.label');btn.dataset.state='loading';btn.textContent=L('copy.loading');let ok=false;
+  const label=btn.dataset.label||L('copy.label');btn.dataset.state='loading';btn.textContent=L('copy.loading');let ok=false;
   try{await navigator.clipboard.writeText(btn.dataset.code);ok=true}catch(e){}
   if(!ok){const t=document.createElement('textarea');t.value=btn.dataset.code;document.body.appendChild(t);t.select();
     try{ok=document.execCommand('copy')}catch(e){}t.remove()}
-  btn.dataset.state=ok?'success':'error';btn.textContent=ok?L('copy.ok'):L('copy.fail');
+  btn.dataset.state=ok?'success':'error';btn.textContent=ok?(btn.dataset.ok||L('copy.ok')):L('copy.fail');
   setTimeout(()=>{delete btn.dataset.state;btn.textContent=label},2600)})}
 
 /* ---- tooltips: 250 ms on hover, instant on focus, tap toggles on touch ---- */
