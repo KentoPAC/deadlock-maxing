@@ -25,7 +25,7 @@ def spec(core_ids, endgame_ids=(11, 12)):
 class AgentBuildTest(unittest.TestCase):
     def setUp(self):
         self._i, self._h, self._p = agent_build.items, agent_build.heroes, agent_build.power_category
-        agent_build.power_category = lambda hero_id, lang: None          # no measured profile in these tests
+        agent_build.power_category = lambda hero_id, lang: {"name": "Power spike", "description": "x", "mods": []}
         agent_build.items, agent_build.heroes = (lambda lang=None: ITEMS), (lambda: HEROES)
 
     def tearDown(self):
@@ -63,7 +63,8 @@ class AgentBuildTest(unittest.TestCase):
             cats = agent_build.to_build(s, 7)["details"]["mod_categories"]
         finally:
             del ITEMS[12]["imbue"]
-        self.assertEqual([c.get("optional") for c in cats], [None, False, False, True, None])   # read first, footer
+        self.assertEqual([c.get("optional") for c in cats], [None, None, False, False, True, None])  # read first,
+        # power spike, the 3 categories, footer
         self.assertEqual(cats[0]["mods"], [])
         mods = {m["ability_id"]: m for c in cats for m in c["mods"]}
         self.assertEqual(mods[12]["imbue_target_ability_id"], 103)
@@ -113,6 +114,19 @@ class AgentBuildTest(unittest.TestCase):
         self.assertTrue(agent_build.check(s, 7))                          # no-break space: refused by the game
         s["categories"][0]["description"] = "Lane ◆ forte · ≈13' → « joue » ■"
         self.assertEqual(agent_build.check(s, 7), [])
+
+    def test_every_build_has_the_code_generated_power_spike_and_footer(self):
+        for lang in (None, "en"):
+            cats = agent_build.to_build(spec(range(2, 11), (11, 12, 13, 14)), 7, lang)["details"]["mod_categories"]
+            self.assertEqual(cats[1]["name"], "Power spike")
+            self.assertIn("D E A D L O C K M A X I N G", cats[-1]["description"])
+            self.assertEqual(cats[-1]["mods"], [])
+
+    def test_the_power_spike_block_has_a_placeholder_without_measured_profile(self):
+        agent_build.power_category = self._p
+        cat = agent_build.power_category(999999, "fr")
+        self.assertEqual(cat["name"], "Power spike")
+        self.assertIn("Pas encore assez de parties", cat["description"])
 
     def test_tags_are_game_tag_ids(self):
         s = spec(range(2, 11), (11, 12, 13, 14))
