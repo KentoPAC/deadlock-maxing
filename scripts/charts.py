@@ -192,7 +192,7 @@ def ingame_power(doc, p, lang="fr", group="ranked"):
         return None
     lines = []
     ln = g.get("lane")
-    if ln:
+    if ln and "kd10" in ln:
         kd, souls = ln["kd10"], ln["duo_souls"]
         verdict = ("win" if kd >= 0.3 or souls >= 250 else "lose" if kd <= -0.3 or souls <= -250 else
                    "win_bit" if kd >= 0.1 or souls >= 100 else "lose_bit" if kd <= -0.1 or souls <= -100 else "even")
