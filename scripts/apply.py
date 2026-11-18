@@ -35,8 +35,8 @@ LINE_H = 19       # height of a description line
 MOD_W = 82        # width of an item card
 CARD_H = 125      # height of an item card (icon + two-line name)
 MAX_W = 1000      # maximum category width
-ROW_W = 1030      # width of the build area: categories flow left to right and wrap past it (to calibrate)
-GAP = 0           # space the game leaves between two categories of a row (to calibrate)
+ROW_W = 1060      # width of the build area (measured in game, 2026-11-18): a row of 1050 fits, 1070 wraps; wider blocks are cut to 1060
+GAP = 10          # space the game leaves between two categories of a row (measured in game, 2026-11-18)
 BUILTIN_LABELS = {"#Citadel_HeroBuilds_EarlyGame": "Early Game",
                   "#Citadel_HeroBuilds_MidGame": "Mid Game",
                   "#Citadel_HeroBuilds_LateGame": "Late Game"}
