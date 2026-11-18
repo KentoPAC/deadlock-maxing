@@ -23,7 +23,7 @@ import os
 import time
 
 from common import STAT_NOTE, fill, heroes, items, make_strings, read_json, write_candidate, write_json
-from i18n import CONTENT_LANG
+from i18n import CONTENT_LANG, LANGS
 
 KEY, SOURCE = "dlmax", "DeadlockMax"
 # Build tags of the game (ids from the game data, as copied builds carry them): up to 3 per build.
@@ -90,6 +90,17 @@ def check(spec, hero_id):
             note = STAT_NOTE.sub("", m.get("note") or "").strip()
             if len(note) < MIN_NOTE:
                 errors.append(f"{where}: {item['name']}: the note must say when and why ({MIN_NOTE}+ characters, no pick or win rates)")
+    # upgrade paths: a component missing from the build is listed, or named in the note (buying it first is
+    # cheaper and gives its effect earlier: e.g. Compress Cooldown before Superior Cooldown)
+    by_class = {i.get("class_name"): i for i in all_items.values()}
+    in_build = {m.get("id") for c in cats for m in c.get("mods") or []}
+    for cat in cats:
+        for m in cat.get("mods") or []:
+            for comp in (by_class.get(c) for c in comps(m.get("id"))):
+                names = {items(lang).get(comp["id"], {}).get("name", "").lower() for lang in LANGS} if comp else set()
+                if comp and comp["id"] not in in_build and not any(n and n in (m.get("note") or "").lower() for n in names):
+                    errors.append(f"{all_items[m['id']]['name']} is built from {comp['name']}: list {comp['name']} "
+                                  f"before it, or name it in the note")
     tags = spec.get("tags") or []
     if len(tags) > 3 or any(t not in TAGS for t in tags):
         errors.append(f"tags: up to 3 among {', '.join(TAGS)}")
