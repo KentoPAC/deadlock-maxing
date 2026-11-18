@@ -236,11 +236,67 @@ def spike_phase(sp):
     return "early" if sp["to"] <= 20000 else "late" if sp["from"] >= 30000 else "mid"
 
 
+# Role measured from the data, used when the community guide's position contradicts it (Lady Geist, ranked as a soft
+# carry with an early peak, keeps growing until the end of the game and farms more than average).
+MEASURED_ROLE = {
+    "fr": {"scaling_carry": "carry qui scale. Il te faut beaucoup d'âmes : ton impact grandit jusqu'en fin de partie, "
+                            "ne gâche pas ton farm en début de partie.",
+           "late": "héros de fin de partie. Ton impact grandit avec le temps : garde-toi pour les gros teamfights.",
+           "early": "héros de début de partie. Ton impact est maximal tôt : joue agressif et convertis ton avance en "
+                    "objectifs avant que la partie s'allonge.",
+           "guide": " (le guide des rôles le classe {pos}, les mesures disent autre chose)",
+           "names": {1: "hard carry", 2: "soft carry"}},
+    "en": {"scaling_carry": "scaling carry. You need lots of souls: your impact grows until the end of the game, do "
+                            "not waste your farm early.",
+           "late": "late game hero. Your impact grows with time: save yourself for the big teamfights.",
+           "early": "early game hero. Your impact peaks early: play aggressively and turn your lead into objectives "
+                    "before the game drags on.",
+           "guide": " (the roles guide ranks it {pos}, the measurements say otherwise)",
+           "names": {1: "hard carry", 2: "soft carry"}},
+}
+
+
+def measured_style(g):
+    """(scaling, farm ratio): scaling is "late" when the impact at an equal game state grows by 0.3 or more from
+    before 20 min to 25-45 min, "early" when it drops as much or the power spike ends by 20K souls."""
+    t = g.get("timing") or []
+    early = [v for v in t[:2] if v is not None]
+    late = [v for v in t[3:6] if v is not None]
+    trend = (sum(late) / len(late) - sum(early) / len(early)) if early and late else 0
+    sp = g.get("spike") or {}
+    farm = [x["per_min"] / x["avg_per_min"] for x in (g.get("farm") or [])[1:] if x and x.get("avg_per_min")]
+    ratio = sum(farm) / len(farm) if farm else 1
+    if trend >= 0.3:
+        return "late", ratio
+    if trend <= -0.3 or (sp.get("to") and sp["to"] <= 20000):
+        return "early", ratio
+    return "steady", ratio
+
+
+def role_text(g, lang, positions):
+    """The guide's positions when the measurements agree, else the measured role (saying the guide disagrees)."""
+    R, M = ROLE[lang], MEASURED_ROLE[lang]
+    scaling, farm = measured_style(g)
+    agree = {1: scaling == "late" or farm >= 1.05, 2: scaling == "early"}
+    kept = [p for p in positions if p in R and agree.get(p, True)]
+    if kept:
+        return R["head"].format(roles=R["or"].join(R[p] for p in kept))
+    if scaling == "steady":
+        return R["head"].format(roles=R["or"].join(R[p] for p in positions if p in R)) if positions else None
+    key = "scaling_carry" if scaling == "late" and farm >= 1.03 else scaling
+    if not positions:                       # not in the guide: the measured role alone
+        return R["head"].format(roles=M[key])
+    name, rest = M[key].split(". ", 1)
+    guide = M["guide"].format(pos=" / ".join(M["names"].get(p, str(p)) for p in positions))
+    return R["head"].format(roles=f"{name}{guide}. {rest}")
+
+
 def role_lines(g, lang, positions):
-    """The role (by community position) and the game plan (measured lane x power spike phase)."""
+    """The role (community position checked against the measurements) and the game plan (lane x spike phase)."""
     R, out = ROLE[lang], []
-    if positions:
-        out.append(R["head"].format(roles=R["or"].join(R[pos] for pos in positions if pos in R)))
+    role = role_text(g, lang, positions or [])
+    if role:
+        out.append(role)
     sp, ln = g.get("spike") or {}, g.get("lane")
     if ln and "kd10" in ln and sp.get("from") and not sp.get("flat"):
         lane = {"win": "win", "win_bit": "win", "lose": "lose", "lose_bit": "lose"}.get(lane_verdict(ln), "even")
