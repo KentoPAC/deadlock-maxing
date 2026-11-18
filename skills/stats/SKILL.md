@@ -63,8 +63,13 @@ From the plugin folder `P` = `.claude/skills/deadlockmax` (DuckDB is the optiona
 2. `uv run --extra stats python -I scripts/profiles.py` (~2 min): one measured profile per hero, for all ranked
    matches and for Oracle+ (top players), written next to the game references:
    - `skills/knowledge/ref/profiles.md`: a short summary per hero (win rate, lane, spike window by net worth and
-     minute, best period at equal game state, value of being fed, farm, anti-heal, key resources). Read it with
-     `grep -n -A10 "^## Vindicta" …/profiles.md`.
+     minute, best period at equal game state, value of being fed, farm, anti-heal, key resources), followed by
+     text charts. Read it with `grep -n -A70 "^## Vindicta" …/profiles.md`.
+   - **Text charts** (`python3 -I scripts/charts.py <hero> [--top]`, no DuckDB): the power line by net worth with
+     the spike window, lane end, Rifts and Patrons; impact by minute at an equal game state; value of being fed;
+     soul sources by phase against the average hero. Look at their shape before writing about a hero (when it is
+     strong, early or late, whether it carries fed). `profiles.py --summary-only` rewrites profiles.md from the
+     JSON (after a change to the charts).
    - `skills/knowledge/ref/profiles.json`: everything (curves per net worth bucket, timing, farm per phase,
      net worth quartiles by minute for Rifts / urns / Patrons, every key resource with its gap, usual gap,
      excess and z-score) for hero pages and the explorer page.

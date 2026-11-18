@@ -23,6 +23,7 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import charts  # noqa: E402
 from common import get  # noqa: E402
 from lake import DEFAULT_DB, DEFAULT_MEMORY, connect  # noqa: E402
 
@@ -564,7 +565,7 @@ def summary(doc):
                          "de la hausse habituelle) : " + " ; ".join(
                              f"{x['fr']} ({fmt(x['effect'])} pour 10 min, acheté vers {fr(x['minute'], 0)} min dans {fr(x['share'], 0)} % "
                              "des parties)" for x in boost) + ".")
-        lines.append("")
+        lines += ["", "```text"] + charts.hero_charts(doc, p)[:-1] + ["```", ""]
     return "\n".join(lines)
 
 
@@ -573,5 +574,12 @@ if __name__ == "__main__":
     ap.add_argument("--db", default=DEFAULT_DB)
     ap.add_argument("--out", default=DEFAULT_OUT)
     ap.add_argument("--memory", default=DEFAULT_MEMORY, help="DuckDB memory cap (default 3GB, env DEADLOCKMAX_MEMORY)")
+    ap.add_argument("--summary-only", action="store_true", help="rewrite profiles.md from profiles.json (no DuckDB)")
     a = ap.parse_args()
+    if a.summary_only:
+        with open(os.path.join(a.out, "profiles.json"), encoding="utf-8") as fh:
+            doc = json.load(fh)
+        with open(os.path.join(a.out, "profiles.md"), "w", encoding="utf-8") as fh:
+            fh.write(summary(doc))
+        sys.exit(f"profiles.md rewritten ({len(doc['heroes'])} heroes)")
     sys.exit(build(a.db, a.out, a.memory))
