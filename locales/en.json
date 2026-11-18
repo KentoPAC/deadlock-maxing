@@ -480,6 +480,8 @@
   "spk.ph_mid": "10 to 20 min",
   "spk.ph_late": "after 20 min",
   "abl.first": "Max first",
+  "igp.title": "In-game preview",
+  "igp.desc": "The categories as the game places them, at the size stored in the code (an area {w} pixels wide). Blocks go left to right and wrap when the area is full.",
   "copy.label": "Copy build",
   "copy.desc": "Copy the description",
   "copy.desc_ok": "Copied · paste it in the description field",

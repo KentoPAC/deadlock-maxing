@@ -480,6 +480,8 @@
   "spk.ph_mid": "10 à 20 min",
   "spk.ph_late": "après 20 min",
   "abl.first": "À monter en premier",
+  "igp.title": "Aperçu en jeu",
+  "igp.desc": "Les catégories telles que le jeu les place, avec la taille enregistrée dans le code (zone de {w} pixels de large). Les blocs sont rangés de gauche à droite et passent à la ligne quand la zone est pleine.",
   "copy.label": "Copier le build",
   "copy.desc": "Copier la description",
   "copy.desc_ok": "Copiée · colle-la dans le champ description",
