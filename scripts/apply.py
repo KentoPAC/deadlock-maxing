@@ -196,6 +196,9 @@ def main():
         "details": original["details"],
         "tags": original.get("tags") or [],
     }
+    cut = [c.get("name") for c in build["details"]["mod_categories"] if len((c.get("description") or "").encode()) > 1024]
+    if cut:
+        print(f"WARNING, the game cuts these category descriptions at 1,024 bytes: {cut}", file=sys.stderr)
     leftovers = [t for t in json.dumps(build, ensure_ascii=False).split('"') if has_cjk(t)]
     if leftovers:
         print("WARNING, untranslated text left:", leftovers[:5], file=sys.stderr)

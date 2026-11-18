@@ -28,7 +28,10 @@ class ChartsTest(unittest.TestCase):
     def test_ingame_power_is_one_bar_per_5000_souls_with_the_strong_window_marked(self):
         doc = {"buckets": BUCKETS, "events": EVENTS}
         curve = [None, None] + [0.5 if 12 <= i < 15 else -0.3 for i in range(2, 26)]
-        cat = charts.ingame_power(doc, {"ranked": group(curve)}, "en")
+        cats = charts.ingame_power(doc, {"ranked": group(curve)}, "en")
+        self.assertEqual([c["name"] for c in cats], ["Role and lane", "Power spike"])   # split: 1,024 bytes each max
+        self.assertTrue(all(len(c["description"].encode()) <= 1024 for c in cats))
+        cat = {"description": "\n".join(c["description"] for c in cats)}
         lines = cat["description"].split("\n")
         self.assertEqual(len([x for x in lines if x.startswith("■")]), 9)    # one bar per 5K, 10K to 50K
         self.assertTrue(all(ch not in cat["description"] for ch in "█▁░│─"))  # characters the game cannot draw
@@ -38,7 +41,7 @@ class ChartsTest(unittest.TestCase):
         self.assertEqual(lines[0], "Game plan: survive the lane, farm for a long time, and wait for your power spike to "
                                    "play the teamfights.")                      # lane lost, spike late (30K+)
         self.assertIn("Lane: slightly unfavourable (−0.2 kills / 10 min, −145 souls for the duo): avoid long trades.", lines)
-        with_role = charts.ingame_power(doc, {"ranked": group(curve)}, "fr", positions=[1])["description"]
+        with_role = charts.ingame_power(doc, {"ranked": group(curve)}, "fr", positions=[1])[0]["description"]
         self.assertTrue(with_role.startswith("Rôle : hard carry (position 1)."))
 
     def test_the_guide_position_is_kept_only_when_the_measurements_agree(self):
