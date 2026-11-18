@@ -42,14 +42,16 @@ TAGS = {"Weapon": 47026193, "Vitality": 4213205702, "Spirit": 36498494, "For New
 READ_FIRST = {"fr": "À lire", "en": "Read first"}
 # Footer: the project's mark, in the only form the game can show (it merges consecutive spaces and its font is
 # proportional, so multi-line ASCII art falls apart; verified 2026-11-18).
-FOOTER = {"fr": {"name": "DeadlockMaxing", "description": "◆ ■ ■  D E A D L O C K M A X I N G  ■ ■ ◆\n"
-                 "▸ des builds expliqués objet par objet, à jour du dernier patch"},
-          "en": {"name": "DeadlockMaxing", "description": "◆ ■ ■  D E A D L O C K M A X I N G  ■ ■ ◆\n"
-                 "▸ builds explained item by item, up to date with the latest patch"}}
+FOOTER = {"fr": {"name": "DeadlockMaxing", "description": "⚔ ✦  D E A D L O C K M A X I N G  ✦ ⚔\n"
+                 "DeadlockMaxing est un projet qui cherche les meilleurs builds grâce à la data, à l'IA et à la "
+                 "connaissance du jeu. Un site est prévu pour la suite. Des retours ? N'hésitez pas à me contacter !"},
+          "en": {"name": "DeadlockMaxing", "description": "⚔ ✦  D E A D L O C K M A X I N G  ✦ ⚔\n"
+                 "DeadlockMaxing is a project that looks for the best builds with data, AI and game knowledge. "
+                 "A website is planned. Feedback? Feel free to contact me!"}}
 # Characters the game accepts in build texts (verified in game, 2026-11-18). Some other characters make it refuse
 # to paste the whole build (□, the no-break, ideographic and em spaces), and block or box characters are not
 # drawn (█ ░ │ ─).
-SAFE_SYMBOLS = set("■◆▲▼●▸→·≈−–—‘’“”«»…•×")
+SAFE_SYMBOLS = set("■◆▲▼●▸→·≈−–—‘’“”«»…•×⚔✦")
 
 
 def unsafe_chars(text):
