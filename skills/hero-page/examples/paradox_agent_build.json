@@ -62,21 +62,21 @@
       "note": "Vers 12 min (Bottes de course d'abord). Tu dois te replacer après chaque permutation : moins de ralentissements subis veut dire que tu survis à ta propre prise."
      },
      {
+      "id": 4139877411,
+      "note": "Vers 13 min, juste avant Maitrise d'endurance qu'il compose : un saut élancé de plus tout de suite, et tu ne paieras ensuite que la différence."
+     },
+     {
+      "id": 334300056,
+      "note": "Vers 15 min. Un second saut élancé : c'est ta façon de prendre l'angle pour Permutation paradoxale et de repartir après. Avec Vitesse persistante, elle te fait toucher le spike 4.8k Vitalité : gros bonus de PV du shop."
+     },
+     {
       "id": 380806748,
       "imbue": 2917891787,
-      "note": "Vers 16 min, imprégnée sur Permutation paradoxale : sa recharge de 95 s baisse de 18 %, donc une prise d'isolé de plus par partie. Elle deviendra Récupération supérieure, et tu ne paieras que la différence."
+      "note": "Vers 17 min, imprégnée sur Permutation paradoxale : sa recharge de 95 s baisse de 18 %, donc une prise d'isolé de plus par partie. Elle deviendra Récupération supérieure, et tu ne paieras que la différence."
      },
      {
       "id": 690458959,
       "note": "Vers 19 min. Ton prochain tir part deux fois, plus fort : garde-le pour la cible que tu viens de permuter, c'est ce qui l'achève avant que son équipe arrive."
-     },
-     {
-      "id": 4139877411,
-      "note": "Vers 17 min, juste avant Maîtrise d'endurance qu'il compose : un saut élancé de plus tout de suite, et tu ne paieras ensuite que la différence."
-     },
-     {
-      "id": 334300056,
-      "note": "Vers 20 min. Un second saut élancé : c'est ta façon de prendre l'angle pour Permutation paradoxale et de repartir après."
      },
      {
       "id": 1998374645,
@@ -121,7 +121,7 @@
      },
      {
       "id": 2163598980,
-      "note": "Si l'équipe adverse fait surtout des dégâts d'esprit, à la place de Maîtrise d'endurance (vers 20 min) : sous 50 % de PV, tu gagnes de la résistance spirituelle, juste le temps de repartir après ta permutation."
+      "note": "Si l'équipe adverse fait surtout des dégâts d'esprit, à la place de Maitrise d'endurance (vers 20 min) : sous 50 % de PV, tu gagnes de la résistance spirituelle, juste le temps de repartir après ta permutation."
      },
      {
       "id": 1414025773,
@@ -203,6 +203,10 @@
      {
       "id": 1662311306,
       "note": "Si ton équipe se fait souvent attraper : annule les effets négatifs d'un allié (ou les tiens) et lui donne une protection. Un actif qui sauve les combats. En passant par Sentinelle gardienne, qui protège déjà un allié."
+     },
+     {
+      "id": 2717651715,
+      "note": "Contre une équipe qui joue groupée, vers 25 min, en fusionnant Prolongation : +28 % de durée sur tes capacités et tes objets. Ton Écran temporel bloque plus longtemps et la cible de Carabine cinétique reste figée plus longtemps."
      }
     ]
    }
@@ -253,10 +257,10 @@
       "Around 10 min, merging Long Range. Even more damage at range: the item both one-tricks keep in almost all their games.",
       "Around 11 min, the key piece of the kit. Cast it on the target right before Paradoxical Swap: it is slowed and cannot use its mobility to escape your team. It is also the counter-buy advised against Apollo, Calico, Celeste, Dynamo, Infernus, Mina, Rem, Shiv and Silver.",
       "Around 12 min (Sprint Boots first). You must reposition after every swap: fewer slows on you means you survive your own pick.",
-      "Around 16 min, imbued on Paradoxical Swap: its 95 s cooldown drops by 18%, so one more pick per game. It becomes Superior Cooldown, and you only pay the difference.",
+      "Around 13 min, right before Stamina Mastery, which it builds into: one more dash jump right away, then you only pay the difference.",
+      "Around 15 min. A second dash jump: it is how you take the angle for Paradoxical Swap and get away afterwards. With Enduring Speed, it takes you to the 4.8k Vitality spike: a big shop health bonus.",
+      "Around 17 min, imbued on Paradoxical Swap: its 95 s cooldown drops by 18%, so one more pick per game. It becomes Superior Cooldown, and you only pay the difference.",
       "Around 19 min. Your next shot fires twice, harder: keep it for the target you just swapped, it is what finishes it before its team arrives.",
-      "Around 17 min, right before Stamina Mastery, which it builds into: one more dash jump right away, then you only pay the difference.",
-      "Around 20 min. A second dash jump: it is how you take the angle for Paradoxical Swap and get away afterwards.",
       "Around 20 min, right before Tankbuster, which it builds into: your Pulse Grenade and Kinetic Carbine deal over 80 damage, so each adds bonus spirit damage right away.",
       "Around 21 min. Your Pulse Grenade and Kinetic Carbine deal well over 165 damage: each adds damage based on the target's current HP, which melts tanks.",
       "Around 26 min, merging Compress Cooldown: the cooldown reduction now covers all your abilities (20%), Paradoxical Swap included. It becomes Transcendent Cooldown.",
@@ -314,7 +318,8 @@
       "If you already have kills and your team protects you: huge weapon damage that grows with each kill, but less HP. Avoid it against a team that dives you.",
       "Against stuns, silences or immobilizations that catch you before you swap: the next control is removed automatically. Via Reactive Barrier, which already shields you when you get controlled.",
       "Against a team that deals mostly big one-shot spirit damage (Seven, Lash): the next big spirit hit you take is strongly reduced. Via Debuff Reducer, which already shortens the effects you take.",
-      "If your team often gets caught: removes an ally's (or your) negative effects and shields them. An active that saves fights. Via Guardian Ward, which already shields an ally."
+      "If your team often gets caught: removes an ally's (or your) negative effects and shields them. An active that saves fights. Via Guardian Ward, which already shields an ally.",
+      "Against a team that plays grouped, around 25 min, merging Duration Extender: +28% duration on your abilities and items. Your Time Wall blocks for longer and the Kinetic Carbine target stays frozen for longer."
      ]
     }
    ]
@@ -335,13 +340,18 @@
    "3077079169": "Affaibli le 30/10 (vitesse des balles de 60 à 45 %, ses améliorations ne sont pas touchées) : il reste la base de Tir d'élite, Balles ouvrantes et Tir express.",
    "3884003354": "Renforcé le 30/10 (anti-soin de 35 à 40 %) : il reste, encore meilleur contre les équipes qui se soignent.",
    "4204808176": "Affaibli le 30/10 (réduction de recharge de la parade de 1,75 à 1,25 s) : il reste contre Abrams ou Billy en lane, la parade renvoie toujours les dégâts."
+  },
+  "review": {
+   "invest:vitality": "Fixed: Extra Stamina and Stamina Mastery now come right after Enduring Speed, so the 4.8k Vitality step lands at 12,000 souls of items, like the best one-tricks.",
+   "missing:2717651715": "Added to the endgame: the best one-tricks buy it and it holds up against the purchases at the same souls; it lengthens Time Wall and the Carbine freeze.",
+   "missing:630839635": "Left out: the best one-tricks never buy it and it trails the purchases made at the same souls; Refresher already covers the double cast in the endgame."
   }
  },
  "dlmax": {
   "resume": "Le build écrit par DeadlockMax : un core Carabine cinétique à prendre à chaque partie, des objets de situation pas chers à y intercaler, et un endgame de T4 choisi selon l'équipe adverse.",
   "points": [
    "Early : Tir curatif, Longue portée et Balles véloces pour poke en lane ; Réfutation contre Abrams ou Billy, Surplus de régénération si tu te fais harceler.",
-   "Mid : Malédiction de ralentissement vers 11 min, puis Tir express, Maîtrise d'endurance et Antichar pour tuer la cible permutée.",
+   "Mid : Malédiction de ralentissement vers 11 min, puis Tir express, Maitrise d'endurance et Antichar pour tuer la cible permutée.",
    "Late : Réverbération mystique et Brûlure spirituelle pour ta fenêtre de 27 à 35 min, puis des T4 choisis selon l'équipe adverse : Relique maudite contre un carry, Brise-tête contre les soins, Indomptable contre les contrôles…",
    "Particularité : le core se prend à chaque partie ; les objets de situation pas chers s'y intercalent, et l'endgame se choisit selon l'équipe adverse."
   ]
@@ -355,6 +365,9 @@
     "Late: Mystic Reverb and Spirit Burn for your 27-35 min window, then tier 4 items picked against the enemy team: Cursed Relic against a carry, Crippling Headshot against healing, Indomitable against crowd control…",
     "Special: the core is taken every game; cheap situational items are slipped into it, and the endgame is picked against the enemy team."
    ]
+  },
+  "tldr": {
+   "why": "The build written by DeadlockMax: it takes the Kinetic Carbine base of the best-ranked Paradox (Ascendant 6), adds lane items chosen per opponent a clear core and endgame proposals for the 12 slots, and explains every purchase."
   }
  }
 }

@@ -178,6 +178,24 @@ is missing.
      10-30, was picked for Lady Geist). find.py prints "Changed AFTER the start of the data" and items.md lists each
      item's recent changes (`patchnotes.py`): judge those items on their current values. agent_build.py refuses
      any such item without a `"patch_review": {"<id>": "why it stays"}` entry.
+   - **Critical review, before finish.py** (`scripts/review.py`; agent_build.py refuses the build while a flag
+     has no answer in `"review": {"<flag>": "fixed: … / why it stays"}`). Save the agent_build as a JSON file and
+     run `python3 -I .claude/skills/deadlockmax/scripts/review.py builds/search-<hero> <file>`. It prints:
+     - **Investment walk** (lane + core order): every soul in a shop column counts towards its bonus, the same
+       for every hero (weapon +9 % at 800, +46 % at 4,800, +115 % at 28,800, the max). The 4,800 step is by far
+       the most profitable, the community's "4.8k spike" ("Early greens: get that 4.8k"). `invest:<column>`:
+       the vitality step or the main column's step comes later than in 3 good builds out of 4 of this hero.
+       Selling an item takes its price out of the column. The in-game top block gets the line "Spike 4.8k : …
+       avec <item>" by code; notes may say "it takes you to the 4.8k Vitality spike".
+     - **Good builds** (the hero's 30 most favourited of the patch, ≥ 5 favourites): `absent:<id>` (a core item
+       none of them takes and the best one-tricks do not buy), `missing:<id>` (in 60 %+ of them, not here),
+       `imbue:<id>` (another target than theirs).
+     - **Win rate at equal souls**: raw item win rates favour expensive items (rich players win more). Each item
+       is compared with the hero's purchases made at the same net worth (`weak:<id>`: a core item 3+ points
+       below). Use this one, never the raw rate, when a statistic decides.
+     Then give a **fresh subagent** the report and the build to attack it as a strong player would (what is
+     bought too late, what is missing against common threats, a note that is wrong about the kit, an evolution
+     or imbue that does not fit): fix what holds, answer the rest in `"review"`.
    Never justify an item by its win or pick rate (Farmingbip trap): a statistic is a clue to explain with the kit.
    Every note quotes its reason; `sources` can cite `build:dlmax/...` paths like the other texts. Write its
    `{resume, points}` like the other builds and set `tldr.pick` to `dlmax` unless a real build is clearly better.
