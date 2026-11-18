@@ -8,6 +8,7 @@ code.<lang>.txt otherwise), and copies it to the clipboard (wl-copy / xclip). Te
 (the author's own language, or texts generated from the locales) are filled in automatically.
 """
 import json
+import re
 import os
 import shutil
 import subprocess
@@ -105,6 +106,32 @@ def _row(cats):
     return None
 
 
+MAX_DESC_BYTES = 1000   # the game keeps 1,024 bytes of a category description (verified 2026-11-18)
+
+
+def split_long(cats, more="(suite)"):
+    """A category whose description is too long for the game is followed by item-less "(suite)" categories that
+    carry the rest, cut at the end of a sentence."""
+    out = []
+    for cat in cats:
+        desc = cat.get("description") or ""
+        if len(desc.encode()) <= MAX_DESC_BYTES:
+            out.append(cat)
+            continue
+        parts, current = [], ""
+        for sentence in re.split(r"(?<=[.!?…])\s+", desc):
+            if current and len((current + " " + sentence).encode()) > MAX_DESC_BYTES:
+                parts.append(current)
+                current = sentence
+            else:
+                current = f"{current} {sentence}".strip()
+        parts.append(current)
+        out.append(dict(cat, description=parts[0]))
+        out += [{"name": f"{cat.get('name') or ''} {more}".strip(), "description": p, "mods": []} for p in parts[1:]]
+    cats[:] = out
+    return cats
+
+
 def pack(cats):
     """Place the categories like the game does (left to right, wrapping past ROW_W), keeping their order.
     Every way of cutting them into rows is tried; the one that takes the least height on screen wins.
@@ -181,6 +208,7 @@ def main():
         node[s["path"][-1]] = s[lang]
 
     if "--keep-layout" not in sys.argv:
+        split_long(original["details"]["mod_categories"], "(suite)" if lang == "fr" else "(continued)")
         pack(original["details"]["mod_categories"])
 
     # Mirror exactly what the in-game "Copy to clipboard" button produces.

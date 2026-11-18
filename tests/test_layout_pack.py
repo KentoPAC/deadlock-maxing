@@ -25,5 +25,18 @@ class PackTest(unittest.TestCase):
         self.assertGreater(big["height"], apply.height_at(cat("One", 1), apply.ROW_W))
 
 
+
+class SplitTest(unittest.TestCase):
+    def test_a_description_over_the_game_limit_is_continued_in_a_new_category(self):
+        cats = [{"name": "Astuces", "description": "Une phrase assez longue pour remplir le bloc. " * 40,
+                 "mods": [{"ability_id": 1}]}]
+        apply.split_long(cats)
+        self.assertGreater(len(cats), 1)
+        self.assertEqual(cats[1]["name"], "Astuces (suite)")
+        self.assertEqual(cats[1]["mods"], [])
+        self.assertTrue(all(len(c["description"].encode()) <= apply.MAX_DESC_BYTES for c in cats))
+        self.assertTrue(cats[0]["description"].endswith("."))
+
+
 if __name__ == "__main__":
     unittest.main()
