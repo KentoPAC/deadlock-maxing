@@ -150,6 +150,10 @@ is missing.
      evolve: tier 4 items (final), some tier 2-3 items (kept or sold for a tier 4) and the 4 tier 1 lane items.
      Check paths in items.md (`component_items`) or the page tooltips. agent_build.py refuses an item whose
      component is neither in the build nor named in its note (e.g. Compress Cooldown before Superior Cooldown).
+   - **Self-contained in-game texts**: anyone reads these builds in game, without our context. Never refer to
+     what the reader does not have: our data views or measurements ("les mesures", "le profil"), guides or
+     classifications they never saw, tools, players' pseudonyms. Say the fact itself ("ton impact grandit jusqu'en
+     fin de partie"), not where it comes from. Creators' names are fine when the advice is theirs.
    - **Name and description** (the user publishes these builds online): the name is "DeadlockMaxing · <hero>".
      The description says, in a friendly tone, how the build was made: the best one-tricks' real purchases on the
      current patch, creators' guides and counter tips, then checked item by item against the kit (one or two kit

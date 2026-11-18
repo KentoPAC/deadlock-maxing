@@ -47,7 +47,8 @@ class ChartsTest(unittest.TestCase):
     def test_the_guide_position_is_kept_only_when_the_measurements_agree(self):
         scaling = dict(group([None] * 26), timing=[0.0, 0.1, 0.3, 0.5, 0.7, 0.9, 1.0],
                        farm=[None] + [{"per_min": 110, "avg_per_min": 100}] * 3)
-        self.assertIn("carry qui scale (le guide des rôles le classe soft carry", charts.role_text(scaling, "fr", [2]))
+        self.assertTrue(charts.role_text(scaling, "fr", [2]).startswith("Rôle : carry qui scale. "))   # no "the guide
+        # says": the reader has no context
         self.assertTrue(charts.role_text(scaling, "fr", [1]).startswith("Rôle : hard carry (position 1)."))
         self.assertTrue(charts.role_text(scaling, "fr", []).startswith("Rôle : carry qui scale."))
         steady = dict(scaling, timing=[0.1] * 7, spike={"from": 30000, "to": 40000})
