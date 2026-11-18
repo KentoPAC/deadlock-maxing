@@ -1,0 +1,348 @@
+{
+ "_about": "Reference DeadlockMaxing build (Paradox, 2026-11-18): the agent_build, its {resume, points} and the tldr sent to finish.py. Validated in game (paste into a new build). Use it as a model for structure, tone and notes, not as content for another hero.",
+ "agent_build": {
+  "name": "DeadlockMaxing · Paradox",
+  "description": "Un build DeadlockMaxing. Il part de ce qu'achètent vraiment les meilleurs one-tricks Paradox (Ascendant et plus) sur le patch actuel, croisé avec les guides et les conseils de contre des créateurs, puis vérifié objet par objet avec le kit : Carabine cinétique grandit avec tes dégâts d'arme, Malédiction de ralentissement prépare chaque Permutation paradoxale, et on garde ce qui marche vraiment sur ce héros. Le core se prend à chaque partie, de gauche à droite. Les catégories optionnelles se piochent selon la partie : contre-achats, soins, contrôles. L'endgame vise un inventaire plein d'objets T4. Chaque objet a sa note : quand l'acheter et pourquoi. Bonne partie !",
+  "categories": [
+   {
+    "name": "Lane (0-9 min)",
+    "description": "Paradox perd un peu sa lane en moyenne : tu joues à distance et tu poke avec Grenade à impulsion puis Carabine cinétique.",
+    "mods": [
+     {
+      "id": 3862866912,
+      "note": "À 1 min, par défaut. Chaque tir sur un adversaire te rend des PV : c'est ce qui te permet de poke sans reculer. C'est l'objet de lane qui aide le plus Paradox face au même adversaire (environ 100 âmes de mieux pour le duo en fin de lane)."
+     },
+     {
+      "id": 3331811235,
+      "note": "Vers 4 min. Tu touches de loin, et Carabine cinétique gagne des dégâts avec tes dégâts d'arme : Longue portée renforce donc tes deux sources de poke. Il deviendra Tir d'élite."
+     },
+     {
+      "id": 3077079169,
+      "note": "Vers 5 min. Peu cher, il sert de base à Balles ouvrantes, Tir d'élite et Tir express : tu ne le revends jamais, il disparaît dans ces objets."
+     }
+    ]
+   },
+   {
+    "name": "Lane : selon l'adversaire",
+    "description": "Les objets de lane qui n'évoluent pas : on les prend à la place de Tir curatif, ou en plus, selon la lane, puis on les revend quand la place manque.",
+    "mods": [
+     {
+      "id": 2829638276,
+      "note": "Si tu te fais harceler et que tu ne peux pas répondre (Haze, Vindicta à distance), achète-le avant Longue portée : la régénération tient la lane sans dépendre de tes tirs. Revends-le vers 20 min."
+     },
+     {
+      "id": 4204808176,
+      "note": "Contre un adversaire de mêlée qui vient frapper en lane (Abrams, Billy) : une parade réussie te soigne et lui renvoie ses dégâts. Achète-le dès qu'il commence à engager, revends-le après la lane."
+     },
+     {
+      "id": 2462046703,
+      "note": "Seulement si ta lane est calme et que tu farmes tranquillement : l'œuf donne des âmes et des bonus permanents plus tu le gardes. Contre un duo agressif, il ne rapporte rien car tu meurs avec."
+     }
+    ]
+   },
+   {
+    "name": "Core (9-35 min)",
+    "core": true,
+    "description": "Le build de chaque partie, de gauche à droite : ta combinaison de prise d'isolé, puis ta fenêtre de force entre 27,5K et 37,5K âmes (Rift de 32 min, Patron vers 34 min).",
+    "mods": [
+     {
+      "id": 2064029594,
+      "note": "Vers 7 min. Gros bonus de dégâts d'arme sur une cible à plus de 50 % de PV : ton premier tir et ta Carabine cinétique d'ouverture frappent plus fort."
+     },
+     {
+      "id": 2152872419,
+      "note": "Vers 10 min, en fusionnant Longue portée. Encore plus de dégâts à distance : c'est l'objet que les deux one-tricks gardent dans presque toutes leurs parties."
+     },
+     {
+      "id": 1813726886,
+      "note": "Vers 11 min, la pièce clé du kit. Lance-la sur la cible juste avant Permutation paradoxale : elle est ralentie et ne peut plus utiliser sa mobilité pour fuir ton équipe. C'est aussi le contre-achat conseillé contre Apollon, Calico, Céleste, Dynamo, Infernus, Mina, Rem, Surin et Silver."
+     },
+     {
+      "id": 2447176615,
+      "note": "Vers 12 min (Bottes de course d'abord). Tu dois te replacer après chaque permutation : moins de ralentissements subis veut dire que tu survis à ta propre prise."
+     },
+     {
+      "id": 380806748,
+      "imbue": 2917891787,
+      "note": "Vers 16 min, imprégnée sur Permutation paradoxale : sa recharge de 95 s baisse de 18 %, donc une prise d'isolé de plus par partie. Elle deviendra Récupération supérieure, et tu ne paieras que la différence."
+     },
+     {
+      "id": 690458959,
+      "note": "Vers 19 min. Ton prochain tir part deux fois, plus fort : garde-le pour la cible que tu viens de permuter, c'est ce qui l'achève avant que son équipe arrive."
+     },
+     {
+      "id": 4139877411,
+      "note": "Vers 17 min, juste avant Maîtrise d'endurance qu'il compose : un saut élancé de plus tout de suite, et tu ne paieras ensuite que la différence."
+     },
+     {
+      "id": 334300056,
+      "note": "Vers 20 min. Un second saut élancé : c'est ta façon de prendre l'angle pour Permutation paradoxale et de repartir après."
+     },
+     {
+      "id": 1998374645,
+      "note": "Vers 20 min, juste avant Antichar qu'il compose : tes Grenade à impulsion et Carabine cinétique dépassent 80 de dégâts, donc chacune ajoute des dégâts d'esprit bonus dès maintenant."
+     },
+     {
+      "id": 2121044373,
+      "note": "Vers 21 min. Ta Grenade à impulsion et ta Carabine cinétique dépassent largement 165 de dégâts : chacune ajoute des dégâts selon les PV actuels de la cible, ce qui fait fondre les tanks."
+     },
+     {
+      "id": 3261353684,
+      "note": "Vers 26 min, en fusionnant Récupération comprimée : la réduction de recharge passe à toutes tes capacités (20 %), Permutation paradoxale comprise. Elle deviendra Récupération transcendante."
+     },
+     {
+      "id": 3577481646,
+      "note": "Vers 29 min, sur Carabine cinétique. Le tir ralentit, soigne et ajoute un pourcentage de dégâts : la cible arrêtée dans le temps ne s'en sort plus. Les meilleurs Paradox l'ont dans presque toutes leurs longues parties.",
+      "imbue": 1128670012
+     },
+     {
+      "id": 343572757,
+      "note": "Vers 33 min. Grenade à impulsion puis Carabine cinétique en moins de 5 s déclenchent l'explosion : dégâts sur la durée et anti-soin, utile contre Victor et Dame Geist qui se soignent beaucoup."
+     }
+    ]
+   },
+   {
+    "name": "Situationnel : contre les soins",
+    "description": "À intercaler dans le core quand l'équipe adverse se soigne beaucoup.",
+    "mods": [
+     {
+      "id": 2603935618,
+      "note": "Contre Victor ou Dame Geist, entre Malédiction de ralentissement et Tir express (vers 15 min) : tes dégâts d'esprit (Grenade, Carabine) réduisent leurs soins, et chaque kill sous son effet te soigne."
+     }
+    ]
+   },
+   {
+    "name": "Situationnel : contre les contrôles et l'esprit",
+    "description": "À intercaler dans le core quand on t'attrape avant que tu permutes : Paradox a peu de PV.",
+    "mods": [
+     {
+      "id": 3731635960,
+      "note": "Si on te contrôle souvent (silences, immobilisations), entre Antichar et Récupération supérieure (vers 22 min) : il retire les effets négatifs et te rend des PV."
+     },
+     {
+      "id": 2163598980,
+      "note": "Si l'équipe adverse fait surtout des dégâts d'esprit, à la place de Maîtrise d'endurance (vers 20 min) : sous 50 % de PV, tu gagnes de la résistance spirituelle, juste le temps de repartir après ta permutation."
+     },
+     {
+      "id": 1414025773,
+      "note": "Si un ultime ou une capacité adverse te tue à chaque combat (Seven, Haze), après Tir express (vers 20 min) : ta prochaine parade bloque les dégâts et les effets."
+     },
+     {
+      "id": 3270001687,
+      "note": "Contre Abrams, Billy, McGinnis, Miro et Minus ou Venator : te téléporte devant toi avec de la résistance aux balles, pour sortir d'une charge, d'un combo ou passer un Mur spectral. Paradox n'a pas d'autre fuite que sa Permutation paradoxale."
+     }
+    ]
+   },
+   {
+    "name": "Contre-achat : héros qui volent ou fuient",
+    "description": "Contre les héros qu'on n'attrape pas : un contrôle à lancer juste après ta Permutation paradoxale.",
+    "mods": [
+     {
+      "id": 1254091416,
+      "note": "Contre Vindicta, Céleste ou Silver (conseil d'AndrewChicken) : permute la cible vers ton équipe, puis Coup d'enclume l'étourdit 2 s plus tard et la ramène au sol si elle vole. Une Vindicta avec Contresort ou Dissipateur de magie l'annule : prévois-le à plusieurs dans l'équipe."
+     }
+    ]
+   },
+   {
+    "name": "Contre-achat : carries à l'arme",
+    "description": "Contre un héros qui gagne les combats au fusil.",
+    "mods": [
+     {
+      "id": 2061878743,
+      "note": "Contre Vindicta, Vypère ou Scopa : désarme la cible et réduit sa résistance aux balles. Permute-la puis désarme-la : elle ne peut plus tirer pendant que ton équipe la tue. Se construit en passant par Canon rouillé."
+     }
+    ]
+   },
+   {
+    "name": "Contre-achat : ultimes et fuites",
+    "description": "Contre une capacité qui sauve ou retourne un combat : la couper avant qu'elle parte.",
+    "mods": [
+     {
+      "id": 619484391,
+      "note": "Contre Dynamo (Intrication quantique), Dame Geist (Échange d'âmes) ou Rem (Sieste ambulante) : réduit au silence tous les adversaires devant toi, avant qu'ils lancent la capacité. Elle n'interrompt pas une capacité déjà canalisée : lance-la avant."
+     }
+    ]
+   },
+   {
+    "name": "Endgame : selon l'équipe adverse",
+    "endgame": true,
+    "description": "Pas d'ordre : choisis selon l'équipe adverse. Après 35 min, revends tes petits objets passifs pour ces T4 (l'achat rapide revend d'abord ceux marqués ↺). Tu n'as 12 emplacements que si ton équipe a détruit les 3 Walkers adverses : avec moins, garde Malédiction de ralentissement, Réverbération mystique et Brûlure spirituelle, puis l'objet qui répond à la plus grosse menace.",
+    "mods": [
+     {
+      "id": 915014646,
+      "note": "Dans presque toutes les parties : elle fusionne Récupération supérieure du core, donc aucun emplacement perdu, et réduit de 25 % la recharge de tes capacités et de Malédiction de ralentissement."
+     },
+     {
+      "id": 2617435668,
+      "note": "Contre un carry ou un héros dont l'ultime décide les combats : permute-le puis maudis-le, il ne peut plus tirer ni utiliser capacités et objets pendant que ton équipe le tue."
+     },
+     {
+      "id": 677738769,
+      "note": "Quand ton équipe se bat groupée et que chaque combat dure : il recharge toutes tes capacités, donc une seconde Permutation paradoxale pour prendre une deuxième cible ou sauver un allié."
+     },
+     {
+      "id": 3884003354,
+      "note": "Contre une équipe qui se soigne ou des tanks résistants : tes tirs à la tête réduisent les résistances et les soins de la cible, et toute ton équipe en profite. En passant par Tirs entêtants, qui réduit déjà la résistance aux balles sur tes tirs à la tête."
+     },
+     {
+      "id": 3005970438,
+      "note": "Contre des tanks bien équipés en résistance spirituelle : chaque Grenade à impulsion et Carabine cinétique amplifie tes dégâts d'esprit suivants sur la même cible. En passant par Vulnérabilité mystique, qui réduit déjà la résistance spirituelle de la cible."
+     },
+     {
+      "id": 365620721,
+      "note": "Si tu as déjà des kills et que ton équipe te protège : énormes dégâts d'arme qui grandissent à chaque kill, mais moins de PV. À éviter contre une équipe qui plonge sur toi."
+     },
+     {
+      "id": 951866250,
+      "note": "Contre des étourdissements, silences ou immobilisations qui t'attrapent avant que tu permutes : le prochain contrôle est retiré automatiquement. En passant par Protection d'urgence, qui te donne déjà une protection quand on te contrôle."
+     },
+     {
+      "id": 1955841979,
+      "note": "Contre une équipe qui fait surtout de gros dégâts d'esprit en un coup (Seven, Lash) : le prochain gros coup d'esprit que tu subis est fortement réduit. En passant par Atténuateur d'effets négatifs, qui raccourcit déjà les effets subis."
+     },
+     {
+      "id": 1662311306,
+      "note": "Si ton équipe se fait souvent attraper : annule les effets négatifs d'un allié (ou les tiens) et lui donne une protection. Un actif qui sauve les combats. En passant par Sentinelle gardienne, qui protège déjà un allié."
+     }
+    ]
+   }
+  ],
+  "abilities": [
+   58655583,
+   58655583,
+   1128670012,
+   1128670012,
+   1366719170,
+   1128670012,
+   2917891787,
+   2917891787,
+   1366719170,
+   1366719170,
+   2917891787,
+   1128670012,
+   2917891787,
+   58655583
+  ],
+  "en": {
+   "name": "DeadlockMaxing · Paradox",
+   "description": "A DeadlockMaxing build. It starts from what the best Paradox one-tricks (Ascendant and above) actually buy on the current patch, crossed with creators' guides and counter tips, then checked item by item against the kit: Kinetic Carbine grows with your weapon damage, Slowing Hex sets up every Paradoxical Swap, and we keep what really works on this hero. The core is bought every game, left to right. The optional categories are picked depending on the game: counter-buys, healing, crowd control. The endgame aims for a full inventory of tier 4 items. Every item has a note: when to buy it and why. Have a good game!",
+   "categories": [
+    {
+     "name": "Lane (0-9 min)",
+     "description": "Paradox loses her lane slightly on average: you play at range and poke with Pulse Grenade then Kinetic Carbine.",
+     "notes": [
+      "At 1 min, by default. Every shot on an enemy gives you HP back: this is what lets you poke without backing off. It is the lane item that helps Paradox most against the same opponent (about 100 more souls for the duo at lane end).",
+      "Around 4 min. You hit from afar, and Kinetic Carbine gains damage from your weapon damage: Long Range powers both your poke sources. It becomes Sharpshooter.",
+      "Around 5 min. Cheap, it is the base of Opening Rounds, Sharpshooter and Express Shot: you never sell it, it goes into those items."
+     ]
+    },
+    {
+     "name": "Lane: depending on the opponent",
+     "description": "Lane items that never upgrade: bought instead of Restorative Shot, or on top, depending on the lane, then sold when slots run out.",
+     "notes": [
+      "If you are harassed and cannot answer (Haze, Vindicta at range), buy it before Long Range: regeneration holds the lane without relying on your shots. Sell it around 20 min.",
+      "Against a melee opponent who comes to hit you in lane (Abrams, Billy): a successful parry heals you and sends the damage back. Buy it as soon as they start engaging, sell it after the lane.",
+      "Only if your lane is calm and you farm safely: the egg gives souls and permanent bonuses the longer you hold it. Against an aggressive duo it gives nothing, because you die with it."
+     ]
+    },
+    {
+     "name": "Core (9-35 min)",
+     "description": "The build of every game, left to right: your pick combo, then your power window between 27.5K and 37.5K souls (32-minute Rift, Mid-Boss around 34 min).",
+     "notes": [
+      "Around 7 min. Big weapon damage bonus on a target above 50% HP: your first shot and your opening Kinetic Carbine hit harder.",
+      "Around 10 min, merging Long Range. Even more damage at range: the item both one-tricks keep in almost all their games.",
+      "Around 11 min, the key piece of the kit. Cast it on the target right before Paradoxical Swap: it is slowed and cannot use its mobility to escape your team. It is also the counter-buy advised against Apollo, Calico, Celeste, Dynamo, Infernus, Mina, Rem, Shiv and Silver.",
+      "Around 12 min (Sprint Boots first). You must reposition after every swap: fewer slows on you means you survive your own pick.",
+      "Around 16 min, imbued on Paradoxical Swap: its 95 s cooldown drops by 18%, so one more pick per game. It becomes Superior Cooldown, and you only pay the difference.",
+      "Around 19 min. Your next shot fires twice, harder: keep it for the target you just swapped, it is what finishes it before its team arrives.",
+      "Around 17 min, right before Stamina Mastery, which it builds into: one more dash jump right away, then you only pay the difference.",
+      "Around 20 min. A second dash jump: it is how you take the angle for Paradoxical Swap and get away afterwards.",
+      "Around 20 min, right before Tankbuster, which it builds into: your Pulse Grenade and Kinetic Carbine deal over 80 damage, so each adds bonus spirit damage right away.",
+      "Around 21 min. Your Pulse Grenade and Kinetic Carbine deal well over 165 damage: each adds damage based on the target's current HP, which melts tanks.",
+      "Around 26 min, merging Compress Cooldown: the cooldown reduction now covers all your abilities (20%), Paradoxical Swap included. It becomes Transcendent Cooldown.",
+      "Around 29 min, on Kinetic Carbine. The shot slows, heals and adds percentage damage: the time-stopped target cannot get out. The best Paradox players have it in almost all their long games.",
+      "Around 33 min. Pulse Grenade then Kinetic Carbine within 5 s trigger the explosion: damage over time and anti-heal, useful against Victor and Lady Geist, who heal a lot."
+     ]
+    },
+    {
+     "name": "Situational: against healing",
+     "description": "Slip it into the core when the enemy team heals a lot.",
+     "notes": [
+      "Against Victor or Lady Geist, between Slowing Hex and Express Shot (around 15 min): your spirit damage (Grenade, Carbine) reduces their healing, and every kill under its effect heals you."
+     ]
+    },
+    {
+     "name": "Situational: against crowd control and spirit",
+     "description": "Slip them into the core when you get caught before swapping: Paradox has little HP.",
+     "notes": [
+      "If you get controlled often (silences, immobilizations), between Tankbuster and Superior Cooldown (around 22 min): it removes negative effects and gives you HP back.",
+      "If the enemy team deals mostly spirit damage, instead of Stamina Mastery (around 20 min): below 50% HP you gain spirit resistance, just long enough to get away after your swap.",
+      "If an enemy ultimate or ability kills you every fight (Seven, Haze), after Express Shot (around 20 min): your next parry blocks the damage and the effects.",
+      "Against Abrams, Billy, McGinnis, Mo & Krill or Venator: teleports you forward with bullet resistance, to get out of a charge, a combo or over a Spectral Wall. Paradox has no other escape than her Paradoxical Swap."
+     ]
+    },
+    {
+     "name": "Counter-buy: heroes who fly or flee",
+     "description": "Against heroes you cannot catch: a control to cast right after your Paradoxical Swap.",
+     "notes": [
+      "Against Vindicta, Celeste or Silver (AndrewChicken's advice): swap the target toward your team, then Knockdown stuns it 2 s later and brings it down if it flies. A Vindicta with Counterspell or Dispel Magic cancels it: have several players carry it."
+     ]
+    },
+    {
+     "name": "Counter-buy: gun carries",
+     "description": "Against a hero who wins fights with their gun.",
+     "notes": [
+      "Against Vindicta, Vyper or Wraith: disarms the target and lowers its bullet resistance. Swap it then disarm it: it can no longer shoot while your team kills it. Built via Rusted Barrel."
+     ]
+    },
+    {
+     "name": "Counter-buy: ultimates and escapes",
+     "description": "Against an ability that saves or turns a fight: cut it before it goes off.",
+     "notes": [
+      "Against Dynamo (Quantum Entanglement), Lady Geist (Soul Exchange) or Rem (Naptime): silences every enemy in front of you, before they cast it. It does not interrupt an ability already being channelled: cast it first."
+     ]
+    },
+    {
+     "name": "Endgame: depending on the enemy team",
+     "description": "No order: pick against the enemy team. After 35 min, sell your small passive items for these tier 4 items (Quickbuy sells the ones marked ↺ first). You only have 12 slots once your team has destroyed the 3 enemy Walkers: with fewer, keep Slowing Hex, Mystic Reverb and Spirit Burn, then the item that answers the biggest threat.",
+     "notes": [
+      "In almost every game: it merges Superior Cooldown from the core, so no slot is lost, and cuts the cooldown of your abilities and Slowing Hex by 25%.",
+      "Against a carry or a hero whose ultimate decides fights: swap them then curse them, they can no longer shoot or use abilities and items while your team kills them.",
+      "When your team fights grouped and fights last: it resets all your abilities, so a second Paradoxical Swap to take a second target or save an ally.",
+      "Against a team that heals or tough tanks: your headshots lower the target's resistances and healing, and your whole team benefits. Via Weakening Headshot, which already lowers bullet resistance on your headshots.",
+      "Against tanks with a lot of spirit resistance: every Pulse Grenade and Kinetic Carbine amplifies your next spirit damage on the same target. Via Mystic Vulnerability, which already lowers the target's spirit resistance.",
+      "If you already have kills and your team protects you: huge weapon damage that grows with each kill, but less HP. Avoid it against a team that dives you.",
+      "Against stuns, silences or immobilizations that catch you before you swap: the next control is removed automatically. Via Reactive Barrier, which already shields you when you get controlled.",
+      "Against a team that deals mostly big one-shot spirit damage (Seven, Lash): the next big spirit hit you take is strongly reduced. Via Debuff Reducer, which already shortens the effects you take.",
+      "If your team often gets caught: removes an ally's (or your) negative effects and shields them. An active that saves fights. Via Guardian Ward, which already shields an ally."
+     ]
+    }
+   ]
+  },
+  "tags": [
+   "Weapon",
+   "Spirit",
+   "Crowd Control"
+  ]
+ },
+ "dlmax": {
+  "resume": "Le build écrit par DeadlockMax : un core Carabine cinétique à prendre à chaque partie, des objets de situation pas chers à y intercaler, et un endgame de T4 choisi selon l'équipe adverse.",
+  "points": [
+   "Early : Tir curatif, Longue portée et Balles véloces pour poke en lane ; Réfutation contre Abrams ou Billy, Surplus de régénération si tu te fais harceler.",
+   "Mid : Malédiction de ralentissement vers 11 min, puis Tir express, Maîtrise d'endurance et Antichar pour tuer la cible permutée.",
+   "Late : Réverbération mystique et Brûlure spirituelle pour ta fenêtre de 27 à 35 min, puis des T4 choisis selon l'équipe adverse : Relique maudite contre un carry, Brise-tête contre les soins, Indomptable contre les contrôles…",
+   "Particularité : le core se prend à chaque partie ; les objets de situation pas chers s'y intercalent, et l'endgame se choisit selon l'équipe adverse."
+  ]
+ },
+ "en": {
+  "dlmax": {
+   "resume": "The build written by DeadlockMax: a Kinetic Carbine core taken every game, cheap situational items to slip into it, and a tier 4 endgame picked against the enemy team.",
+   "points": [
+    "Early: Restorative Shot, Long Range and High-Velocity Rounds to poke in lane; Rebuttal against Abrams or Billy, Extra Regen if you are harassed.",
+    "Mid: Slowing Hex around 11 min, then Express Shot, Stamina Mastery and Tankbuster to kill the swapped target.",
+    "Late: Mystic Reverb and Spirit Burn for your 27-35 min window, then tier 4 items picked against the enemy team: Cursed Relic against a carry, Crippling Headshot against healing, Indomitable against crowd control…",
+    "Special: the core is taken every game; cheap situational items are slipped into it, and the endgame is picked against the enemy team."
+   ]
+  }
+ }
+}
