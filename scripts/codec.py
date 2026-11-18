@@ -69,8 +69,8 @@ def encode_category(cat):
 def encode_currency_change(change):
     return (optional(field_varint, 1, change.get("ability_id"))
             + optional(field_varint, 2, change.get("currency_type"))
-            + optional(field_varint, 3, change.get("delta"))
-            + optional(field_bytes, 4, change.get("annotation")))
+            + optional(field_varint, 3, change.get("delta")))
+    # field 4 (annotation) exists in the protobuf, but the game refuses to paste a build that uses it (2026-11-18)
 
 
 def encode_build(build):

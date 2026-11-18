@@ -80,8 +80,8 @@ is missing.
     "tr_en": {"<key>": ["en of [0]", …]},
     "agent_build": {"name": "…", "description": "…", "categories": [{"name": "…", "description": "…",
                     "core": false, "endgame": false, "mods": [{"id": 0, "note": "…"}]}], "abilities": [0, …],
-                    "ability_notes": {"<id>": "…"}, "en": {"name": "…", "description": "…",
-                    "categories": [{"name": "…", "description": "…", "notes": ["…"]}], "ability_notes": {}}}}
+                    "en": {"name": "…", "description": "…",
+                    "categories": [{"name": "…", "description": "…", "notes": ["…"]}]}}}
    EOF
    ```
    `tr`: one list per key, **in the exact order** of "To translate" (or a partial `{"n": "fr"}`).
@@ -139,8 +139,8 @@ is missing.
      core so its components grow into the endgame items, and say it in the note ("it becomes …"). Items that never
      evolve: tier 4 items (final), some tier 2-3 items (kept or sold for a tier 4) and the 4 tier 1 lane items.
      Check paths in items.md (`component_items`) or the page tooltips.
-   - `abilities`: the point order (the OTPs' most common order unless the kit or a creator says otherwise), with
-     `ability_notes` on the unlocks.
+   - `abilities`: the point order (the OTPs' most common order unless the kit or a creator says otherwise). No
+     notes on the ability order: the game refuses to paste such a build; ability advice goes in `plan.abilities`.
    Never justify an item by its win or pick rate (Farmingbip trap): a statistic is a clue to explain with the kit.
    Every note quotes its reason; `sources` can cite `build:dlmax/...` paths like the other texts. Write its
    `{resume, points}` like the other builds and set `tldr.pick` to `dlmax` unless a real build is clearly better.
