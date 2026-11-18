@@ -21,11 +21,13 @@ enemy team, each note saying against what).
 Core + endgame list at least 12 tier 4 or active items (more when more are useful: the notes say which one to pick
 in which situation); the smaller passives are sold one by one to make room (an upgrade takes its component's slot).
 """
+import json
 import os
 import time
 
 from common import STAT_NOTE, fill, heroes, items, make_strings, read_json, write_candidate, write_json
 from i18n import CONTENT_LANG, LANGS
+import charts
 import patchnotes
 
 KEY, SOURCE = "dlmax", "DeadlockMax"
@@ -149,6 +151,18 @@ def game_fields(mod, upgraded=()):
     return out
 
 
+def power_category(hero_id, lang):
+    """An item-less category "When it is strong" with the hero's measured power line drawn as in-game text."""
+    try:
+        with open(charts.PROFILES, encoding="utf-8") as f:
+            doc = json.load(f)
+    except (OSError, ValueError):
+        return None
+    p = next((h for h in doc["heroes"] if h["id"] == hero_id), None)
+    cat = charts.ingame_power(doc, p, lang) if p else None
+    return dict(cat, mods=[]) if cat else None
+
+
 def to_build(spec, hero_id, lang_field=None):
     """Game build format; lang_field="en" takes the English texts (same structure, same items)."""
     en = spec.get("en") or {}
@@ -171,9 +185,12 @@ def to_build(spec, hero_id, lang_field=None):
         change = ({"ability_id": a, "currency_type": 2, "delta": -1} if k == 1 else
                   {"ability_id": a, "currency_type": 1, "delta": -[1, 2, 5][min(k - 2, 2)]})
         changes.append(change)
-    intro = {"name": READ_FIRST["en" if lang_field else "fr"], "description": tx("description", None), "mods": []}
+    intro = [{"name": READ_FIRST["en" if lang_field else "fr"], "description": tx("description", None), "mods": []}]
+    power = power_category(hero_id, "en" if lang_field else "fr")
+    if power:
+        intro.append(power)
     return {"hero_id": hero_id, "name": tx("name", None), "description": tx("description", None), "language": 2,
-            "details": {"mod_categories": [intro] + cats, "ability_order": {"currency_changes": changes}},
+            "details": {"mod_categories": intro + cats, "ability_order": {"currency_changes": changes}},
             "tags": [TAGS[t] for t in spec.get("tags") or []]}
 
 
