@@ -25,7 +25,7 @@ def spec(core_ids, endgame_ids=(11, 12)):
 class AgentBuildTest(unittest.TestCase):
     def setUp(self):
         self._i, self._h, self._p = agent_build.items, agent_build.heroes, agent_build.power_category
-        agent_build.power_category = lambda hero_id, lang: {"name": "Power spike", "description": "x", "mods": []}
+        agent_build.power_category = lambda hero_id, lang, positions=None: {"name": "Power spike", "description": "x", "mods": []}
         agent_build.items, agent_build.heroes = (lambda lang=None: ITEMS), (lambda: HEROES)
 
     def tearDown(self):
@@ -125,7 +125,7 @@ class AgentBuildTest(unittest.TestCase):
     def test_the_power_spike_block_has_a_placeholder_without_measured_profile(self):
         agent_build.power_category = self._p
         cat = agent_build.power_category(999999, "fr")
-        self.assertEqual(cat["name"], "Power spike")
+        self.assertEqual(cat["name"], "Rôle et power spike")
         self.assertIn("Pas encore assez de parties", cat["description"])
 
     def test_tags_are_game_tag_ids(self):

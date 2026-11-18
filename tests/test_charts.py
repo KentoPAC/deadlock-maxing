@@ -35,7 +35,11 @@ class ChartsTest(unittest.TestCase):
         self.assertIn("◆ SPIKE", next(x for x in lines if "30K" in x))
         self.assertTrue(all(x.startswith("■") for x in lines if "K (" in x))      # bars first: they line up
         self.assertIn("30K and 37.5K", lines[-1])
-        self.assertEqual(lines[0], "Lane: slightly unfavourable (−0.2 kills / 10 min, −145 souls for the duo): avoid long trades.")
+        self.assertEqual(lines[0], "Game plan: survive the lane, farm for a long time, and wait for your power spike to "
+                                   "play the teamfights.")                      # lane lost, spike late (30K+)
+        self.assertIn("Lane: slightly unfavourable (−0.2 kills / 10 min, −145 souls for the duo): avoid long trades.", lines)
+        with_role = charts.ingame_power(doc, {"ranked": group(curve)}, "fr", positions=[1])["description"]
+        self.assertTrue(with_role.startswith("Rôle : hard carry (position 1)."))
 
     def test_numbers_use_the_french_decimal_comma(self):
         self.assertEqual(charts.k(27500), "27,5K")
