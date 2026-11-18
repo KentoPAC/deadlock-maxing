@@ -10,6 +10,9 @@ Usage :
                                                mark a video as a guide for one hero, with the builds it recommends
                                                (find.py adds them as "Vidéo" candidates; the plan cites the video)
   python3 -I videos.py list                    videos and number of heroes covered
+  python3 -I videos.py counter-items [<hero>]  creators' counter tips read the other way: for each item, the enemy
+                                               heroes it is advised against (counter-buy categories of a build;
+                                               <hero> leaves out the tips about that hero itself)
 
 English hero and item names are converted to ids when saving (loud failure when unknown): the page then
 shows names, icons and tooltips from the API, like everywhere else.
@@ -144,6 +147,29 @@ def add(v, src):
         sys.exit("Not saved:\n  " + "\n  ".join(bad))
 
 
+def counter_items(exclude_hero=None):
+    """{item id: [(enemy hero id, tip text, video, t)]}: the creators' "how to counter X" tips, by item."""
+    out = {}
+    for hero, tips in load()["tips"].items():
+        if exclude_hero and int(hero) == exclude_hero:
+            continue
+        for tip in tips:
+            for item in tip.get("items") or []:
+                out.setdefault(item, []).append((int(hero), tip.get("text", ""), tip.get("video"), tip.get("t")))
+    return out
+
+
+def print_counter_items(query=None):
+    from common import find_hero, heroes, items
+    exclude = find_hero(query)["id"] if query else None
+    names, its = {h: x["name"] for h, x in heroes().items()}, items()
+    for item, uses in sorted(counter_items(exclude).items(), key=lambda x: -len(x[1])):
+        it = its.get(item, {})
+        print(f"{item}  {it.get('name')} (T{it.get('item_tier')}, {it.get('item_slot_type')}"
+              f"{', active' if it.get('is_active_item') else ''}) against: "
+              + ", ".join(f"{names.get(h, h)} [video:{v}@{t}]" for h, _, v, t in uses))
+
+
 def main():
     a = sys.argv[1:]
     if a[:1] == ["fetch"] and len(a) > 1:
@@ -152,6 +178,8 @@ def main():
         add(vid(a[1]), sys.stdin.read())
     elif a[:1] == ["guide"] and len(a) > 2:
         guide(vid(a[1]), a[2], a[3:])
+    elif a[:1] == ["counter-items"]:
+        print_counter_items(a[1] if len(a) > 1 else None)
     elif a[:1] == ["list"]:
         d = load()
         for v, m in d["videos"].items():
