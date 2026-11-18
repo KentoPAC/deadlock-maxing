@@ -30,9 +30,10 @@ class ChartsTest(unittest.TestCase):
         curve = [None, None] + [0.5 if 12 <= i < 15 else -0.3 for i in range(2, 26)]
         cat = charts.ingame_power(doc, {"ranked": group(curve)}, "en")
         lines = cat["description"].split("\n")
-        self.assertEqual(len([x for x in lines if x[:1].isdigit()]), 9)   # one bar per 5K, 10K to 50K
+        self.assertEqual(len([x for x in lines if x.startswith("■")]), 9)    # one bar per 5K, 10K to 50K
         self.assertTrue(all(ch not in cat["description"] for ch in "█▁░│─"))  # characters the game cannot draw
-        self.assertIn("◆ STRONG", next(x for x in lines if x.startswith("30K")))
+        self.assertIn("◆ SPIKE", next(x for x in lines if "30K" in x))
+        self.assertTrue(all(x.startswith("■") for x in lines if "K (" in x))      # bars first: they line up
         self.assertIn("30K and 37.5K", lines[-1])
 
     def test_numbers_use_the_french_decimal_comma(self):

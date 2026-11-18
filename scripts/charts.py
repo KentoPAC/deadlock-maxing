@@ -152,21 +152,33 @@ def farm(g):
 
 
 INGAME = {
-    "fr": {"title": "Quand il est fort", "head": "Son impact sur les combats selon ses âmes (■ = plus fort), mesuré après la lane :",
-           "strong": "◆ FORT", "window": "Fort entre {a} et {b} âmes (vers {ma} à {mb} min)", "obj": " : force {list}.",
-           "rift": "le Rift de {m}'", "boss": "le Patron de {m}'", "and": " et ",
-           "flat": "Pas de pic net : son impact reste à peu près le même toute la partie."},
-    "en": {"title": "When it is strong", "head": "Its impact on fights by souls (■ = stronger), measured after the lane:",
-           "strong": "◆ STRONG", "window": "Strong between {a} and {b} souls (around minute {ma} to {mb})", "obj": ": force {list}.",
-           "rift": "the {m}' Rift", "boss": "the {m}' Mid-Boss", "and": " and ",
-           "flat": "No clear peak: its impact stays about the same all game."},
+    "fr": {"title": "Power spike", "head": "Impact sur les teamfights selon ses âmes (■ = plus fort), mesuré après la lane :",
+           "spike": "◆ SPIKE", "window": "Power spike entre {a} et {b} âmes (≈{ma}-{mb} min), en {phase}",
+           "obj": " : joue {list}.", "rift": "le Rift de {m}'", "boss": "le Patron de {m}'", "and": " et ",
+           "phase": {"early": "early game", "mid": "mid game", "late": "late game"},
+           "flat": "Pas de vrai power spike : son impact reste à peu près le même toute la partie.",
+           "lane": {"win": "Lane : forte, il gagne souvent sa lane ({kd} kill / 10 min, {souls} âmes pour le duo).",
+                    "win_bit": "Lane : un peu favorable ({kd} kill / 10 min, {souls} âmes pour le duo).",
+                    "lose": "Lane : faible, il perd souvent sa lane ({kd} kill / 10 min, {souls} âmes pour le duo) : joue safe.",
+                    "lose_bit": "Lane : un peu défavorable ({kd} kill / 10 min, {souls} âmes pour le duo) : évite les échanges longs.",
+                    "even": "Lane : neutre, ni forte ni faible ({kd} kill / 10 min, {souls} âmes pour le duo)."}},
+    "en": {"title": "Power spike", "head": "Impact on teamfights by souls (■ = stronger), measured after the lane:",
+           "spike": "◆ SPIKE", "window": "Power spike between {a} and {b} souls (≈{ma}-{mb} min), {phase}",
+           "obj": ": play {list}.", "rift": "the {m}' Rift", "boss": "the {m}' Mid-Boss", "and": " and ",
+           "phase": {"early": "early game", "mid": "mid game", "late": "late game"},
+           "flat": "No real power spike: its impact stays about the same all game.",
+           "lane": {"win": "Lane: strong, it often wins its lane ({kd} kills / 10 min, {souls} souls for the duo).",
+                    "win_bit": "Lane: slightly favourable ({kd} kills / 10 min, {souls} souls for the duo).",
+                    "lose": "Lane: weak, it often loses its lane ({kd} kills / 10 min, {souls} souls for the duo): play safe.",
+                    "lose_bit": "Lane: slightly unfavourable ({kd} kills / 10 min, {souls} souls for the duo): avoid long trades.",
+                    "even": "Lane: neutral, neither strong nor weak ({kd} kills / 10 min, {souls} souls for the duo)."}},
 }
 
 
 def ingame_power(doc, p, lang="fr", group="ranked"):
-    """The power line as in-game text (category description): one line per 5,000 souls with a bar of ■, the only
-    kind of chart the game's font can draw (proportional font, no block characters; verified 2026-11-18).
-    Bars are relative to the hero's own range: the longest line is where it weighs most on fights."""
+    """The lane and the power spike as in-game text (category description). The game's font is proportional and
+    has no block characters (verified 2026-11-18): each line starts with its bar of ■ so the bars line up, then
+    the souls and the minute. Bars are relative to the hero's own range: the longest is where it weighs most."""
     g, T = p.get(group), INGAME[lang]
     if not g:
         return None
@@ -178,16 +190,28 @@ def ingame_power(doc, p, lang="fr", group="ranked"):
             rows.append((nw, sum(vals) / len(vals)))
     if len(rows) < 3:
         return None
+    lines = []
+    ln = g.get("lane")
+    if ln:
+        kd, souls = ln["kd10"], ln["duo_souls"]
+        verdict = ("win" if kd >= 0.3 or souls >= 250 else "lose" if kd <= -0.3 or souls <= -250 else
+                   "win_bit" if kd >= 0.1 or souls >= 100 else "lose_bit" if kd <= -0.1 or souls <= -100 else "even")
+
+        def num_(v, d):
+            txt = f"{abs(v):.{d}f}".replace(".", "," if lang == "fr" else ".")
+            return ("+" if v >= 0 else "−") + txt
+        lines += [T["lane"][verdict].format(kd=num_(ln["kd10"], 1), souls=num_(ln["duo_souls"], 0)), ""]
     lo, hi = min(v for _, v in rows), max(v for _, v in rows)
-    lines = [T["head"]]
+    lines.append(T["head"])
     for nw, v in rows:
         n = 1 + round((v - lo) / (hi - lo) * 9) if hi > lo else 5
         mm = minute_at(nwq, nw)
-        strong = sp.get("from") and sp["from"] <= nw < sp["to"] + 2500
-        when = f" ≈{mm:.0f}'" if mm is not None else ""
-        lines.append(f"{k(nw, lang)}{when} {'■' * n}" + (f" {T['strong']}" if strong else ""))
+        spike = sp.get("from") and sp["from"] <= nw < sp["to"] + 2500
+        when = f" (≈{mm:.0f}')" if mm is not None else ""
+        lines.append(f"{'■' * n}  {k(nw, lang)}{when}" + (f"  {T['spike']}" if spike else ""))
     if sp.get("from") and not sp.get("flat"):
-        txt = T["window"].format(a=k(sp["from"], lang), b=k(sp["to"], lang),
+        phase = T["phase"]["early" if sp["to"] <= 20000 else "late" if sp["from"] >= 30000 else "mid"]
+        txt = T["window"].format(a=k(sp["from"], lang), b=k(sp["to"], lang), phase=phase,
                                  ma=f"{sp.get('min_from') or 0:.0f}", mb=f"{sp.get('min_to') or 0:.0f}")
         objs = [T[key].format(m=mn) for key in ("rift", "boss") for mn in doc["events"].get(key, [])
                 if sp.get("min_from") is not None and sp["min_from"] <= mn <= sp["min_to"]]
