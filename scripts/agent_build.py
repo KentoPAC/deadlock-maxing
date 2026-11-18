@@ -12,6 +12,8 @@ Input (the "agent_build" key of finish.py), texts in the content language, the s
    "tags": ["Weapon", "Spirit", "Crowd Control"],  # up to 3 game tags (TAGS)
    "patch_review": {"<item id>": "why it still belongs after its recent change"},  # items changed after the
                                                  # start of the data window (find.py lists them), required
+   "review": {"<flag>": "why it stays so, or what changed"},  # every flag of review.py (4.8k investment steps,
+                                                 # what good builds agree on, win rate at equal souls), required
    (advice on abilities goes in plan.abilities: the game refuses a build with notes on its ability order)
    "en": {"name": "...", "description": "...", "categories": [{"name": "...", "description": "...", "notes": ["..."]}],
           }}
@@ -30,6 +32,7 @@ from common import STAT_NOTE, fill, heroes, items, make_strings, read_json, writ
 from i18n import CONTENT_LANG, LANGS
 import charts
 import patchnotes
+import review as critic
 
 KEY, SOURCE = "dlmax", "DeadlockMax"
 BUILD_NAME = "DeadlockMaxing"   # the project's name, first in every agent build's title (builds get published)
@@ -87,8 +90,9 @@ def hero_abilities(hero_id):
     return {by_class.get(slots.get(f"signature{n}")) for n in range(1, 5)} - {None}
 
 
-def check(spec, hero_id, since=None):
-    """Every reason the build cannot be published (empty when it is fine)."""
+def check(spec, hero_id, since=None, folder=None):
+    """Every reason the build cannot be published (empty when it is fine). With the search folder, the critical
+    review (review.py) runs too: each of its flags needs an answer in spec["review"]."""
     errors, all_items = [], items()
     comps = lambda i: {c for c in all_items.get(i, {}).get("component_items") or []}
     en = spec.get("en") or {}
@@ -158,6 +162,10 @@ def check(spec, hero_id, since=None):
                 what = " ; ".join(f"{c['date']} {c['text']}" for c in recent[i])
                 errors.append(f"{all_items[i]['name']} changed after the start of the data ({what}): judge it on its "
                               f"current values and say why it stays in \"patch_review\": {{\"{i}\": \"...\"}}, or remove it")
+    if folder:
+        for flag, why in critic.unanswered(spec, critic.flags(folder, spec, hero_id, since)).items():
+            errors.append(f"review {flag}: {why}; fix the build, or say why it stays so in \"review\": "
+                          f"{{\"{flag}\": \"...\"}} (python3 -I review.py <folder> shows the details)")
     texts = [spec.get("name"), spec.get("description"), en.get("name"), en.get("description")]
     texts += [x for c in cats for x in (c.get("name"), c.get("description"))]
     texts += [x for c in cats_en for x in (c.get("name"), c.get("description"))]
@@ -246,7 +254,8 @@ def to_build(spec, hero_id, lang_field=None, positions=None):
     # the footer at the bottom (the mark, the agent's description of how this build was made, then the project)
     lang = "en" if lang_field else "fr"
     intro = power_category(hero_id, lang, positions)
-    intro[-1]["description"] += "\n\n" + HOW_TO_READ[lang]
+    spikes = critic.thresholds_line(spec, hero_id, lang)
+    intro[-1]["description"] += "\n\n" + (spikes + "\n" if spikes else "") + HOW_TO_READ[lang]
     footer = [{"name": MADE[lang], "description": tx("description", None), "mods": []},
               dict(FOOTER[lang], mods=[])]
     return {"hero_id": hero_id, "name": tx("name", None), "description": tx("description", None), "language": 2,
@@ -258,7 +267,7 @@ def publish(folder, spec):
     """Check the build, write it as the "dlmax" candidate (first in the list) with both languages filled."""
     data = read_json(f"{folder}/candidates.json")
     hero_id = data["hero"]["id"]
-    errors = check(spec, hero_id, data.get("since"))
+    errors = check(spec, hero_id, data.get("since"), folder)
     if errors:
         raise SystemExit("DeadlockMax build refused:\n- " + "\n- ".join(errors))
     roles = read_json(f"{folder}/roles.json") if os.path.exists(f"{folder}/roles.json") else {}

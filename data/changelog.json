@@ -261,6 +261,22 @@
     "finish.py"
    ],
    "todo": "Run find.py <hero> <folder> --refresh-otp (OTP builds read the late game from games of 35 min and more and get a \"Fin de partie : 12 emplacements\" category), then write the DeadlockMax build (\"agent_build\", see SKILL.md and agent_build.py): lane items reasoned per opponent, early / mid / late with when and why, the 12 endgame slots, situational categories, ability order; its {resume, points}; tldr.pick = dlmax."
+  },
+  {
+   "version": 17,
+   "date": "2026-11-18",
+   "title": {
+    "fr": "Relecture critique du build DeadlockMax : paliers 4.8k, bons builds, victoires à âmes égales",
+    "en": "Critical review of the DeadlockMax build: 4.8k steps, good builds, win rate at equal souls"
+   },
+   "parts": [
+    "builds"
+   ],
+   "scripts": [
+    "review.py",
+    "agent_build.py"
+   ],
+   "todo": "Run review.py <folder> on the DeadlockMax build (its spec.json), fix or answer every flag in \"review\" (4.8k investment steps, what good builds agree on, win rate at equal souls), have a fresh subagent attack the build, then send the agent_build again through finish.py."
   }
  ]
 }
