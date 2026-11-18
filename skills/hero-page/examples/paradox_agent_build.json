@@ -166,7 +166,7 @@
    {
     "name": "Endgame : selon l'équipe adverse",
     "endgame": true,
-    "description": "Pas d'ordre : choisis selon l'équipe adverse. Après 35 min, revends tes petits objets passifs pour ces T4 (l'achat rapide revend d'abord ceux marqués ↺). Tu n'as 12 emplacements que si ton équipe a détruit les 3 Walkers adverses : avec moins, garde Malédiction de ralentissement, Réverbération mystique et Brûlure spirituelle, puis l'objet qui répond à la plus grosse menace.",
+    "description": "Pas d'ordre : choisis selon l'équipe adverse. Après 35 min, revends tes petits objets passifs pour ces T4 (l'achat rapide revend d'abord les petits objets de lane). Tu n'as 12 emplacements que si ton équipe a détruit les 3 Walkers adverses : avec moins, garde Malédiction de ralentissement, Réverbération mystique et Brûlure spirituelle, puis l'objet qui répond à la plus grosse menace.",
     "mods": [
      {
       "id": 915014646,
@@ -304,7 +304,7 @@
     },
     {
      "name": "Endgame: depending on the enemy team",
-     "description": "No order: pick against the enemy team. After 35 min, sell your small passive items for these tier 4 items (Quickbuy sells the ones marked ↺ first). You only have 12 slots once your team has destroyed the 3 enemy Walkers: with fewer, keep Slowing Hex, Mystic Reverb and Spirit Burn, then the item that answers the biggest threat.",
+     "description": "No order: pick against the enemy team. After 35 min, sell your small passive items for these tier 4 items (Quickbuy sells your small lane items first). You only have 12 slots once your team has destroyed the 3 enemy Walkers: with fewer, keep Slowing Hex, Mystic Reverb and Spirit Burn, then the item that answers the biggest threat.",
      "notes": [
       "In almost every game: it merges Superior Cooldown from the core, so no slot is lost, and cuts the cooldown of your abilities and Slowing Hex by 25%.",
       "Against a carry or a hero whose ultimate decides fights: swap them then curse them, they can no longer shoot or use abilities and items while your team kills them.",
