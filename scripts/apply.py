@@ -35,6 +35,8 @@ LINE_H = 19       # height of a description line
 MOD_W = 82        # width of an item card
 CARD_H = 125      # height of an item card (icon + two-line name)
 MAX_W = 1000      # maximum category width
+ROW_W = 1030      # width of the build area: categories flow left to right and wrap past it (to calibrate)
+GAP = 0           # space the game leaves between two categories of a row (to calibrate)
 BUILTIN_LABELS = {"#Citadel_HeroBuilds_EarlyGame": "Early Game",
                   "#Citadel_HeroBuilds_MidGame": "Mid Game",
                   "#Citadel_HeroBuilds_LateGame": "Late Game"}
@@ -55,27 +57,76 @@ def wrap_lines(text, chars_per_line):
     return lines
 
 
-def layout(cat):
-    """Set the category width/height so its (translated) text is not cut by the game."""
+def _label_w(cat):
     label = BUILTIN_LABELS.get(cat.get("name") or "", cat.get("name") or "")
+    return 30 + len(label) * LABEL_CHAR_W
+
+
+def _desc_lines(cat, width):
     desc = (cat.get("description") or "").strip()
+    return wrap_lines(desc, max(5, int((width - _label_w(cat) - 25) / CHAR_W))) if desc else 0
+
+
+def min_width(cat, max_lines=4):
+    """Narrowest width that shows the title, the items on one line (up to a full row) and the description
+    within max_lines lines."""
     n = len(cat.get("mods") or [])
-    label_w = 30 + len(label) * LABEL_CHAR_W
-    min_w = max(label_w + 20, 20 + n * MOD_W, 100)
+    width = min(ROW_W, max(_label_w(cat) + 20, 20 + n * MOD_W, 100))
+    while width < ROW_W and _desc_lines(cat, width) > max_lines:
+        width += 20
+    return min(width, ROW_W)
 
-    def lines_for(width):
-        return wrap_lines(desc, max(5, int((width - label_w - 25) / CHAR_W))) if desc else 0
 
-    # Narrowest width that keeps the description within 4 lines (MAX_W otherwise).
-    width = min_w
-    if desc:
-        while width < MAX_W and lines_for(width) > 4:
-            width += 20
-        width = min(width, MAX_W)
-    header_h = max(28, lines_for(width) * LINE_H)
-    height = 22 + header_h + (12 + CARD_H if n else 0) + 10
-    cat["width"] = float(width)
-    cat["height"] = float(height)
+def height_at(cat, width):
+    """Height of a category drawn at this width: header (title + wrapped description) + rows of item cards."""
+    n = len(cat.get("mods") or [])
+    per_line = max(1, int((width - 20) / MOD_W))
+    card_rows = -(-n // per_line) if n else 0
+    header_h = max(28, _desc_lines(cat, width) * LINE_H)
+    return 22 + header_h + (12 + card_rows * CARD_H if n else 0) + 10
+
+
+def layout(cat):
+    """Size one category on its own (kept for single-category use)."""
+    w = min_width(cat)
+    cat["width"], cat["height"] = float(w), float(height_at(cat, w))
+
+
+def _row(cats):
+    """Widths and height of a row holding these categories, or None if they cannot share one row.
+    Descriptions first get up to 4 lines, then up to 7 if that is what lets the categories fit."""
+    for max_lines in (4, 7):
+        mins = [min_width(c, max_lines) for c in cats]
+        free = ROW_W - sum(mins) - GAP * (len(cats) - 1)
+        if free >= 0:
+            widths = [int(w + free * w / sum(mins)) for w in mins]
+            widths[-1] += ROW_W - GAP * (len(cats) - 1) - sum(widths)   # the row ends exactly at ROW_W
+            return widths, max(height_at(c, w) for c, w in zip(cats, widths))
+    return None
+
+
+def pack(cats):
+    """Place the categories like the game does (left to right, wrapping past ROW_W), keeping their order.
+    Every way of cutting them into rows is tried; the one that takes the least height on screen wins.
+    Each row is filled to ROW_W and its categories share one height."""
+    n = len(cats)
+    best = [0] + [None] * n          # best[i]: (height, cut) for the first i categories
+    for i in range(1, n + 1):
+        for j in range(i - 1, -1, -1):
+            row = _row(cats[j:i]) if j < i - 1 else _row(cats[j:i]) or ([ROW_W], height_at(cats[j], ROW_W))
+            if row is None:
+                break                    # adding more categories to the left only makes the row wider
+            total = (best[j][0] if j else 0) + row[1]
+            if best[i] is None or total < best[i][0]:
+                best[i] = (total, j, row)
+    rows, i = [], n
+    while i:
+        _, j, (widths, h) = best[i]
+        for cat, w in zip(cats[j:i], widths):
+            cat["width"], cat["height"] = float(w), float(h)
+        rows.insert(0, cats[j:i])
+        i = j
+    return rows
 
 
 def has_cjk(text):
@@ -130,8 +181,7 @@ def main():
         node[s["path"][-1]] = s[lang]
 
     if "--keep-layout" not in sys.argv:
-        for cat in original["details"]["mod_categories"]:
-            layout(cat)
+        pack(original["details"]["mod_categories"])
 
     # Mirror exactly what the in-game "Copy to clipboard" button produces.
     build = {

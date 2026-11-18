@@ -18,6 +18,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import GAME_LANGUAGE, get, heroes, items, parse_otp_note, rank_label, read_json, read_text, write_json, write_text  # noqa: E402
+from apply import GAP, ROW_W  # noqa: E402
 from i18n import CONTENT_LANG, DEFAULT_LANG, LANGS, t, table, use  # noqa: E402
 from status import ANALYSIS_VERSION, CHANGELOG, completeness, load_json, resolve_sources  # noqa: E402
 from textlinks import link_index, short_names, signature_abilities  # noqa: E402
@@ -370,7 +371,12 @@ def load_builds(folder, candidates, summaries, lang):
                        # texts in the author's own language are shown as written (never "corrected")
                        "authorWords": c["source"] != "OTP" and c.get("language") == GAME_LANGUAGE.get(lang),
                        "resume": summary.get("resume", ""), "points": summary.get("points", []),
-                       "cats": cats, "order": order, "video": video_ref(c), "agent": c.get("agent")})
+                       "cats": cats, "order": order, "video": video_ref(c), "agent": c.get("agent"),
+                       # the categories as the game draws them (size in UI pixels), for the in-game preview
+                       "game": [{"name": cat.get("name") or "", "desc": cat.get("description") or "",
+                                 "w": round(cat.get("width") or 0), "h": round(cat.get("height") or 0),
+                                 "opt": bool(cat.get("optional")), "ids": [m["ability_id"] for m in cat.get("mods", [])]}
+                                for cat in build["details"]["mod_categories"]] if c["_translated"] else None})
     return builds
 
 
@@ -527,6 +533,7 @@ def build_page(folder, data, lang):
                "days": data["days"],
                "generated": datetime.datetime.fromtimestamp(data["generated"]).strftime(t("datetime_format")),
                "builds": builds, "items": item_data(all_items, used, keys), "links": links,
+               "gameRow": {"w": ROW_W, "gap": GAP},
                "lang": content_lang, "contentFallback": content_lang != lang, "profile": profile}
     ui = {**table("ui"), "style_tags": table("style_tags")}
     page = fill_template(read_text(TEMPLATE), {
