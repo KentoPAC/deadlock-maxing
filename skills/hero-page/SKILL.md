@@ -139,6 +139,9 @@ is missing.
      core so its components grow into the endgame items, and say it in the note ("it becomes …"). Items that never
      evolve: tier 4 items (final), some tier 2-3 items (kept or sold for a tier 4) and the 4 tier 1 lane items.
      Check paths in items.md (`component_items`) or the page tooltips.
+   - **In-game import** (verified 2026-11-18): paste into a NEW build (Build Browser → Create New Build → paste).
+     The game ignores the build description on paste, so agent_build.py puts it in a first item-less category
+     "À lire"; category descriptions, item notes, tags (`"tags"`: up to 3 game tags) and the ability order import.
    - `abilities`: the point order (the OTPs' most common order unless the kit or a creator says otherwise). No
      notes on the ability order: the game refuses to paste such a build; ability advice goes in `plan.abilities`.
    Never justify an item by its win or pick rate (Farmingbip trap): a statistic is a clue to explain with the kit.
