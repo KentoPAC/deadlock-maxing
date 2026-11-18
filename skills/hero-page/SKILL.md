@@ -150,6 +150,9 @@ is missing.
      evolve: tier 4 items (final), some tier 2-3 items (kept or sold for a tier 4) and the 4 tier 1 lane items.
      Check paths in items.md (`component_items`) or the page tooltips. agent_build.py refuses an item whose
      component is neither in the build nor named in its note (e.g. Compress Cooldown before Superior Cooldown).
+   - **Map timers drive some purchases**: the hard (tier 3) camps spawn at 8:00 (wiki), so Cultist Sacrifice
+     is bought before 8 min to drain one right away; minutes in notes come from the hero's net worth by minute
+     (profiles `nw_by_minute`) against the souls spent in the build order, not from guesses.
    - **Self-contained in-game texts**: anyone reads these builds in game, without our context. Never refer to
      what the reader does not have: our data views or measurements ("les mesures", "le profil"), guides or
      classifications they never saw, tools, players' pseudonyms. Say the fact itself ("ton impact grandit jusqu'en
