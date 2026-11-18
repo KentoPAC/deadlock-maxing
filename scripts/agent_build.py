@@ -40,6 +40,20 @@ TAGS = {"Weapon": 47026193, "Vitality": 4213205702, "Spirit": 36498494, "For New
 # The game ignores the build description when a code is pasted (verified 2026-11-18, even with its own codes):
 # the description goes into a first category without items, whose description is imported.
 READ_FIRST = {"fr": "À lire", "en": "Read first"}
+# Footer: the project's mark, in the only form the game can show (it merges consecutive spaces and its font is
+# proportional, so multi-line ASCII art falls apart; verified 2026-11-18).
+FOOTER = {"fr": {"name": "DeadlockMaxing", "description": "◆ ■ ■  D E A D L O C K M A X I N G  ■ ■ ◆\n"
+                 "▸ des builds expliqués objet par objet, à jour du dernier patch"},
+          "en": {"name": "DeadlockMaxing", "description": "◆ ■ ■  D E A D L O C K M A X I N G  ■ ■ ◆\n"
+                 "▸ builds explained item by item, up to date with the latest patch"}}
+# Characters the game accepts in build texts (verified in game, 2026-11-18). Some other symbols make it refuse
+# to paste the whole build (□, U+3000 and em spaces), and block or box characters are not drawn (█ ░ │ ─).
+SAFE_SYMBOLS = set("■◆▲▼●▸→·≈−–—‘’“”«»…•×")
+
+
+def unsafe_chars(text):
+    """Characters outside plain Latin text and the symbols verified in game."""
+    return sorted({c for c in text or "" if ord(c) > 0x24F and c not in SAFE_SYMBOLS})
 SLOTS = 12
 MIN_NOTE = 25        # characters: a note says when and why, not just "good"
 
@@ -122,6 +136,14 @@ def check(spec, hero_id, since=None):
                 what = " ; ".join(f"{c['date']} {c['text']}" for c in recent[i])
                 errors.append(f"{all_items[i]['name']} changed after the start of the data ({what}): judge it on its "
                               f"current values and say why it stays in \"patch_review\": {{\"{i}\": \"...\"}}, or remove it")
+    texts = [spec.get("name"), spec.get("description"), en.get("name"), en.get("description")]
+    texts += [x for c in cats for x in (c.get("name"), c.get("description"))]
+    texts += [x for c in cats_en for x in (c.get("name"), c.get("description"))]
+    texts += [m.get("note") for c in cats for m in c.get("mods") or []] + [n for c in cats_en for n in c.get("notes") or []]
+    bad = sorted({ch for t in texts for ch in unsafe_chars(t)})
+    if bad:
+        errors.append(f"characters the game may refuse or not draw: {' '.join(bad)} (allowed symbols: "
+                      f"{' '.join(sorted(SAFE_SYMBOLS))})")
     tags = spec.get("tags") or []
     if len(tags) > 3 or any(t not in TAGS for t in tags):
         errors.append(f"tags: up to 3 among {', '.join(TAGS)}")
@@ -189,8 +211,9 @@ def to_build(spec, hero_id, lang_field=None):
     power = power_category(hero_id, "en" if lang_field else "fr")
     if power:
         intro.append(power)
+    footer = [dict(FOOTER["en" if lang_field else "fr"], mods=[])]
     return {"hero_id": hero_id, "name": tx("name", None), "description": tx("description", None), "language": 2,
-            "details": {"mod_categories": intro + cats, "ability_order": {"currency_changes": changes}},
+            "details": {"mod_categories": intro + cats + footer, "ability_order": {"currency_changes": changes}},
             "tags": [TAGS[t] for t in spec.get("tags") or []]}
 
 

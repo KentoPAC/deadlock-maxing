@@ -63,7 +63,7 @@ class AgentBuildTest(unittest.TestCase):
             cats = agent_build.to_build(s, 7)["details"]["mod_categories"]
         finally:
             del ITEMS[12]["imbue"]
-        self.assertEqual([c.get("optional") for c in cats], [None, False, False, True])   # "read first" first
+        self.assertEqual([c.get("optional") for c in cats], [None, False, False, True, None])   # read first, footer
         self.assertEqual(cats[0]["mods"], [])
         mods = {m["ability_id"]: m for c in cats for m in c["mods"]}
         self.assertEqual(mods[12]["imbue_target_ability_id"], 103)
@@ -104,6 +104,13 @@ class AgentBuildTest(unittest.TestCase):
             self.assertEqual(agent_build.check(s, 7, since=1000), [])
         finally:
             agent_build.patchnotes.changes = old
+
+    def test_symbols_the_game_refuses_are_caught(self):
+        s = spec(range(2, 11), (11, 12, 13, 14))
+        s["categories"][0]["description"] = "Lane □ forte"
+        self.assertIn("□", " ".join(agent_build.check(s, 7)))
+        s["categories"][0]["description"] = "Lane ◆ forte · ≈13' → « joue » ■"
+        self.assertEqual(agent_build.check(s, 7), [])
 
     def test_tags_are_game_tag_ids(self):
         s = spec(range(2, 11), (11, 12, 13, 14))
