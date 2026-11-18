@@ -63,8 +63,8 @@ class AgentBuildTest(unittest.TestCase):
             cats = agent_build.to_build(s, 7)["details"]["mod_categories"]
         finally:
             del ITEMS[12]["imbue"]
-        self.assertEqual([c.get("optional") for c in cats], [None, None, False, False, True, None])  # read first,
-        # power spike, the 3 categories, footer
+        self.assertEqual([c.get("optional") for c in cats], [None, False, False, True, None])   # role / power spike
+        # on top, the 3 categories, footer
         self.assertEqual(cats[0]["mods"], [])
         mods = {m["ability_id"]: m for c in cats for m in c["mods"]}
         self.assertEqual(mods[12]["imbue_target_ability_id"], 103)
@@ -118,8 +118,10 @@ class AgentBuildTest(unittest.TestCase):
     def test_every_build_has_the_code_generated_power_spike_and_footer(self):
         for lang in (None, "en"):
             cats = agent_build.to_build(spec(range(2, 11), (11, 12, 13, 14)), 7, lang)["details"]["mod_categories"]
-            self.assertEqual(cats[1]["name"], "Power spike")
+            self.assertEqual(cats[0]["name"], "Power spike")
+            self.assertIn("core", cats[0]["description"])                   # how to read the build, on top
             self.assertIn("D E A D L O C K M A X I N G", cats[-1]["description"])
+            self.assertIn("\nD\n", cats[-1]["description"])                  # the build's description, in the footer
             self.assertEqual(cats[-1]["mods"], [])
 
     def test_the_power_spike_block_has_a_placeholder_without_measured_profile(self):

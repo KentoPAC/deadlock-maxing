@@ -18,6 +18,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import GAME_LANGUAGE, get, heroes, items, parse_otp_note, rank_label, read_json, read_text, write_json, write_text  # noqa: E402
+from agent_build import FOOTER as AGENT_FOOTER  # noqa: E402
 from apply import GAP, ROW_W  # noqa: E402
 from i18n import CONTENT_LANG, DEFAULT_LANG, LANGS, t, table, use  # noqa: E402
 from status import ANALYSIS_VERSION, CHANGELOG, completeness, load_json, resolve_sources  # noqa: E402
@@ -350,7 +351,7 @@ def load_builds(folder, candidates, summaries, lang):
         cats = [{"name": cat.get("name"), "desc": cat.get("description") or "", "optional": bool(cat.get("optional")),
                  "width": round(cat.get("width") or 0), "mods": [mod_data(m) for m in cat.get("mods", [])]}
                 for cat in build["details"]["mod_categories"]
-                if cat.get("mods") or c["source"] != "DeadlockMax"]  # its item-less "read first" category = desc
+                if cat.get("mods") or c["source"] != "DeadlockMax"]  # its item-less blocks (role / power spike, footer) are shown elsewhere
         order = [{"id": x["ability_id"], "unlock": x.get("currency_type") == 2}
                  for x in (build["details"].get("ability_order") or {}).get("currency_changes", [])]
         counters = load_json(f"{build_dir}/counters.json")
@@ -373,8 +374,7 @@ def load_builds(folder, candidates, summaries, lang):
                        "resume": summary.get("resume", ""), "points": summary.get("points", []),
                        "cats": cats, "order": order, "video": video_ref(c), "agent": c.get("agent"),
                        # an agent build ends with an item-less footer category (the project's mark): shown on the page
-                       "footer": next((cat.get("description") for cat in build["details"]["mod_categories"][::-1]
-                                       if not cat.get("mods")), None) if c["source"] == "DeadlockMax" else None,
+                       "footer": AGENT_FOOTER[lang]["description"] if c["source"] == "DeadlockMax" else None,
                        # the categories as the game draws them (size in UI pixels), for the in-game preview
                        "game": [{"name": cat.get("name") or "", "desc": cat.get("description") or "",
                                  "w": round(cat.get("width") or 0), "h": round(cat.get("height") or 0),
