@@ -437,9 +437,14 @@ def enemy_heroes(enemy_ids):
 def localized_summaries(folder, lang):
     """The written analysis in `lang` (summaries.<lang>.json), else the content-language one; and its language."""
     path = f"{folder}/summaries.{lang}.json"
-    if lang != CONTENT_LANG and os.path.exists(path):
-        return read_json(path), lang
     summaries = load_json(f"{folder}/summaries.json", {})
+    if lang != CONTENT_LANG and os.path.exists(path):
+        translated = read_json(path)
+        # choices that are not texts are shared by every language: the advised build is the same everywhere
+        pick = (summaries.get("tldr") or {}).get("pick")
+        if pick:
+            translated.setdefault("tldr", {})["pick"] = pick
+        return translated, lang
     return summaries, summaries.get("lang", CONTENT_LANG)
 
 
