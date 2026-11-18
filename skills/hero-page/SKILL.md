@@ -192,7 +192,10 @@ is missing.
        `imbue:<id>` (another target than theirs).
      - **Win rate at equal souls**: raw item win rates favour expensive items (rich players win more). Each item
        is compared with the hero's purchases made at the same net worth (`weak:<id>`: a core item 3+ points
-       below). Use this one, never the raw rate, when a statistic decides.
+       below). Use this one, never the raw rate, when a statistic decides, and weigh its sample: a figure over a
+       few hundred games never outweighs one over tens of thousands, nor two one-tricks what most of the hero's
+       players and good builds agree on (Pocket, 2026-11-18: Cultist Sacrifice, bought in 88 % of games, was left
+       out for Trophy Collector, 688 games). Going against the meta is an argued option, not the core.
      Then give a **fresh subagent** the report and the build to attack it as a strong player would (what is
      bought too late, what is missing against common threats, a note that is wrong about the kit, an evolution
      or imbue that does not fit): fix what holds, answer the rest in `"review"`.

@@ -53,6 +53,9 @@ class ChartsTest(unittest.TestCase):
         self.assertTrue(charts.role_text(scaling, "fr", []).startswith("Rôle : carry qui scale."))
         steady = dict(scaling, timing=[0.1] * 7, spike={"from": 30000, "to": 40000})
         self.assertIsNone(charts.role_text(steady, "fr", []))
+        # a deficit that shrinks late is no late game when the spike is over by 20K souls (Pocket)
+        pocket = dict(scaling, spike={"from": 5000, "to": 12500})
+        self.assertEqual(charts.measured_style(pocket)[0], "early")
 
     def test_numbers_use_the_french_decimal_comma(self):
         self.assertEqual(charts.k(27500), "27,5K")
