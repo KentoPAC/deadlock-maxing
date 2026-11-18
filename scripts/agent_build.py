@@ -46,14 +46,18 @@ FOOTER = {"fr": {"name": "DeadlockMaxing", "description": "◆ ■ ■  D E A D 
                  "▸ des builds expliqués objet par objet, à jour du dernier patch"},
           "en": {"name": "DeadlockMaxing", "description": "◆ ■ ■  D E A D L O C K M A X I N G  ■ ■ ◆\n"
                  "▸ builds explained item by item, up to date with the latest patch"}}
-# Characters the game accepts in build texts (verified in game, 2026-11-18). Some other symbols make it refuse
-# to paste the whole build (□, U+3000 and em spaces), and block or box characters are not drawn (█ ░ │ ─).
+# Characters the game accepts in build texts (verified in game, 2026-11-18). Some other characters make it refuse
+# to paste the whole build (□, the no-break, ideographic and em spaces), and block or box characters are not
+# drawn (█ ░ │ ─).
 SAFE_SYMBOLS = set("■◆▲▼●▸→·≈−–—‘’“”«»…•×")
 
 
 def unsafe_chars(text):
-    """Characters outside plain Latin text and the symbols verified in game."""
-    return sorted({c for c in text or "" if ord(c) > 0x24F and c not in SAFE_SYMBOLS})
+    """Characters outside plain Latin text and the symbols verified in game. Any space but the plain one (no-break,
+    ideographic, em…) and invisible or control characters are out: the game refused builds containing them."""
+    return sorted({c for c in text or "" if (ord(c) > 0x24F and c not in SAFE_SYMBOLS)
+                   or (c.isspace() and c not in " \n") or (ord(c) < 0x20 and c != "\n") or 0x7F <= ord(c) <= 0xA0
+                   or c == "\u00ad"})
 SLOTS = 12
 MIN_NOTE = 25        # characters: a note says when and why, not just "good"
 
