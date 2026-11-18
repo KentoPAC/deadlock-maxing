@@ -11,7 +11,7 @@ def group(curve):
     return {"fights": curve, "spike": {"from": 30000, "to": 37500, "min_from": 27, "min_to": 34},
             "nw_by_minute": {"5": [0, 3000, 0], "10": [0, 8000, 0], "20": [0, 20000, 0], "30": [0, 32000, 0],
                              "50": [0, 60000, 0]},
-            "lane": {"end_min": 9}, "timing": [0.2, -0.1], "fed": [0.1, None, -0.2], "farm": []}
+            "lane": {"end_min": 9, "kd10": -0.2, "duo_souls": -145}, "timing": [0.2, -0.1], "fed": [0.1, None, -0.2], "farm": []}
 
 
 class ChartsTest(unittest.TestCase):
@@ -35,6 +35,7 @@ class ChartsTest(unittest.TestCase):
         self.assertIn("◆ SPIKE", next(x for x in lines if "30K" in x))
         self.assertTrue(all(x.startswith("■") for x in lines if "K (" in x))      # bars first: they line up
         self.assertIn("30K and 37.5K", lines[-1])
+        self.assertEqual(lines[0], "Lane: slightly unfavourable (−0.2 kills / 10 min, −145 souls for the duo): avoid long trades.")
 
     def test_numbers_use_the_french_decimal_comma(self):
         self.assertEqual(charts.k(27500), "27,5K")
