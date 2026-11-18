@@ -25,7 +25,7 @@ def spec(core_ids, endgame_ids=(11, 12)):
 class AgentBuildTest(unittest.TestCase):
     def setUp(self):
         self._i, self._h = agent_build.items, agent_build.heroes
-        agent_build.items, agent_build.heroes = (lambda: ITEMS), (lambda: HEROES)
+        agent_build.items, agent_build.heroes = (lambda lang=None: ITEMS), (lambda: HEROES)
 
     def tearDown(self):
         agent_build.items, agent_build.heroes = self._i, self._h
@@ -82,6 +82,13 @@ class AgentBuildTest(unittest.TestCase):
             self.assertEqual(mods[21]["sell_priority"], 95)
         finally:
             del ITEMS[20], ITEMS[21], ITEMS[11]["component_items"]
+
+    def test_a_missing_component_is_listed_or_named_in_the_note(self):
+        s = spec(range(2, 11), (11, 12, 13, 14))                    # 13 is built from 1 (the lane item)
+        s["categories"][0]["mods"][0]["id"] = 14
+        self.assertIn("built from I1", " ".join(agent_build.check(s, 7)))
+        s["categories"][2]["mods"][2]["note"] = NOTE + " En passant par I1."
+        self.assertNotIn("built from I1", " ".join(agent_build.check(s, 7)))
 
     def test_tags_are_game_tag_ids(self):
         s = spec(range(2, 11), (11, 12, 13, 14))
