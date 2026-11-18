@@ -152,7 +152,8 @@ def farm(g):
 
 
 INGAME = {
-    "fr": {"title": "Rôle et power spike", "head": "Impact sur les teamfights selon ses âmes (■ = plus fort), mesuré après la lane :",
+    "fr": {"title": "Power spike", "role_title": "Rôle et lane",
+           "head": "Impact sur les teamfights selon ses âmes (■ = plus fort), mesuré après la lane :",
            "spike": "◆ SPIKE", "window": "Power spike entre {a} et {b} âmes (≈{ma}-{mb} min), en {phase}",
            "obj": " : joue {list}.", "rift": "le Rift de {m}'", "boss": "le Patron de {m}'", "and": " et ",
            "phase": {"early": "early game", "mid": "mid game", "late": "late game"},
@@ -162,7 +163,8 @@ INGAME = {
                     "lose": "Lane : faible, souvent perdue ({kd} kill / 10 min, {souls} âmes pour le duo) : joue safe.",
                     "lose_bit": "Lane : un peu défavorable ({kd} kill / 10 min, {souls} âmes pour le duo) : évite les échanges longs.",
                     "even": "Lane : neutre, ni forte ni faible ({kd} kill / 10 min, {souls} âmes pour le duo)."}},
-    "en": {"title": "Role and power spike", "head": "Impact on teamfights by souls (■ = stronger), measured after the lane:",
+    "en": {"title": "Power spike", "role_title": "Role and lane",
+           "head": "Impact on teamfights by souls (■ = stronger), measured after the lane:",
            "spike": "◆ SPIKE", "window": "Power spike between {a} and {b} souls (≈{ma}-{mb} min), {phase}",
            "obj": ": play {list}.", "rift": "the {m}' Rift", "boss": "the {m}' Mid-Boss", "and": " and ",
            "phase": {"early": "early game", "mid": "mid game", "late": "late game"},
@@ -346,7 +348,13 @@ def ingame_power(doc, p, lang="fr", group="ranked", positions=None):
         lines.append(txt + (T["obj"].format(list=T["and"].join(objs)) if objs else "."))
     else:
         lines.append(T["flat"])
-    return {"name": T["title"], "description": "\n".join(lines)}
+    # the game keeps 1,024 bytes of a category description (verified 2026-11-18): role and lane, then the power line
+    text = "\n".join(lines)
+    if "\n\n" + T["head"] in text:
+        role, power = text.split("\n\n" + T["head"], 1)
+        return [{"name": T["role_title"], "description": role.strip()},
+                {"name": T["title"], "description": T["head"] + power}]
+    return [{"name": T["title"], "description": text}]
 
 
 def hero_charts(doc, p, group="ranked"):

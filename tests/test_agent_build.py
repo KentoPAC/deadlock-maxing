@@ -25,7 +25,8 @@ def spec(core_ids, endgame_ids=(11, 12)):
 class AgentBuildTest(unittest.TestCase):
     def setUp(self):
         self._i, self._h, self._p = agent_build.items, agent_build.heroes, agent_build.power_category
-        agent_build.power_category = lambda hero_id, lang, positions=None: {"name": "Power spike", "description": "x", "mods": []}
+        agent_build.power_category = lambda hero_id, lang, positions=None: [{"name": "Power spike", "description": "x",
+                                                                                   "mods": []}]
         agent_build.items, agent_build.heroes = (lambda lang=None: ITEMS), (lambda: HEROES)
 
     def tearDown(self):
@@ -63,8 +64,8 @@ class AgentBuildTest(unittest.TestCase):
             cats = agent_build.to_build(s, 7)["details"]["mod_categories"]
         finally:
             del ITEMS[12]["imbue"]
-        self.assertEqual([c.get("optional") for c in cats], [None, False, False, True, None])   # role / power spike
-        # on top, the 3 categories, footer
+        self.assertEqual([c.get("optional") for c in cats], [None, False, False, True, None, None])  # power spike on
+        # top, the 3 categories, how this build was made, footer
         self.assertEqual(cats[0]["mods"], [])
         mods = {m["ability_id"]: m for c in cats for m in c["mods"]}
         self.assertEqual(mods[12]["imbue_target_ability_id"], 103)
@@ -121,14 +122,19 @@ class AgentBuildTest(unittest.TestCase):
             self.assertEqual(cats[0]["name"], "Power spike")
             self.assertIn("core", cats[0]["description"])                   # how to read the build, on top
             self.assertIn("D E A D L O C K M A X I N G", cats[-1]["description"])
-            self.assertIn("\nD\n", cats[-1]["description"])                  # the build's description, in the footer
+            self.assertEqual(cats[-2]["description"], "D")                    # the build's description, before it
             self.assertEqual(cats[-1]["mods"], [])
 
     def test_the_power_spike_block_has_a_placeholder_without_measured_profile(self):
         agent_build.power_category = self._p
-        cat = agent_build.power_category(999999, "fr")
-        self.assertEqual(cat["name"], "Rôle et power spike")
+        cat = agent_build.power_category(999999, "fr")[0]
+        self.assertEqual(cat["name"], "Power spike")
         self.assertIn("Pas encore assez de parties", cat["description"])
+
+    def test_a_text_over_the_game_limit_is_refused(self):
+        s = spec(range(2, 11), (11, 12, 13, 14))
+        s["categories"][0]["description"] = "é" * 501                     # 1,002 bytes
+        self.assertIn("over 1000 bytes", " ".join(agent_build.check(s, 7)))
 
     def test_tags_are_game_tag_ids(self):
         s = spec(range(2, 11), (11, 12, 13, 14))
