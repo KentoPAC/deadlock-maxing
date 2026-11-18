@@ -90,6 +90,20 @@ class AgentBuildTest(unittest.TestCase):
         s["categories"][2]["mods"][2]["note"] = NOTE + " En passant par I1."
         self.assertNotIn("built from I1", " ".join(agent_build.check(s, 7)))
 
+    def test_an_item_changed_during_the_data_window_needs_a_review(self):
+        changes = {"items": {11: [{"date": "2026-10-30", "ts": 2000, "title": "P", "text": "Heal reduced from 65 to 40"}]},
+                   "heroes": {}}
+        old = agent_build.patchnotes.changes
+        agent_build.patchnotes.changes = lambda days=120: changes
+        try:
+            s = spec(range(2, 11), (11, 12, 13, 14))
+            self.assertIn("Heal reduced from 65 to 40", " ".join(agent_build.check(s, 7, since=1000)))
+            self.assertEqual(agent_build.check(s, 7, since=3000), [])                     # changed before the data
+            s["patch_review"] = {"11": "Still the best answer to burst after the nerf."}
+            self.assertEqual(agent_build.check(s, 7, since=1000), [])
+        finally:
+            agent_build.patchnotes.changes = old
+
     def test_tags_are_game_tag_ids(self):
         s = spec(range(2, 11), (11, 12, 13, 14))
         s["tags"] = ["Weapon", "Crowd Control"]

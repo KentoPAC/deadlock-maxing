@@ -10,6 +10,8 @@ Input (the "agent_build" key of finish.py), texts in the content language, the s
                              "sell": <0-100, default 95 for tier 1 and 85 for tier 2 passives: sold first by Quickbuy>}]}],
    "abilities": [<ability id>, ...],            # point order: the first time an ability appears is its unlock
    "tags": ["Weapon", "Spirit", "Crowd Control"],  # up to 3 game tags (TAGS)
+   "patch_review": {"<item id>": "why it still belongs after its recent change"},  # items changed after the
+                                                 # start of the data window (find.py lists them), required
    (advice on abilities goes in plan.abilities: the game refuses a build with notes on its ability order)
    "en": {"name": "...", "description": "...", "categories": [{"name": "...", "description": "...", "notes": ["..."]}],
           }}
@@ -24,6 +26,7 @@ import time
 
 from common import STAT_NOTE, fill, heroes, items, make_strings, read_json, write_candidate, write_json
 from i18n import CONTENT_LANG, LANGS
+import patchnotes
 
 KEY, SOURCE = "dlmax", "DeadlockMax"
 BUILD_NAME = "DeadlockMaxing"   # the project's name, first in every agent build's title (builds get published)
@@ -46,7 +49,7 @@ def hero_abilities(hero_id):
     return {by_class.get(slots.get(f"signature{n}")) for n in range(1, 5)} - {None}
 
 
-def check(spec, hero_id):
+def check(spec, hero_id, since=None):
     """Every reason the build cannot be published (empty when it is fine)."""
     errors, all_items = [], items()
     comps = lambda i: {c for c in all_items.get(i, {}).get("component_items") or []}
@@ -105,6 +108,18 @@ def check(spec, hero_id):
                 if comp and comp["id"] not in in_build and not any(n and n in (m.get("note") or "").lower() for n in names):
                     errors.append(f"{all_items[m['id']]['name']} is built from {comp['name']}: list {comp['name']} "
                                   f"before it, or name it in the note")
+    # items changed after the start of the data window: the agent says why each one still belongs in the build
+    if since:
+        try:
+            recent = patchnotes.since(patchnotes.changes(120), since)["items"]
+        except Exception:
+            recent = {}
+        review = {str(k): v for k, v in (spec.get("patch_review") or {}).items()}
+        for i in sorted(in_build & set(recent)):
+            if len((review.get(str(i)) or "").strip()) < 20:
+                what = " ; ".join(f"{c['date']} {c['text']}" for c in recent[i])
+                errors.append(f"{all_items[i]['name']} changed after the start of the data ({what}): judge it on its "
+                              f"current values and say why it stays in \"patch_review\": {{\"{i}\": \"...\"}}, or remove it")
     tags = spec.get("tags") or []
     if len(tags) > 3 or any(t not in TAGS for t in tags):
         errors.append(f"tags: up to 3 among {', '.join(TAGS)}")
@@ -166,7 +181,7 @@ def publish(folder, spec):
     """Check the build, write it as the "dlmax" candidate (first in the list) with both languages filled."""
     data = read_json(f"{folder}/candidates.json")
     hero_id = data["hero"]["id"]
-    errors = check(spec, hero_id)
+    errors = check(spec, hero_id, data.get("since"))
     if errors:
         raise SystemExit("DeadlockMax build refused:\n- " + "\n- ".join(errors))
     build = to_build(spec, hero_id)
