@@ -23,6 +23,7 @@ in which situation); the smaller passives are sold one by one to make room (an u
 """
 import json
 import os
+import re
 import time
 
 from common import STAT_NOTE, fill, heroes, items, make_strings, read_json, write_candidate, write_json
@@ -42,6 +43,9 @@ TAGS = {"Weapon": 47026193, "Vitality": 4213205702, "Spirit": 36498494, "For New
 # Top of every build: what you read in ten seconds to understand the hero (role, game plan, lane, power spike) and
 # how to read the build. Bottom: how this build was made (the agent's description) and the project.
 MADE = {"fr": "Comment ce build a été fait", "en": "How this build was made"}
+# Our jargon and buy rates: meaningless to a player reading the build in game, and stat-driven builds are frowned upon
+JARGON = re.compile(r"Oracle ?\+|Phantom ?\+|Fantôme ?\+|\b\d+ ?% (?:de leurs|de ses|des|of their|of his|of her|of)\b"
+                    r"|\bguide des rôles\b|\broles guide\b|\bles mesures\b|\bthe measurements\b|\bz-score\b", re.I)
 MAX_BYTES = 1000      # the game keeps 1,024 bytes of a category description and cuts the rest (verified 2026-11-18)
 HOW_TO_READ = {"fr": "▸ Lire le build : le core se prend à chaque partie, de gauche à droite · les catégories "
                      "optionnelles se piochent selon la partie · l'endgame vise des objets T4 · chaque objet a sa note.",
@@ -158,6 +162,10 @@ def check(spec, hero_id, since=None):
     texts += [x for c in cats for x in (c.get("name"), c.get("description"))]
     texts += [x for c in cats_en for x in (c.get("name"), c.get("description"))]
     texts += [m.get("note") for c in cats for m in c.get("mods") or []] + [n for c in cats_en for n in c.get("notes") or []]
+    jargon = sorted({m.group(0) for t in texts if t for m in JARGON.finditer(t)})
+    if jargon:
+        errors.append(f"in-game texts are read without our context: no buy rates, rank groups or data words "
+                      f"({jargon}); say the reason instead (\"almost all the best players buy it\" at most)")
     long_ = [t[:40] for t in texts if t and len(t.encode()) > MAX_BYTES]
     if long_:
         errors.append(f"texts over {MAX_BYTES} bytes (the game cuts category descriptions at 1,024 bytes; accents "

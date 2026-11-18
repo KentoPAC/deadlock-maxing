@@ -136,6 +136,15 @@ class AgentBuildTest(unittest.TestCase):
         s["categories"][0]["description"] = "é" * 501                     # 1,002 bytes
         self.assertIn("over 1000 bytes", " ".join(agent_build.check(s, 7)))
 
+    def test_buy_rates_and_our_jargon_stay_out_of_in_game_texts(self):
+        s = spec(range(2, 11), (11, 12, 13, 14))
+        s["categories"][0]["mods"][0]["note"] = NOTE + " Les Oracle+ l'achètent dans 89 % de leurs parties."
+        errors = " ".join(agent_build.check(s, 7))
+        self.assertIn("Oracle+", errors)
+        self.assertIn("89 % de leurs", errors)
+        s["categories"][0]["mods"][0]["note"] = NOTE + " 50 % de PV : il soigne."     # a game value, fine
+        self.assertEqual(agent_build.check(s, 7), [])
+
     def test_tags_are_game_tag_ids(self):
         s = spec(range(2, 11), (11, 12, 13, 14))
         s["tags"] = ["Weapon", "Crowd Control"]

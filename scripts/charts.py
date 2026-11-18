@@ -246,15 +246,13 @@ MEASURED_ROLE = {
            "late": "héros de fin de partie. Ton impact grandit avec le temps : garde-toi pour les gros teamfights.",
            "early": "héros de début de partie. Ton impact est maximal tôt : joue agressif et convertis ton avance en "
                     "objectifs avant que la partie s'allonge.",
-           "guide": " (le guide des rôles le classe {pos}, les mesures disent autre chose)",
-           "names": {1: "hard carry", 2: "soft carry"}},
+},
     "en": {"scaling_carry": "scaling carry. You need lots of souls: your impact grows until the end of the game, do "
                             "not waste your farm early.",
            "late": "late game hero. Your impact grows with time: save yourself for the big teamfights.",
            "early": "early game hero. Your impact peaks early: play aggressively and turn your lead into objectives "
                     "before the game drags on.",
-           "guide": " (the roles guide ranks it {pos}, the measurements say otherwise)",
-           "names": {1: "hard carry", 2: "soft carry"}},
+},
 }
 
 
@@ -285,12 +283,8 @@ def role_text(g, lang, positions):
         return R["head"].format(roles=R["or"].join(R[p] for p in kept))
     if scaling == "steady":
         return R["head"].format(roles=R["or"].join(R[p] for p in positions if p in R)) if positions else None
-    key = "scaling_carry" if scaling == "late" and farm >= 1.03 else scaling
-    if not positions:                       # not in the guide: the measured role alone
-        return R["head"].format(roles=M[key])
-    name, rest = M[key].split(". ", 1)
-    guide = M["guide"].format(pos=" / ".join(M["names"].get(p, str(p)) for p in positions))
-    return R["head"].format(roles=f"{name}{guide}. {rest}")
+    # the measured role, stated plainly: in-game readers have no use for where a disagreeing label came from
+    return R["head"].format(roles=M["scaling_carry" if scaling == "late" and farm >= 1.03 else scaling])
 
 
 def role_lines(g, lang, positions):
