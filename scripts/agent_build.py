@@ -9,6 +9,7 @@ Input (the "agent_build" key of finish.py), texts in the content language, the s
                              "imbue": <ability id, required for items that imbue an ability>,
                              "sell": <0-100, default 95 for tier 1 and 85 for tier 2 passives: sold first by Quickbuy>}]}],
    "abilities": [<ability id>, ...],            # point order: the first time an ability appears is its unlock
+   "tags": ["Weapon", "Spirit", "Crowd Control"],  # up to 3 game tags (TAGS)
    (advice on abilities goes in plan.abilities: the game refuses a build with notes on its ability order)
    "en": {"name": "...", "description": "...", "categories": [{"name": "...", "description": "...", "notes": ["..."]}],
           }}
@@ -25,6 +26,14 @@ from common import STAT_NOTE, fill, heroes, items, make_strings, read_json, writ
 from i18n import CONTENT_LANG
 
 KEY, SOURCE = "dlmax", "DeadlockMax"
+# Build tags of the game (ids from the game data, as copied builds carry them): up to 3 per build.
+TAGS = {"Weapon": 47026193, "Vitality": 4213205702, "Spirit": 36498494, "For New Players": 1052421347,
+        "For Intermediate Players": 1150155374, "For Advanced Players": 3797987367, "Damage": 2592289373,
+        "Utility": 953263904, "Healing": 38758251, "Crowd Control": 4216803923, "Mobility": 3238474489,
+        "Melee": 3401565923, "Headshots": 2579669585, "Debuff": 255841590}
+# The game ignores the build description when a code is pasted (verified 2026-11-18, even with its own codes):
+# the description goes into a first category without items, whose description is imported.
+READ_FIRST = {"fr": "À lire", "en": "Read first"}
 SLOTS = 12
 MIN_NOTE = 25        # characters: a note says when and why, not just "good"
 
@@ -81,6 +90,9 @@ def check(spec, hero_id):
             note = STAT_NOTE.sub("", m.get("note") or "").strip()
             if len(note) < MIN_NOTE:
                 errors.append(f"{where}: {item['name']}: the note must say when and why ({MIN_NOTE}+ characters, no pick or win rates)")
+    tags = spec.get("tags") or []
+    if len(tags) > 3 or any(t not in TAGS for t in tags):
+        errors.append(f"tags: up to 3 among {', '.join(TAGS)}")
     order = spec.get("abilities") or []
     own = hero_abilities(hero_id)
     if own and set(order) != own:
@@ -129,8 +141,10 @@ def to_build(spec, hero_id, lang_field=None):
         change = ({"ability_id": a, "currency_type": 2, "delta": -1} if k == 1 else
                   {"ability_id": a, "currency_type": 1, "delta": -[1, 2, 5][min(k - 2, 2)]})
         changes.append(change)
+    intro = {"name": READ_FIRST["en" if lang_field else "fr"], "description": tx("description", None), "mods": []}
     return {"hero_id": hero_id, "name": tx("name", None), "description": tx("description", None), "language": 2,
-            "details": {"mod_categories": cats, "ability_order": {"currency_changes": changes}}, "tags": []}
+            "details": {"mod_categories": [intro] + cats, "ability_order": {"currency_changes": changes}},
+            "tags": [TAGS[t] for t in spec.get("tags") or []]}
 
 
 def publish(folder, spec):

@@ -348,7 +348,8 @@ def load_builds(folder, candidates, summaries, lang):
         summary = summaries.get(c["key"], {})
         cats = [{"name": cat.get("name"), "desc": cat.get("description") or "", "optional": bool(cat.get("optional")),
                  "width": round(cat.get("width") or 0), "mods": [mod_data(m) for m in cat.get("mods", [])]}
-                for cat in build["details"]["mod_categories"]]
+                for cat in build["details"]["mod_categories"]
+                if cat.get("mods") or c["source"] != "DeadlockMax"]  # its item-less "read first" category = desc
         order = [{"id": x["ability_id"], "unlock": x.get("currency_type") == 2}
                  for x in (build["details"].get("ability_order") or {}).get("currency_changes", [])]
         counters = load_json(f"{build_dir}/counters.json")

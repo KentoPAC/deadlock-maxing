@@ -185,7 +185,7 @@
   "kbd.key": "Key {n}",
   "kbd.ult": " (ultimate)",
   "doc.title": "{hero} builds",
-  "foot": "In game: hero builds → “Paste build”. Data from deadlock-api.com.",
+  "foot": "In game: hero builds → “Create New Build” → “Paste build” (the game does not import the build description). Data from deadlock-api.com.",
   "pct": "{n}%",
   "ago.today": "today",
   "ago.yesterday": "yesterday",

@@ -185,7 +185,7 @@
   "kbd.key": "Touche {n}",
   "kbd.ult": " (ultime)",
   "doc.title": "Builds {hero}",
-  "foot": "En jeu : builds du héros → « Coller le build ». Données deadlock-api.com.",
+  "foot": "En jeu : builds du héros → « Créer un nouveau build » → « Coller le build » (la description du build n'est pas importée par le jeu). Données deadlock-api.com.",
   "pct": "{n} %",
   "ago.today": "aujourd’hui",
   "ago.yesterday": "hier",

@@ -62,7 +62,8 @@ class AgentBuildTest(unittest.TestCase):
             cats = agent_build.to_build(s, 7)["details"]["mod_categories"]
         finally:
             del ITEMS[12]["imbue"]
-        self.assertEqual([c["optional"] for c in cats], [False, False, True])
+        self.assertEqual([c.get("optional") for c in cats], [None, False, False, True])   # "read first" first
+        self.assertEqual(cats[0]["mods"], [])
         mods = {m["ability_id"]: m for c in cats for m in c["mods"]}
         self.assertEqual(mods[12]["imbue_target_ability_id"], 103)
         self.assertNotIn("sell_priority", mods[1])                       # tier 3: no default
@@ -81,6 +82,14 @@ class AgentBuildTest(unittest.TestCase):
             self.assertEqual(mods[21]["sell_priority"], 95)
         finally:
             del ITEMS[20], ITEMS[21], ITEMS[11]["component_items"]
+
+    def test_tags_are_game_tag_ids(self):
+        s = spec(range(2, 11), (11, 12, 13, 14))
+        s["tags"] = ["Weapon", "Crowd Control"]
+        self.assertEqual(agent_build.check(s, 7), [])
+        self.assertEqual(agent_build.to_build(s, 7)["tags"], [47026193, 4216803923])
+        s["tags"] = ["Fun"]
+        self.assertIn("tags: up to 3", " ".join(agent_build.check(s, 7)))
 
     def test_ability_order_becomes_unlocks_then_upgrades(self):
         order = agent_build.to_build(spec(range(1, 11)), 7)["details"]["ability_order"]["currency_changes"]
