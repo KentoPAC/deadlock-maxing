@@ -5,7 +5,7 @@ description: Analyse Deadlock matches with DeadlockMax - one match from its id o
 
 # DeadlockMax: match analysis
 
-The user's account: see the project memory (deadlock-match-analysis). Answer in the user's language, with full
+The player's account id comes from the request (ask for it when it is missing). Answer in the user's language, with full
 official item and ability names (**deadlockmax:knowledge**).
 
 ## One match

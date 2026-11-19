@@ -16,7 +16,6 @@ Three checks, each raising flags the agent answers in the spec ("review": {"<fla
 
 Usage: python3 -I review.py <builds/search-hero folder> [spec.json]   (default: the folder's dlmax/spec.json)
 """
-import json
 import os
 import sys
 import time
