@@ -384,19 +384,6 @@ kbd{display:inline-block;min-width:15px;padding:0 3px;border-radius:3px;backgrou
 .copy:hover{background:var(--color-accent-hi);transform:rotate(-2deg) translate(-1px,-1px);box-shadow:7px 7px 0 var(--color-shade)}
 .copy:active{transform:rotate(-2deg) translate(3px,3px);box-shadow:2px 2px 0 var(--color-shade)}
 .copy:disabled{cursor:not-allowed;background:var(--color-paper-3);color:var(--color-neutral);box-shadow:3px 3px 0 var(--color-shade);transform:rotate(-2deg)}
-.igp{margin-top:var(--space-md)}
-.igp summary{cursor:pointer;font:700 var(--text-sm)/1 var(--font-display);letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-hi);padding:6px 0}
-.igp__area{container-type:inline-size;display:flex;flex-wrap:wrap;align-items:flex-start;gap:calc(var(--gap) / var(--rw) * 100cqw);max-width:1030px;background:oklch(45% 0.12 255);padding:6px;border-radius:4px}
-.igp__cat{--u:calc(100cqw / var(--rw));width:calc(var(--w) * var(--u));height:calc(var(--h) * var(--u));background:oklch(38% 0.09 255);border:1px solid oklch(30% 0.08 255);overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box}
-.igp__head{display:flex;gap:calc(8 * var(--u));align-items:flex-start;padding:calc(6 * var(--u)) calc(8 * var(--u));background:oklch(32% 0.07 255);font-size:calc(13 * var(--u));line-height:1.35;color:#eee;min-height:calc(28 * var(--u))}
-.igp__head b{white-space:nowrap;font-weight:700}
-.igp__opt{font-size:calc(9 * var(--u));padding:1px 4px;background:oklch(30% 0.06 255);color:#9bf;white-space:nowrap}
-.igp__desc{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
-.igp__mods{display:flex;flex-wrap:wrap;gap:calc(4 * var(--u));padding:calc(6 * var(--u)) calc(8 * var(--u))}
-.igp__mod{width:calc(76 * var(--u));height:calc(118 * var(--u));display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:calc(4 * var(--u));background:oklch(75% 0.05 120);box-sizing:border-box}
-.igp__mod.weapon{background:oklch(72% 0.09 60)}.igp__mod.vitality{background:oklch(72% 0.09 135)}.igp__mod.spirit{background:oklch(65% 0.09 305)}
-.igp__mod img{width:80%;aspect-ratio:1;object-fit:contain}
-.igp__mod i{font-style:normal;font-weight:700;font-size:calc(10 * var(--u));line-height:1.1;color:#111;text-align:center}
 .bfoot{margin-top:var(--space-lg);padding:var(--space-md);border:1px solid var(--color-rule);border-radius:var(--radius-sm);background:var(--color-paper-2);text-align:center}
 .bfoot p{margin:0 auto;max-width:70ch;color:var(--color-muted);font-size:var(--text-sm)}
 .bfoot .bfoot__mark{font:800 var(--text-lg)/1.2 var(--font-display);letter-spacing:.12em;color:var(--color-accent-hi);margin-bottom:var(--space-xs)}
@@ -434,7 +421,20 @@ kbd{display:inline-block;min-width:15px;padding:0 3px;border-radius:3px;backgrou
   transition:background-color var(--dur-micro) var(--ease-out)}
 .notes-btn:hover{background:var(--color-paper-3)}
 .notes-btn[aria-pressed=true]{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-accent-ink)}
-.cats{display:flex;flex-wrap:wrap;gap:var(--space-sm);margin-top:var(--space-sm);align-items:flex-start}
+.cats{container:cats/inline-size;margin-top:var(--space-sm);background:oklch(24% 0.05 255);padding:6px;border-radius:4px}
+.cats__in{--u:calc(100cqw / var(--rw));display:flex;flex-wrap:wrap;align-items:stretch;gap:calc(var(--gap) * var(--u))}
+.cats .catp{flex:0 0 auto;width:calc(var(--w) * var(--u));background:oklch(31% 0.05 255);border:1px solid oklch(40% 0.06 255);box-shadow:none}
+.cats .catp--opt{background:oklch(30% 0.06 258);border-color:oklch(44% 0.08 258)}
+.cats .catp__h{padding:calc(6 * var(--u)) calc(9 * var(--u));background:oklch(25% 0.045 255);border-bottom:none;font-size:max(11px,calc(13 * var(--u)))}
+.cats .catp__d{padding:calc(5 * var(--u)) calc(9 * var(--u)) 0;max-width:none;font-size:max(11px,calc(13 * var(--u)));line-height:1.35;color:oklch(86% 0.02 255)}
+.cats .mods{gap:calc(6 * var(--u));padding:calc(7 * var(--u)) calc(9 * var(--u)) calc(9 * var(--u))}
+.cats .mod{width:calc(76 * var(--u))}
+.cats .gcard{width:100%}
+.cats .gcard__art{width:100%;height:calc(67 * var(--u))}
+.cats .gcard__name{min-height:calc(30 * var(--u));font-size:max(9px,calc(11 * var(--u)))}
+.cats .mod__evo{max-width:calc(76 * var(--u))}
+.cats .mod__evo:not(.mod__imb),.cats .mod__sell{display:none}
+@container cats (max-width:699px){.cats__in{--u:1px}.cats .catp{width:100%}}
 .catp{flex:0 1 auto;max-width:100%;min-width:0;background:color-mix(in oklch,var(--color-paper-2) 92%,var(--color-hero));
   border:1px solid var(--color-rule);box-shadow:0 3px 0 var(--color-shade)}
 .catp--opt{background:color-mix(in oklch,var(--color-paper-2) 78%,oklch(55% 0.08 255));border-color:color-mix(in oklch,var(--color-rule) 60%,oklch(55% 0.08 255))}
@@ -1098,25 +1098,20 @@ function buildPanel(b){
     +(b.code&&b.desc?`<button class="copy copy--sub cham" data-code="${esc(b.desc)}" data-label="${esc(L('copy.desc'))}" data-ok="${esc(L('copy.desc_ok'))}" title="${esc(L('copy.desc_title'))}">${L('copy.desc')}</button>`:'')+'</span>';
   let nn=0;const nTotal=b.cats.reduce((a,c)=>a+c.mods.filter(m=>m.note).length,0);
   const cats=`<div class="cats-bar"><h3>${L('bp.items')}</h3>${nTotal?`<button type="button" class="notes-btn" aria-pressed="${NOTES}">${L('bp.notes',{n:nTotal})}</button>`:''}</div>
-  <div class="cats">`+(CUR_IDS=new Set(b.cats.flatMap(c=>c.mods.map(m=>+m.id))),'')+b.cats.map(c=>{const nums=c.mods.map(m=>m.note?++nn:0);
+  <div class="cats"><div class="cats__in" style="--rw:${(D.gameRow||{}).w||1060};--gap:${(D.gameRow||{}).gap||10}">`+(CUR_IDS=new Set(b.cats.flatMap(c=>c.mods.map(m=>+m.id))),'')+b.cats.map(c=>{const nums=c.mods.map(m=>m.note?++nn:0);
     const notes=c.mods.map((m,k)=>m.note?`<li><span>${nums[k]}</span><span><b>${esc(T(m.id).n||'')}</b> — ${lk(m.note)}</span></li>`:'').join('');
-    const fit=Math.min(c.mods.length,11)*92+18,w=`flex-basis:${Math.max(Math.min(Math.round((c.width||0)*.98),1100),fit>1100?0:fit,200)}px`;
+    // the game's layout: rows of --rw units, each category at the width the game gives it (apply.py pack)
+    const w=c.width?`--w:${c.width}`:'--w:var(--rw)';
     return `<section class="catp${c.optional?' catp--opt':''}" style="${w}"><div class="catp__h">${esc(catName(c.name))}${c.optional?`<span class="opt">${L('cat.optional')}</span>`:''}</div>`
     +(c.desc?`<p class="catp__d">${lk(c.desc)}</p>`:'')
     +(c.mods.length?`<div class="mods">${c.mods.map((m,k)=>modCard(m,nums[k])).join('')}</div>`:'')
-    +(notes?`<ol class="catp__notes">${notes}</ol>`:'')+'</section>'}).join('')+'</div>';
+    +(notes?`<ol class="catp__notes">${notes}</ol>`:'')+'</section>'}).join('')+'</div></div>';
   return `<article class="panel"><div class="panel__top"><div>
     <p class="panel__src">${esc(srcName(b.source))} <span>· ${esc(b.sourceInfo)}</span></p><h2>${esc(b.name)}</h2>
     <p class="facts">${L('bp.by')} <b>${esc(b.author)}</b>${b.buildId?` · build <span class="num">${b.buildId}</span>`:''}${b.translated?'':L('bp.untranslated')}</p>
     ${b.video?`<p class="facts">${L('build.video')} ${vlink(b.video.id,b.video.t,`${esc(b.video.author)}, « ${esc(b.video.title)} » (${ts(b.video.t)})`)}</p>`:''}</div>${btn}</div>
-    ${statStrip(b)}${takeBlock(b)}${playSection(b)}${counterSection(b)}${b.desc?`<p class="authordesc">${lk(b.desc)}</p>`:''}${cats}${gamePreview(b)}${abilityGrid(b.order)}${b.footer?`<footer class="bfoot">${b.footer.split('\n').map((l,i)=>i?`<p>${esc(l)}</p>`:`<p class="bfoot__mark">${esc(l)}</p>`).join('')}</footer>`:''}</article>`}
+    ${statStrip(b)}${takeBlock(b)}${playSection(b)}${counterSection(b)}${b.desc?`<p class="authordesc">${lk(b.desc)}</p>`:''}${cats}${abilityGrid(b.order)}${b.footer?`<footer class="bfoot">${b.footer.split('\n').map((l,i)=>i?`<p>${esc(l)}</p>`:`<p class="bfoot__mark">${esc(l)}</p>`).join('')}</footer>`:''}</article>`}
 // In-game preview: categories drawn at the size stored in the code, scaled to the game's build area
-function gamePreview(b){const g=b.game,R=D.gameRow;if(!g||!g.length||!R)return'';
-  return `<details class="igp"><summary>${L('igp.title')}</summary><p class="phase__desc">${L('igp.desc',{w:R.w})}</p>
-   <div class="igp__area" style="--rw:${R.w};--gap:${R.gap}">${g.map(c=>`<div class="igp__cat" style="--w:${c.w};--h:${c.h}">
-     <div class="igp__head"><b>${esc(catName(c.name))}</b>${c.opt?'<span class="igp__opt">OPTIONAL</span>':''}${c.desc?`<span class="igp__desc">${esc(c.desc)}</span>`:''}</div>
-     <div class="igp__mods">${c.ids.map(id=>`<span class="igp__mod ${esc(T(id).slot||'')}" data-id="${id}" tabindex="0">${T(id).icon?`<img src="${esc(T(id).icon)}" alt="">`:''}<i>${esc(T(id).n||'')}</i></span>`).join('')}</div></div>`).join('')}</div></details>`}
-
 /* ---- comparison ---- */
 const KW=[[/situ|option|util|selon|counter|contre|si /i,'Situ.',8],[/late|fin de partie|tardi|endgame/i,'Late',2],
   [/mid|milieu/i,'Mid',1],[/early|lane|début|premier|core|base|start/i,'Early',0]];

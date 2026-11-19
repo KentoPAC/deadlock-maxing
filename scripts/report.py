@@ -374,12 +374,7 @@ def load_builds(folder, candidates, summaries, lang):
                        "resume": summary.get("resume", ""), "points": summary.get("points", []),
                        "cats": cats, "order": order, "video": video_ref(c), "agent": c.get("agent"),
                        # an agent build ends with an item-less footer category (the project's mark): shown on the page
-                       "footer": AGENT_FOOTER[lang]["description"] if c["source"] == "DeadlockMax" else None,
-                       # the categories as the game draws them (size in UI pixels), for the in-game preview
-                       "game": [{"name": cat.get("name") or "", "desc": cat.get("description") or "",
-                                 "w": round(cat.get("width") or 0), "h": round(cat.get("height") or 0),
-                                 "opt": bool(cat.get("optional")), "ids": [m["ability_id"] for m in cat.get("mods", [])]}
-                                for cat in build["details"]["mod_categories"]] if c["_translated"] else None})
+                       "footer": AGENT_FOOTER[lang]["description"] if c["source"] == "DeadlockMax" else None})
     return builds
 
 
